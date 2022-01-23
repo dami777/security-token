@@ -9,7 +9,7 @@ contract ERC1400 {
     string internal symbol; // token symbol
     uint256 internal decimal;   // token decimal
     address private owner;  // set the address of the owner to be private
-    bool private lockUpTokens;
+    bool private lockUpTokens = false;
 
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
 
