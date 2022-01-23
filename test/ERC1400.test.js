@@ -46,6 +46,14 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         })
     })
 
+
+    // test how to return reasons for failure
+    describe("test failure reasons", ()=>{
+        it("failed", async()=>{
+            await erc1400.add(2)
+        })
+    })
+
   
 
     

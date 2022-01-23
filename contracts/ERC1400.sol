@@ -30,6 +30,12 @@ contract ERC1400 {
 
     }
 
+    function add(uint256 _value) public returns (bool success) {
+        require(_value > 10, "value is less than 10");
+        return true;
+        
+    }
+
 
 
     
