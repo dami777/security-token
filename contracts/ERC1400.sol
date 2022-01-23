@@ -9,6 +9,7 @@ contract ERC1400 {
     string internal symbol; // token symbol
     uint256 internal decimal;   // token decimal
     address private owner;  // set the address of the owner to be private
+    bool private lockUpTokens;
 
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
 
@@ -21,7 +22,13 @@ contract ERC1400 {
 
     }
 
+    modifier restricted {
+        require(msg.sender == owner, "0x56");
+        _;
+    }
 
+
+    // approve tokens to external operators
     function approve(address _externalAddress, uint256 _value) public returns (bool success) {
 
         // use safemath function here to avoid under and overflow
@@ -30,10 +37,11 @@ contract ERC1400 {
 
     }
 
-    function add(uint256 _value) public returns (bool success) {
-        require(_value > 10, "value is less than 10");
-        return true;
-        
+    
+    function canTransfer(address _to, uint256 _value) {
+
+
+
     }
 
 
