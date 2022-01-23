@@ -5,16 +5,34 @@ pragma solidity 0.8.10;
 
 contract ERC1400 {
 
-    string public name;
-    string public symbol;
-    uint256 public decimal;
+    string internal name;   // token name
+    string internal symbol; // token symbol
+    uint256 internal decimal;   // token decimal
+    address private owner;  // set the address of the owner to be private
+
+    mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
 
     constructor (string memory _name, string memory _symbol, uint256 _decimal) {
 
         name = _name;
         symbol = _symbol;
         decimal = _decimal;
+        owner = msg.sender;
 
     }
+
+
+    function approve(address _externalAddress, uint256 _value) public returns (bool success) {
+
+        // use safemath function here to avoid under and overflow
+        allowance[msg.sender][_externalAddress] += _value;
+        return true;
+
+    }
+
+
+
+    
+
 
 }

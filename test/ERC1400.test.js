@@ -5,7 +5,7 @@ require("chai")
     .should()
 
 
-contract('ERC1400', ()=>{
+contract('ERC1400', ([address1, address2, exchange])=>{
 
     let erc1400
     let name = "Tangl"
@@ -30,33 +30,23 @@ contract('ERC1400', ()=>{
 
     })
 
-    // variable initialization when contract loads
+    // test the allowance
+    describe("approval of external address", ()=>{
 
-    describe("test variable initialization in constructor", ()=>{
-
-        it("has a name", async()=>{
-
-            const tokenName = await erc1400.name()
-            tokenName.should.be.equal(name, "the name was initialized at the constructor")
-
+        it("has an initial value of external address is zero before approval", async()=>{
+            const initalValue = await erc1400.allowance(address1, exchange);
+            initalValue.toString().should.be.equal("0", " it has an inital value of zero")
         })
 
-        it("has a symbol", async()=>{
+        it("value is now greater than zero after approval", async()=>{
+            await erc1400.approve(exchange, 10, {from: address1});
 
-            const tokenSymbol = await erc1400.symbol()
-            tokenSymbol.should.be.equal(symbol, "the symbol was initialized at the constructor")
-
+            const newValue = await erc1400.allowance(address1, exchange)
+            newValue.toString().should.be.equal("10", "the value of the approved exchange was updated after approval")
         })
-
-
-        it("has decimals", async()=>{
-
-            const tokenDecimal = await erc1400.decimal()
-            tokenDecimal.toString().should.be.equal(decimal.toString(), "the decimal was initialized at the constructor")
-
-        })
-
     })
+
+  
 
     
 
