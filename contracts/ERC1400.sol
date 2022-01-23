@@ -37,10 +37,14 @@ contract ERC1400 {
 
     }
 
-    
-    function canTransfer(address _to, uint256 _value) {
 
 
+    // used bytes1 instead of byte as bytes1 is now an alias for byte    
+    function canTransfer(address _to, uint256 _value) public view returns (bytes1 status, bytes32 statusDescription){
+
+        if( _value < 10) {
+            return(hex"50", "Transfer failed");
+        }
 
     }
 
