@@ -24,8 +24,8 @@ contract ERC1400 {
     address private owner;  // set the address of the owner to be private
 
     // boolean
-    bool private lockUpTokens = false; // token lockup indicator
-    bool private whitelisted;
+    bool private lockUpTokens = true; // token lockup indicator
+    mapping(address => bool) private whitelist; //  whitelist map
 
 
     // structs
@@ -81,15 +81,25 @@ contract ERC1400 {
 
         if( lockUpTokens == true) {
 
-            return(hex"55", "funds locked (lockup period)");
+            return (hex"55", "funds locked (lockup period)");
         } 
-
 
     }
 
 
+    // function to add an address to whitelist
+    function addToWhiteList(address _investor) public returns (bytes1 status, bytes32 statusDescription) {
+        
+        if (whitelist[_investor]) {
+
+            return (hex"59", "investor already whitelisted");
+            
+        }
+
+        return (hex"5a", "whitelisted successfully");
+
+    }
 
     
-
 
 }

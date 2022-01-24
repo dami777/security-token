@@ -51,7 +51,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     describe("test failure reasons", ()=>{
         it("failed", async()=>{
             const handledFailedCase = await erc1400.canTransfer(address2, 2)
-            console.log(handledFailedCase)
+            
         })
     })
 
