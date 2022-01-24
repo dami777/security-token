@@ -25,7 +25,8 @@ contract ERC1400 {
 
     // boolean
     bool private lockUpTokens = true; // token lockup indicator
-    mapping(address => bool) private whitelist; //  whitelist map
+    bool private isIssuable;    //  manage when a token can be issued
+    
 
 
     // structs
@@ -47,11 +48,9 @@ contract ERC1400 {
 
 
     //  mappings
-
-
-    
-
+    mapping(address => bool) private whitelist; //  whitelist map
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
+
 
     constructor (string memory _name, string memory _symbol, uint256 _decimal) {
 
