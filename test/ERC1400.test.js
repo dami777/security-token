@@ -69,6 +69,10 @@ contract('ERC1400', ([address1, address2, exchange])=>{
              onboardResponse.logs[0].args._timeAdded.toString().should.not.be.equal("", "time is not null")
         })
 
+        it("fails to whitelist", async()=>{
+            await erc1400.addToWhiteList(address2).should.be.rejected
+        })
+
 
         
 
