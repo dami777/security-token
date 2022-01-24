@@ -29,6 +29,17 @@ contract ERC1400 {
 
     // structs
 
+    struct KYC {
+
+        string _firstname;
+        string _lastname;
+        string _othername;
+        string _location;
+        address _walletAddress;
+
+        
+    }
+
 
 
     //  mappings
