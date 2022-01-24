@@ -25,6 +25,7 @@ contract ERC1400 {
 
     // boolean
     bool private lockUpTokens = false; // token lockup indicator
+    bool private whitelisted;
 
 
     // structs
