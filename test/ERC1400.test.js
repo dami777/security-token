@@ -57,22 +57,20 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     //  test onboarding of investors account
     describe("test onboarding of investors", ()=>{
 
-        it("onboarded an investor successfully", async()=>{
-            const onboardResponse = await erc1400.addToWhiteList(address2)
+        let onboardResponse
 
-            console.log(onboardResponse)
-            const responseCode = onboardResponse.status
-            responseCode.should.be.equal("0x5a", "whitelisted an investor successfully")
+        beforeEach(async()=>{
+            onboardResponse = await erc1400.addToWhiteList(address2)
+        })
+
+        it("onboarded an investor successfully with an event", async()=>{
+             onboardResponse.logs[0].event.should.be.equal("WhiteList", "emitted the whitelist event")
+             onboardResponse.logs[0].args._investor.should.be.equal(address2, "emitted the onboared address")
+             onboardResponse.logs[0].args._timeAdded.toString().should.not.be.equal("", "time is not null")
         })
 
 
-        /*it("onboard investor failed", async()=>{
-            
-            const onboardResponse = await erc1400.addToWhiteList(address2)
-            const responseCode = onboardResponse.status
-            responseCode.should.be.equal("0x59", "investor whitelist failed")
-
-        })*/
+        
 
     })
 

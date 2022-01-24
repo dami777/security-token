@@ -94,12 +94,11 @@ contract ERC1400 {
     // function to add an address to whitelist
     function addToWhiteList(address _investor) public {
         
-        require(!whitelist[_investor]);
+        require(!whitelist[_investor], "this investor has been onboared before");
         whitelist[_investor] = true;
         emit WhiteList(_investor, block.timestamp);
 
     
-
     }
 
 }
