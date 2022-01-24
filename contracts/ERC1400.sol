@@ -41,12 +41,15 @@ contract ERC1400 {
         
     }
 
+    //  events
+    event WhiteList(address _investor, uint256 _timeAdded);
+
 
 
     //  mappings
 
 
-    //  events
+    
 
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
 
@@ -87,19 +90,16 @@ contract ERC1400 {
     }
 
 
+
     // function to add an address to whitelist
-    function addToWhiteList(address _investor) public returns (bytes1 status, bytes32 statusDescription) {
+    function addToWhiteList(address _investor) public {
         
-        if (whitelist[_investor]) {
-
-            return (hex"59", "investor already whitelisted");
-            
-        }
-
-        return (hex"5a", "whitelisted successfully");
-
-    }
+        require(!whitelist[_investor]);
+        whitelist[_investor] = true;
+        emit WhiteList(_investor, block.timestamp);
 
     
+
+    }
 
 }
