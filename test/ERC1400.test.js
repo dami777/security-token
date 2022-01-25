@@ -81,9 +81,10 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     describe("new tokens", ()=>{
 
         let mint
+        let amountToIssue = 10
 
         beforeEach(async()=>{
-            mint = await erc1400.issueTokens(address1, 10)
+            mint = await erc1400.issueTokens(address1, amountToIssue)
         })
 
         it("emitted an event", async()=>{
@@ -93,9 +94,15 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         })
 
-        it("updates the balance of the new token receiver", ()=>{
+        it("emits the right data in the event", async()=>{
+            mint.logs[0].args._to.should.be.equal(address1, "it emitted the address passed to the event")
+            mint.logs[0].args._amountIssued.toString().should.be.equal(amountToIssue.toString(), "it emitted the issued amount passed to the event")
+            mint.logs[0].args._timeIssued.toString().should.not.be.equal("", "time issued is not empty")
+        })
+
+        it("updates the balance of the new token receiver", async()=>{
             const balance = await erc1400.balanceOf(address1)
-            balance.toString().should.be.equal("10", "the balance of the new tokens issued was incremented")
+            balance.toString().should.be.equal(amountToIssue, "the balance of the new tokens issued was incremented")
         })
 
     })

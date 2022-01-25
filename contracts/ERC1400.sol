@@ -32,16 +32,6 @@ contract ERC1400 {
 
     // structs
 
-    struct KYC {
-
-        string _firstname;
-        string _lastname;
-        string _othername;
-        string _location;
-        address _walletAddress;
-
-        
-    }
 
     //  events
     event WhiteList (address _investor, uint256 _timeAdded); // event to be emitted whenever an address is whitelisted
@@ -51,7 +41,7 @@ contract ERC1400 {
 
     //  mappings
     mapping(address => bool) private whitelist; //  whitelist map
-    mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
+    mapping(address => mapping(address => uint256)) private allowance;   // set the address of the allowed external operator
     mapping(address => uint256) public balanceOf; // map to store the token balances of token holders
 
 
