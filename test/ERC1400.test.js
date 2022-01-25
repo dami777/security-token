@@ -11,9 +11,10 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     let name = "Tangl"
     let symbol = "TAN"
     let decimal = 18
+    let totalSupply = 10
 
     beforeEach( async()=>{
-        erc1400 = await ERC1400.new(name, symbol, decimal)
+        erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply)
     })
 
     //  deployment test
@@ -74,7 +75,21 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         })
 
 
-        
+    })
+    
+    //test the issuance of new tokens
+    describe("new tokens", ()=>{
+
+        beforeEach(async()=>{
+            await erc1400.issueTokens(address1, 10)
+        })
+
+        it("increases the number of total supply when new tokens are minted", async()=>{
+
+                const updatedSupply = await erc1400.totalSupply()
+                updatedSupply.toString().should.be.equal("20", "total supply increased")
+
+        })
 
     })
 

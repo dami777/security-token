@@ -19,7 +19,7 @@ contract ERC1400 {
 
     //  uints
     uint256 internal decimal;   // token decimal
-    uint256 internal totalSupply; // token total supply
+    uint256 public totalSupply; // token total supply
 
     //  addresses
     address private owner;  // set the address of the owner to be private
@@ -60,7 +60,7 @@ contract ERC1400 {
         name = _name;
         symbol = _symbol;
         decimal = _decimal;
-        total = _totalSupply;
+        totalSupply = _totalSupply;
         owner = msg.sender;
 
     }
@@ -70,7 +70,7 @@ contract ERC1400 {
         _;
     }
 
-    // function to mint and issue new tokens
+    // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
     function  issueTokens(address _to, uint256 _amount) public restricted {
         
         
