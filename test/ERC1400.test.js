@@ -93,6 +93,11 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         })
 
+        it("updates the balance of the new token receiver", ()=>{
+            const balance = await erc1400.balanceOf(address1)
+            balance.toString().should.be.equal("10", "the balance of the new tokens issued was incremented")
+        })
+
     })
 
   
