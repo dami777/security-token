@@ -80,14 +80,16 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     //test the issuance of new tokens
     describe("new tokens", ()=>{
 
+        let mint
+
         beforeEach(async()=>{
-            await erc1400.issueTokens(address1, 10)
+            mint = await erc1400.issueTokens(address1, 10)
         })
 
-        it("increases the number of total supply when new tokens are minted", async()=>{
+        it("emitted an event", async()=>{
+            
 
-                const updatedSupply = await erc1400.totalSupply()
-                updatedSupply.toString().should.be.equal("20", "total supply increased")
+            mint.logs[0].event.should.be.equal("Issued", "Issued event was emitted")
 
         })
 
