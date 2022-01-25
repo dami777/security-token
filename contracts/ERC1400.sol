@@ -51,6 +51,7 @@ contract ERC1400 {
     //  mappings
     mapping(address => bool) private whitelist; //  whitelist map
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
+    mapping(address => uint256) public balanceOf; // map to store the token balances of addresses
 
 
     constructor (string memory _name, string memory _symbol, uint256 _decimal) {
@@ -65,6 +66,13 @@ contract ERC1400 {
     modifier restricted {
         require(msg.sender == owner, "0x56");
         _;
+    }
+
+    // function to mint and issue new tokens
+    function  issueTokens(address _to, uint256 _amount) public restricted {
+        
+
+
     }
 
 
