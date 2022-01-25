@@ -76,6 +76,7 @@ contract ERC1400 {
         
         require(_to != address(0x0));   // the destinaton address should not be an empty address
         balanceOf[_to] += _amount;  // use safemath library to avoid under and overflow
+        totalSupply += _amount; // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         
 
     }
