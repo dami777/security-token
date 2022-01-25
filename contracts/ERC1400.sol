@@ -55,11 +55,12 @@ contract ERC1400 {
     mapping(address => uint256) public balanceOf; // map to store the token balances of token holders
 
 
-    constructor (string memory _name, string memory _symbol, uint256 _decimal) {
+    constructor (string memory _name, string memory _symbol, uint256 _decimal, uint256 _totalSupply) {
 
         name = _name;
         symbol = _symbol;
         decimal = _decimal;
+        total = _totalSupply;
         owner = msg.sender;
 
     }
