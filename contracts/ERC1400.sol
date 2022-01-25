@@ -19,6 +19,7 @@ contract ERC1400 {
 
     //  uints
     uint256 internal decimal;   // token decimal
+    uint256 internal totalSupply; // token total supply
 
     //  addresses
     address private owner;  // set the address of the owner to be private
@@ -51,7 +52,7 @@ contract ERC1400 {
     //  mappings
     mapping(address => bool) private whitelist; //  whitelist map
     mapping(address => mapping(address => uint256)) public allowance;   // set the address of the allowed external operator
-    mapping(address => uint256) public balanceOf; // map to store the token balances of addresses
+    mapping(address => uint256) public balanceOf; // map to store the token balances of token holders
 
 
     constructor (string memory _name, string memory _symbol, uint256 _decimal) {
@@ -71,7 +72,10 @@ contract ERC1400 {
     // function to mint and issue new tokens
     function  issueTokens(address _to, uint256 _amount) public restricted {
         
-
+        
+        require(_to != address(0x0));   // the destinaton address should not be an empty address
+        balanceOf[_to] += _amount;  // use safemath library to avoid under and overflow
+        
 
     }
 
