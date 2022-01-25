@@ -12,7 +12,7 @@ contract ERC1400 {
 
     */
 
-    //  strings
+    //  string
 
     string internal name;   // token name
     string internal symbol; // token symbol
@@ -43,7 +43,8 @@ contract ERC1400 {
     }
 
     //  events
-    event WhiteList(address _investor, uint256 _timeAdded);
+    event WhiteList (address _investor, uint256 _timeAdded); // event to be emitted whenever an address is whitelisted
+    event Issued (address _to, uint256 _amountIssued, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
 
 
 
