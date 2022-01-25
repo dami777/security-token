@@ -19,7 +19,7 @@ contract ERC1400 {
 
     //  uints
     uint256 internal decimal;   // token decimal
-    uint256 public totalSupply; // token total supply
+    uint256 internal totalSupply; // token total supply
 
     //  addresses
     address private owner;  // set the address of the owner to be private
@@ -45,7 +45,7 @@ contract ERC1400 {
 
     //  events
     event WhiteList (address _investor, uint256 _timeAdded); // event to be emitted whenever an address is whitelisted
-    event Issued (address _to, uint256 _amountIssued, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
+    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
 
 
 
@@ -77,6 +77,7 @@ contract ERC1400 {
         require(_to != address(0x0));   // the destinaton address should not be an empty address
         balanceOf[_to] += _amount;  // use safemath library to avoid under and overflow
         totalSupply += _amount; // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_to, _amount, totalSupply, block.timestamp); // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }
