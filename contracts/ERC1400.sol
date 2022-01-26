@@ -120,7 +120,9 @@ contract ERC1400 {
     // function to transfer tokens. the internal transfer function will be called here
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
-
+        require(address _to != address(0x0),  "can't transfer to zero address");
+        require(balanceOf[msg.sender] >= _amount, "insufficient amount");
+        _transfer(msg.sender, _to, _amount);
 
     }
 
