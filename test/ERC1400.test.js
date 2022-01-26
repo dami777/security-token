@@ -1,4 +1,5 @@
 const ERC1400 = artifacts.require('./ERC1400')
+const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 require("chai")
     .use(require("chai-as-promised"))
@@ -146,9 +147,19 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         describe("token transfer failure", ()=>{
 
+            beforeEach(async()=>{
+                await erc1400.issueTokens(address1, 2)
+            })
+
             it("fails due to insuffient token amount", async()=>{
                 await erc1400.transfer(address2, 100).should.be.rejected
-            })  
+            })
+            
+            it("fails to send to zero address", async()=>{
+                await erc1400.transfer(ETHER_ADDRESS, 2).should.be.rejected
+            })
+            
+            
 
         })
 
