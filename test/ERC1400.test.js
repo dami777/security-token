@@ -181,6 +181,11 @@ contract('ERC1400', ([address1, address2, exchange])=>{
             address2Balance.toString().should.be.equal("10", "the token reflected in address2 account")
         })
 
+        it("reduced the approved balance of the exchange after transfer", async()=>{
+            const allowance = await erc1400.allowance(address1, exchange)
+            allowance.toString().should.be.equal("0", "the approved amount to the exchange reduced after the transfer")
+        })
+
     })
 
 })
