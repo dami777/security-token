@@ -177,14 +177,15 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         })
 
         it("sends the token to address 2", async()=>{
+
+            const address1Balance = await erc1400.balanceOf(address1)
             const address2Balance = await erc1400.balanceOf(address2)
-            address2Balance.toString().should.be.equal("10", "the token reflected in address2 account")
+
+            address2Balance.toString().should.be.equal("10", "the token was moved to address2 account by the exchange")
+            address1Balance.toString().should.be.equal("10", "the token was moved from address account by the exchange")
         })
 
-        it("reduced the approved balance of the exchange after transfer", async()=>{
-            const allowance = await erc1400.allowance(address1, exchange)
-            allowance.toString().should.be.equal("0", "the approved amount to the exchange reduced after the transfer")
-        })
+        
 
     })
 
