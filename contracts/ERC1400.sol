@@ -37,6 +37,7 @@ contract ERC1400 {
     event WhiteList (address _investor, uint256 _timeAdded); // event to be emitted whenever an address is whitelisted
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount); // event to be emitted whenever token is been transferred
+    event Approved (address _tokenHolder, address _externalAddress, uint256 _amount); //emit the approve event
 
 
 
@@ -93,6 +94,7 @@ contract ERC1400 {
 
         // use safemath function here to avoid under and overflow
         allowance[msg.sender][_externalAddress] += _value;
+        emit Approval(msg.sender, _externalAddress, _value); // emit the approved event
         return true;
 
     }
@@ -125,6 +127,23 @@ contract ERC1400 {
 
         _transfer(msg.sender, _to, _amount);
         return true;
+
+    }
+
+    // function transferFrom. The function for external addresses such as escrows to move tokens on behalf of the token holder
+    
+    function transferFrom(address _from, address _to, uint256 _amount) external returns (bool success) {
+
+        // _from is the current token holder
+        // _to is the destinantion address
+        //  msg.sender is the external address calling this function
+        // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
+        require(allowance[_from][msg.sender] >= amount); // the allowed value approved by the token holder must not be less than the amount
+        _transfer(_from, _to, _amount); // transfer the tokens
+
+        // reset the allowance value
+
+        allowance[from][msg.sender] =  allowance[from][msg.sender] - _amount; // use safe math here
 
     }
 
