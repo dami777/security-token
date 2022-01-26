@@ -98,10 +98,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         let amountToIssue = 10;
 
-        // issue tokens
-        /*beforeEach(async()=>{
-            await erc1400.issueTokens()
-        })*/
+        
 
         // test that the balance of two addresses are zero
         it("has zero tokens", async()=>{
@@ -138,7 +135,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
                 transfer.logs[0].event.should.be.equal("Transfer", "emits the Transfer event")
                 transfer.logs[0].args._amount.toString().should.be.equal("5", "emits the amount transferred")
                 transfer.logs[0].args._from.should.be.equal(address1, "emits the sender of the token")
-                transfer.logs[0].args._to.should.be.equal(address2, "emits the receivder of the token")
+                transfer.logs[0].args._to.should.be.equal(address2, "emits the receiver of the token")
                 addressBalance1.toString().should.be.equal("5", "tokens was transfered from this address")
                 addressBalance2.toString().should.be.equal("5", "tokens was transfered to this address")
             })
