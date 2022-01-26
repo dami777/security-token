@@ -131,7 +131,15 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
             it("transfers tokens to address2 from address1", async()=>{
                 const transfer = await erc1400.transfer(address2, 5)
+                const addressBalance1 = await erc1400.balanceOf(address1)
+                const addressBalance2 = await erc1400.balanceOf(address2)
+
                 transfer.logs[0].event.should.be.equal("Transfer", "emits the Transfer event")
+                transfer.logs[0].args._amount.toString().should.be.equal("5", "emits the amount transferred")
+                transfer.logs[0].args._from.should.be.equal(address1, "emits the sender of the token")
+                transfer.logs[0].args._to.should.be.equal(address2, "emits the receivder of the token")
+                addressBalance1.toString().should.be.equal("5", "tokens was transfered from this address")
+                addressBalance2.toString().should.be.equal("5", "tokens was transfered to this address")
             })
 
         })
@@ -139,10 +147,5 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         
 
     })
-
-    
-  
-
-    
 
 })
