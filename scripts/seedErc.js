@@ -16,7 +16,7 @@ module.exports = async function(callback) {
         // issue tokens to self
         await erc1400.issueTokens(issuer, 10, {from: issuer})
 
-        console.log("token sent to issuer")
+        console.log("token sent to issuer") // token displayed on metamask
     } catch(err) {
         console.log(err)
     }
