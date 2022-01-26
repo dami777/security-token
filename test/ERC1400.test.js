@@ -11,7 +11,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     let name = "Tangl"
     let symbol = "TAN"
     let decimal = 18
-    let totalSupply = 10
+    let totalSupply = 0
 
     beforeEach( async()=>{
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply)
@@ -89,20 +89,52 @@ contract('ERC1400', ([address1, address2, exchange])=>{
             balance.toString().should.be.equal(amountToIssue.toString(), "the balance of the new tokens issued was incremented")
         })
 
+
     })
 
-    // test bytes
-    describe("bytes test", ()=>{
-        it("test bytes", async()=>{
-            const tx = {
-                name: "tim"
-            }
+    // token transfer
+    describe("token transfer", ()=>{
 
-            const data = await erc1400.sendBytes("0x5553a27edeb7f391ceb7181d3e70095cb54eeca2f6f6540f5bf4c66640599a691a9b8887863c8976ae360ffb7565d7c859f924f77bae4a0bef4656969699226900")
-            console.log(data.toString())
+        let amountToIssue = 10;
+
+        // issue tokens
+        /*beforeEach(async()=>{
+            await erc1400.issueTokens()
+        })*/
+
+        // test that the balance of two addresses are zero
+        it("has zero tokens", async()=>{
+            const addressBalance1 = await erc1400.balanceOf(address1)
+            const addressBalance2 = await erc1400.balanceOf(address2)
+
+            addressBalance1.toString().should.be.equal("0", "address 1  has zero token balance")
+            addressBalance2.toString().should.be.equal("0", "address 2  has zero token balance")
+
         })
+
+        
+
+        describe("issue tokens to address 1", ()=>{
+
+            beforeEach(async()=>{
+
+               
+                await erc1400.issueTokens(address1, amountToIssue);
+               
+            })
+
+            it("updates the balance for the token receiver", async()=>{
+                const addressBalance1 = await erc1400.balanceOf(address1)
+                addressBalance1.toString().should.be.equal(amountToIssue.toString(), "address 1  has been issued new tokens")
+            })
+
+        })
+
+        
+
     })
 
+    
   
 
     

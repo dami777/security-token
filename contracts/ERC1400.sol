@@ -66,8 +66,11 @@ contract ERC1400 {
     // 1. internal funtion to transfer tokens from an address to another address
      function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
-        balanceOf[_from] = balanceOf[_from] - value; // reduce the sender's balance --> use safemath
-        balanceOf[_to] = balanceOf[_to] + value; // increase the value of the receiver ---> usesafemath
+        require(_to != address(0),  "can't transfer to zero address");
+        require(balanceOf[_from] >= _amount, "insufficient amount");
+        
+        balanceOf[_from] = balanceOf[_from] - _amount; // reduce the sender's balance --> use safemath
+        balanceOf[_to] = balanceOf[_to] + _amount; // increase the value of the receiver ---> usesafemath
         emit Transfer (_from, _to, _amount); // emit the Tranfer event
         return true;
      }
@@ -76,10 +79,10 @@ contract ERC1400 {
     function  issueTokens(address _to, uint256 _amount) public restricted {
         
         
-        require(_to != address(0x0));   // the destinaton address should not be an empty address
-        balanceOf[_to] += _amount;  // use safemath library to avoid under and overflow
-        totalSupply += _amount; // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_to, _amount, totalSupply, block.timestamp); // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        require(_to != address(0));     // the destinaton address should not be an empty address
+        balanceOf[_to] += _amount;      // use safemath library to avoid under and overflow
+        totalSupply += _amount;         // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_to, _amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }
@@ -120,8 +123,6 @@ contract ERC1400 {
     // function to transfer tokens. the internal transfer function will be called here
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
-        require(address _to != address(0x0),  "can't transfer to zero address");
-        require(balanceOf[msg.sender] >= _amount, "insufficient amount");
         _transfer(msg.sender, _to, _amount);
 
     }
