@@ -36,6 +36,7 @@ contract ERC1400 {
     //  events
     event WhiteList (address _investor, uint256 _timeAdded); // event to be emitted whenever an address is whitelisted
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
+    event Transfer (address _from, address _to, uint256 _amount); // event to be emitted whenever token is been transferred
 
 
 
@@ -62,7 +63,7 @@ contract ERC1400 {
 
     // internal functions
 
-    // 1. internal funtion to transfer
+    // 1. internal funtion to transfer tokens from an address to another address
      function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         balanceOf[_from] = balanceOf[_from] - value; // reduce the sender's balance --> use safemath
@@ -113,7 +114,13 @@ contract ERC1400 {
         whitelist[_investor] = true;
         emit WhiteList(_investor, block.timestamp);
 
-    
+    }
+
+    // function to transfer tokens. the internal transfer function will be called here
+    function transfer(address _to, uint256 _amount) public returns (bool success) {
+
+
+
     }
 
 
