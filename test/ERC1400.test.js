@@ -128,6 +128,12 @@ contract('ERC1400', ([address1, address2, exchange])=>{
                 addressBalance1.toString().should.be.equal(amountToIssue.toString(), "address 1  has been issued new tokens")
             })
 
+
+            it("transfers tokens to address2 from address1", async()=>{
+                const transfer = await erc1400.transfer(address2, 5)
+                transfer.los[0].event.should.be.equal("Transfer", "emits the Transfer event")
+            })
+
         })
 
         
