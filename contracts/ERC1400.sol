@@ -38,6 +38,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued); // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount); // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount); //emit the approve event
+    
 
 
 
@@ -145,9 +146,6 @@ contract ERC1400 {
 
         allowance[_from][msg.sender] =  allowance[_from][msg.sender] - _amount; // use safe math here
 
-    }
-
-
-    
+    }  
 
 }

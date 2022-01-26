@@ -1,5 +1,5 @@
-const Migrations = artifacts.require("Migrations");
+const Erc1400 = artifacts.require("ERC1400");
 
 module.exports = function (deployer) {
-  deployer.deploy(Migrations);
+  deployer.deploy(Erc1400, "TANGLE", "TAN", 10, 0);
 };
