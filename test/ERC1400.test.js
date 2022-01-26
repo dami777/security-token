@@ -185,6 +185,10 @@ contract('ERC1400', ([address1, address2, exchange])=>{
             address1Balance.toString().should.be.equal("10", "the token was moved from address account by the exchange")
         })
 
+        it("emits the tranfer event", async()=>{
+            transferFrom.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+        })
+
         it("failed to transfer due to insufficient approved token to the exchange", async()=>{
             await erc1400.transferFrom(address1, address2, 20, {from: exchange}).should.be.rejected //transfer should fail for trying to send more than the approved tokens
         })
