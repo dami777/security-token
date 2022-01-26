@@ -187,6 +187,8 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         it("emits the tranfer event", async()=>{
             transferFrom.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferFrom.logs[0].args._from.should.be.equal(address1, "it emits the _from address which is the address of the approver who was also the token holder")
+            transferFrom.logs[0].args._to.should.be.equal(address2, "it emits the _to address which is the address of the token receiver")
         })
 
         it("failed to transfer due to insufficient approved token to the exchange", async()=>{
