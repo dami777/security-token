@@ -144,6 +144,16 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         })
 
+        describe("token transfer failure", ()=>{
+
+            it("fails due to insuffient token amount", async()=>{
+                await erc1400.transfer(address2, 100).should.be.rejected
+            })  
+
+        })
+
+        
+
         
 
     })
