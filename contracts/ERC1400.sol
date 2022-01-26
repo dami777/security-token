@@ -68,7 +68,7 @@ contract ERC1400 {
 
         require(_to != address(0),  "can't transfer to zero address");
         require(balanceOf[_from] >= _amount, "insufficient amount");
-        
+
         balanceOf[_from] = balanceOf[_from] - _amount; // reduce the sender's balance --> use safemath
         balanceOf[_to] = balanceOf[_to] + _amount; // increase the value of the receiver ---> usesafemath
         emit Transfer (_from, _to, _amount); // emit the Tranfer event
@@ -124,6 +124,7 @@ contract ERC1400 {
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
         _transfer(msg.sender, _to, _amount);
+        return true;
 
     }
 
