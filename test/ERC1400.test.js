@@ -161,8 +161,25 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         })
 
         
+    })
 
+    // token transferFrom
+    describe("token transferFrom", ()=>{
+
+        let transferFrom
         
+
+        // approve an address. In the case, the address is assumed to be an DEX
+        beforeEach(async()=>{
+            await erc1400.approve(exchange, 10) // approve 10 tokens to the exchange
+            await erc1400.issueTokens(address1, 20) // issue tokens to address1
+            transferFrom = await erc1400.transferFrom(address1, address2, 10, {from: exchange}) // exchange sends tokens from address1 to address2
+        })
+
+        it("sends the token to address 2", async()=>{
+            const address2Balance = await erc1400.balanceOf(address2)
+            address2Balance.toString().should.be.equal("10", "the token reflected in address2 account")
+        })
 
     })
 
