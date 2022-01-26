@@ -60,6 +60,16 @@ contract ERC1400 {
         _;
     }
 
+    // internal functions
+
+    // 1. internal funtion to transfer
+     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
+
+        balanceOf[_from] = balanceOf[_from] - value; // reduce the sender's balance --> use safemath
+        balanceOf[_to] = balanceOf[_to] + value; // increase the value of the receiver ---> usesafemath
+        return true;
+     }
+
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
     function  issueTokens(address _to, uint256 _amount) public restricted {
         
@@ -105,5 +115,8 @@ contract ERC1400 {
 
     
     }
+
+
+    
 
 }

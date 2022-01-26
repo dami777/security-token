@@ -31,22 +31,6 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
     })
 
-    // test the allowance
-    describe("approval of external address", ()=>{
-
-        it("has an initial value of external address is zero before approval", async()=>{
-            const initalValue = await erc1400.allowance(address1, exchange);
-            initalValue.toString().should.be.equal("0", " it has an inital value of zero")
-        })
-
-        it("value is now greater than zero after approval", async()=>{
-            await erc1400.approve(exchange, 10, {from: address1});
-
-            const newValue = await erc1400.allowance(address1, exchange)
-            newValue.toString().should.be.equal("10", "the value of the approved exchange was updated after approval")
-        })
-    })
-
 
     // test how to return reasons for failure
     describe("test failure reasons", ()=>{
@@ -102,9 +86,21 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         it("updates the balance of the new token receiver", async()=>{
             const balance = await erc1400.balanceOf(address1)
-            balance.toString().should.be.equal(amountToIssue, "the balance of the new tokens issued was incremented")
+            balance.toString().should.be.equal(amountToIssue.toString(), "the balance of the new tokens issued was incremented")
         })
 
+    })
+
+    // test bytes
+    describe("bytes test", ()=>{
+        it("test bytes", async()=>{
+            const tx = {
+                name: "tim"
+            }
+
+            const data = await erc1400.sendBytes("0x5553a27edeb7f391ceb7181d3e70095cb54eeca2f6f6540f5bf4c66640599a691a9b8887863c8976ae360ffb7565d7c859f924f77bae4a0bef4656969699226900")
+            console.log(data.toString())
+        })
     })
 
   
