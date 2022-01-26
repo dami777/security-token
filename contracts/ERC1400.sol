@@ -68,6 +68,7 @@ contract ERC1400 {
 
         balanceOf[_from] = balanceOf[_from] - value; // reduce the sender's balance --> use safemath
         balanceOf[_to] = balanceOf[_to] + value; // increase the value of the receiver ---> usesafemath
+        emit Transfer (_from, _to, _amount); // emit the Tranfer event
         return true;
      }
 
