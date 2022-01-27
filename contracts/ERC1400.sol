@@ -164,7 +164,8 @@ contract ERC1400 {
 
         // reset the allowance value
 
-        allowance[_from][msg.sender] =  0;              
+        allowance[_from][msg.sender] =  0;   
+        return true;           
 
     }  
 
