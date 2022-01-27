@@ -174,7 +174,7 @@ contract ERC1400 {
 
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
-        documents[_name] = Doc(_name, _uri, _documentHash);     // save the document
+        documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
         emit Document(_name, _documentHash, _uri);              // emit event when document is set on chain
 
     }
