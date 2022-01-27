@@ -95,7 +95,7 @@ contract ERC1400 {
      }
 
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
-    function  issueTokens(address _to, uint256 _amount) public restricted {
+    function  issueTokens(address _to, uint256 _amount) external restricted {
         
         
         require(_to != address(0));                                      // the destinaton address should not be an empty address
@@ -108,7 +108,7 @@ contract ERC1400 {
 
 
     // approve tokens to external operators
-    function approve(address _externalAddress, uint256 _value) public returns (bool success) {
+    function approve(address _externalAddress, uint256 _value) external returns (bool success) {
 
         require(_externalAddress != address(0), "56");                  //0x56   invalid external address
         allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
@@ -132,7 +132,7 @@ contract ERC1400 {
 
 
     // function to add an address to whitelist
-    function addToWhiteList(address _investor) public {
+    function addToWhiteList(address _investor) external {
         
         require(!whitelist[_investor], "can't whitelist an address more than once");
         whitelist[_investor] = true;
@@ -141,7 +141,7 @@ contract ERC1400 {
     }
 
     // function to transfer tokens. the internal transfer function will be called here
-    function transfer(address _to, uint256 _amount) public returns (bool success) {
+    function transfer(address _to, uint256 _amount) external returns (bool success) {
 
         _transfer(msg.sender, _to, _amount);
         return true;
