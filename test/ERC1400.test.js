@@ -206,14 +206,18 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         let name = "contract"
         let uri = "pinata.com"
         let hash = "qr4353tfgbdfry54y45"
+        let setDoc;
 
         beforeEach(async()=>{
-            await erc1400.setDocument(name, uri, hash)
+            setDoc = await erc1400.setDocument(name, uri, hash)
         })
 
 
-        it("sets the document", ()=>{
-            
+        it("sets the document on chain", ()=>{
+
+            setDoc.logs[0].event.should.be.equal("Document", "it emitted the document event")
+            console.log(setDoc.logs[0].args)
+
         })
 
     })

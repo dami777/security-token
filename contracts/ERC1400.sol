@@ -171,7 +171,7 @@ contract ERC1400 {
 
     // set document
 
-    function setDocument (bytes calldata _name, string calldata _uri, bytes32 _documentHash) external  {
+    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         documents[_name] = Doc(_name, _uri, _documentHash);     // save the document
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
@@ -180,7 +180,7 @@ contract ERC1400 {
 
     // get document
     
-    function getDocument (bytes calldata _name) external view returns (Doc calldata) {
+    function getDocument (bytes32 _name) external view returns (Doc memory) {
 
         return documents[_name];  // return the document struct mapped with bytes _name
 
