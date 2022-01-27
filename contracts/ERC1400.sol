@@ -171,7 +171,7 @@ contract ERC1400 {
 
     // set document
 
-    function setDocument (bytes _name, string _uri, bytes32 _documentHash) external  {
+    function setDocument (bytes calldata _name, string calldata _uri, bytes32 _documentHash) external  {
         
         documents[_name] = Doc(_name, _uri, _documentHash);     // save the document
 
@@ -179,7 +179,7 @@ contract ERC1400 {
 
     // get document
     
-    function getDocument (bytes _name) external view returns (Doc) {
+    function getDocument (bytes calldata _name) external view returns (Doc calldata) {
 
         return documents[_name];  // return the document struct mapped with bytes _name
 

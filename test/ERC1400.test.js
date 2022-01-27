@@ -200,7 +200,25 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
     })
 
+    // putting document on chain
+    describe("putting document onchain", ()=>{
 
-    
+        let name = "contract"
+        let uri = "pinata.com"
+        let hash = "qr4353tfgbdfry54y45"
+
+        beforeEach(async()=>{
+            await erc1400.setDocument(name, uri, hash)
+        })
+
+
+        it("sets the document", ()=>{
+            
+        })
+
+    })
+
+
+
 
 })
