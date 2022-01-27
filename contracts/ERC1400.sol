@@ -49,11 +49,11 @@ contract ERC1400 {
     mapping(bytes32 => uint256) public partitions; // map to store the partitions
 
 
-    constructor (string memory _name, string memory _symbol, uint256 _decimal, uint256 _totalSupply) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
 
         name = _name;
         symbol = _symbol;
-        decimal = _decimal;
+        granularity = _granularity; // same as decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
 
@@ -93,6 +93,8 @@ contract ERC1400 {
 
     // approve tokens to external operators
     function approve(address _externalAddress, uint256 _value) public returns (bool success) {
+
+        require(_externalAddress != address(0), "56"); //0x56   invalid external address
 
         // use safemath function here to avoid under and overflow
         allowance[msg.sender][_externalAddress] += _value;
