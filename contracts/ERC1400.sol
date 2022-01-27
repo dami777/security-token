@@ -31,6 +31,11 @@ contract ERC1400 {
 
 
     // structs
+    struct Doc {
+        bytes _name;
+        string _uri;
+        bytes32 _documentHash
+    } // struct to handle the documents
 
 
     //  events
