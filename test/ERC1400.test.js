@@ -34,7 +34,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
 
     // test how to return reasons for failure
-    /*describe("test failure reasons", ()=>{
+    describe("test failure reasons", ()=>{
         it("failed", async()=>{
             const handledFailedCase = await erc1400.canTransfer(address2, 2)
         })
@@ -198,7 +198,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         
 
-    })*/
+    })
 
     // putting document on chain
     describe("putting document onchain", ()=>{
