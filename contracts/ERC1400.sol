@@ -51,8 +51,8 @@ contract ERC1400 {
     event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
-    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        //emit the approve event
-    
+    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
+    event Document (bytes _name, string _uri, bytes32 _documentHash);                                        // event to be emitted whenever a document is put on-chain
 
 
 
@@ -174,6 +174,7 @@ contract ERC1400 {
     function setDocument (bytes calldata _name, string calldata _uri, bytes32 _documentHash) external  {
         
         documents[_name] = Doc(_name, _uri, _documentHash);     // save the document
+        emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
 
