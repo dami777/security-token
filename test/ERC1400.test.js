@@ -20,7 +20,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
     //  deployment test
 
-    describe("deployment", ()=>{
+    /*describe("deployment", ()=>{
 
         it("deployed the contract", async()=>{
 
@@ -228,6 +228,21 @@ contract('ERC1400', ([address1, address2, exchange])=>{
         })
 
         
+
+    })*/
+
+
+    // token partition
+    describe("get partitioned token balance", ()=>{
+
+        let shareClassA = web3.utils.asciiToHex("CLASS A")
+
+        it("gets the partitioned token balance", async()=>{
+
+            const balance = await erc1400.balanceOfByPartition(shareClassA, address1)
+            balance.toString().should.be.equal("0", "Class A token balance of address 1 is zero")
+
+        })
 
     })
 
