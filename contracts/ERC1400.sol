@@ -63,7 +63,9 @@ contract ERC1400 {
     mapping(address => mapping(address => uint256)) private allowance;      // set the address of the allowed external operator
     mapping(address => uint256) public balanceOf;                           // map to store the token balances of token holders
     mapping(bytes32 => uint256) public partitions;                          // map to store the partitions
-    mapping(bytes32 => Doc) public documents;                                 // map to store the documents
+    mapping(bytes32 => Doc) public documents;                               // map to store the documents
+    mapping(bytes32 => mapping(address _tokenHolder => uint256)) internal _balanceOfByPartition;                               // map 
+
 
 
     constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
@@ -188,5 +190,9 @@ contract ERC1400 {
         return (_document._uri, _document._name);  // return the document uri and name
 
     }
+
+   
+   /************************************* Partitions ****************************/
+
 
 }
