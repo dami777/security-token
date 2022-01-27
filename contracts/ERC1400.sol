@@ -181,7 +181,7 @@ contract ERC1400 {
 
     // get document
     
-    function getDocument (bytes32 _name) external view returns (string memory, bytes32 _name) {
+    function getDocument (bytes32 _name) external view returns (string memory, bytes32) {
 
         Doc storage _document = documents[_name];
 
