@@ -39,9 +39,10 @@ contract ERC1400 {
      // *************************************** Structs ********************************************************* //
 
     struct Doc {
-        bytes _name;
-        string _uri;
+        bytes32 _name;
         bytes32 _documentHash;
+        string _uri;
+        
     } // struct to handle the documents
 
 
@@ -52,7 +53,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes _name, string _uri, bytes32 _documentHash);                                        // event to be emitted whenever a document is put on-chain
+    event Document (bytes32 _name, bytes32 _documentHash, string _uri );                                        // event to be emitted whenever a document is put on-chain
 
 
 
@@ -180,9 +181,11 @@ contract ERC1400 {
 
     // get document
     
-    function getDocument (bytes32 _name) external view returns (Doc memory) {
+    function getDocument (bytes32 _name) external view returns (string memory, bytes32 _name) {
 
-        return documents[_name];  // return the document struct mapped with bytes _name
+        Doc storage _document = documents[_name];
+
+        return (_document._uri, _document._name);  // return the document uri and name
 
     }
 
