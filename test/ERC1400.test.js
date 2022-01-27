@@ -34,7 +34,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
 
     // test how to return reasons for failure
-    describe("test failure reasons", ()=>{
+    /*describe("test failure reasons", ()=>{
         it("failed", async()=>{
             const handledFailedCase = await erc1400.canTransfer(address2, 2)
         })
@@ -198,28 +198,36 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         
 
-    })
+    })*/
 
     // putting document on chain
     describe("putting document onchain", ()=>{
 
-        let name = web3.utils.asciiToHex("contract")
-        let uri = web3.utils.asciiToHex("pinata.com")
+        let name = web3.utils.asciiToHex("contract")    // convert string to hex. This is the datatype that web3 understands for bytes32 datatype
+        let uri = "pinata.com"
         let hash = web3.utils.asciiToHex("qr4353tfgbdfry54y45")
         let setDoc;
 
         beforeEach(async()=>{
             setDoc = await erc1400.setDocument(name, hash, uri)
-            console.log(setDoc)
+           
         })
 
 
         it("sets the document on chain", ()=>{
 
             setDoc.logs[0].event.should.be.equal("Document", "it emitted the document event")
-            console.log(setDoc.logs[0].args)
 
         })
+
+        it("fetches the document from the blockchain", async()=>{
+
+            const fetchDoc = await erc1400.getDocument(name)
+            fetchDoc.uri.should.be.equal(uri, "it fetches the uri of the document")
+
+        })
+
+        
 
     })
 
