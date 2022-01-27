@@ -19,7 +19,7 @@ contract ERC1400 {
 
     // *************************************** Integers ********************************************************* //
 
-    uint256 internal decimal;   // token decimal
+    uint256 internal granularity;   // token decimal
     uint256 internal totalSupply; // token total supply
 
 
