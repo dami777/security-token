@@ -203,13 +203,14 @@ contract('ERC1400', ([address1, address2, exchange])=>{
     // putting document on chain
     describe("putting document onchain", ()=>{
 
-        let name = "contract"
-        let uri = "pinata.com"
-        let hash = "qr4353tfgbdfry54y45"
+        let name = web3.utils.asciiToHex("contract")
+        let uri = web3.utils.asciiToHex("pinata.com")
+        let hash = web3.utils.asciiToHex("qr4353tfgbdfry54y45")
         let setDoc;
 
         beforeEach(async()=>{
-            setDoc = await erc1400.setDocument(name, uri, hash)
+            setDoc = await erc1400.setDocument(name, hash, uri)
+            console.log(setDoc)
         })
 
 
