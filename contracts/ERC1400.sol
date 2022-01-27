@@ -53,7 +53,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes32 _name, bytes32 _documentHash, string _uri );                                        // event to be emitted whenever a document is put on-chain
+    event Document (bytes32 _name, bytes32 _documentHash, string _uri);                                        // event to be emitted whenever a document is put on-chain
 
 
 
@@ -63,7 +63,7 @@ contract ERC1400 {
     mapping(address => mapping(address => uint256)) private allowance;      // set the address of the allowed external operator
     mapping(address => uint256) public balanceOf;                           // map to store the token balances of token holders
     mapping(bytes32 => uint256) public partitions;                          // map to store the partitions
-    mapping(bytes => Doc) public documents;                                 // map to store the documents
+    mapping(bytes32 => Doc) public documents;                                 // map to store the documents
 
 
     constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
