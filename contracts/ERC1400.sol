@@ -19,7 +19,7 @@ contract ERC1400 {
 
     // *************************************** Integers ********************************************************* //
 
-    uint256 internal granularity;   // token decimal
+    uint256 internal granularity;   // token granularity
     uint256 internal totalSupply; // token total supply
 
 
@@ -31,7 +31,7 @@ contract ERC1400 {
 
      // *************************************** Booleans ********************************************************* //
 
-    bool private lockUpTokens = true; // token lockup indicator
+    bool private lockUpTokens = false; // token lockup indicator
     bool private isIssuable;    //  manage when a token can be issued
     
 
@@ -68,11 +68,11 @@ contract ERC1400 {
 
 
 
-    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
+    constructor (string memory _name, string memory _symbol, uint256 _decimal, uint256 _totalSupply) {
 
         name = _name;
         symbol = _symbol;
-        granularity = _granularity; // same as decimals 
+        granularity = 10 ** _decimals; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
 
@@ -101,10 +101,11 @@ contract ERC1400 {
     function  issueTokens(address _to, uint256 _amount) external restricted {
         
         
-        require(_to != address(0));                                      // the destinaton address should not be an empty address
-        balanceOf[_to] += _amount;                                       // use safemath library to avoid under and overflow
-        totalSupply += _amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_to, _amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        require(_to != address(0));_
+        uint256 amount =  _amount * granularity;                          // the destinaton address should not be an empty address
+        balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
+        totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }

@@ -246,9 +246,5 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
     })
 
-    
-
-
-
 
 })
