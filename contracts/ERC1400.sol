@@ -222,6 +222,7 @@ contract ERC1400 {
 
     function authorizeOperator (address _operator) public {
         _isOperator[msg.sender][_operator] = true;
+        emit AuthorizedOperator(_operator, msg.sender);
     }
 
     function revokeOperator (address _operator) public {
