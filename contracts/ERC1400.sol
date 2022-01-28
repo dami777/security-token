@@ -231,6 +231,10 @@ contract ERC1400 {
     function authorizeOperatorByPartition (address _operator, bytes32 _partition) public  {
         _isOperatorByPartition[msg.sender][_operator][_partition] = true;
     }
+
+    function revokeOperatorByPartition (address _operator, bytes32 _partition) public {
+        _isOperatorByPartition[msg.sender][_operator][_partition] = false;
+    }
    
    /************************************* Partitions ****************************/
 
