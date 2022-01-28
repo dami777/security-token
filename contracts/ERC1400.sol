@@ -79,8 +79,8 @@ contract ERC1400 {
     mapping(bytes32 => Doc) public documents;                               // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) => _partitionsOf;                         // map that stores the partitions of a token holder
-    mapping(address => bool) internal _isOperator;                              // map to approve or revoke  operators
-    mapping(address => bool) internal _isOperatorByPartition;                  // map to approve or revoke operators by partition
+    mapping(address => mapping(address => bool)) internal _isOperator;                              // map to approve or revoke operators for a token holder
+    mapping(address => mapping(bytes32 => bool)) internal _isOperatorByPartition;                  // map to approve or revoke operators by partition
 
     constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply) {
 
@@ -212,6 +212,10 @@ contract ERC1400 {
 
     function isOperator (address _operator) public returns (bool) {
         return _isOperator[_operator];
+    }
+
+    function isOperatorByPartition(address _operator) public returns (bool) {
+        return  _isOperatorByPartition[_operator];
     }
    
    /************************************* Partitions ****************************/
