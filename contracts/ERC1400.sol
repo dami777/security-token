@@ -213,7 +213,7 @@ contract ERC1400 {
 
    /************************ Internal functions for partition ************************/
 
-    _transferByPartiton(bytes32 _partition, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
+    _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
        
        if (_partition == "") {
            _transfer(msg.sender, _to, _value);
@@ -253,13 +253,13 @@ contract ERC1400 {
    // transfer by partition
    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes _data) external returns (bytes32) {
 
-       _transferByPartiton(_partition, _to, _value, _data, "");
+       _transferByPartiton(_partition, msg.sender, _to, _value, _data, "");
  
    }    
 
    // operator transfer by partition
-   function operatorTransferByPartition() external returns (bytes32) {
-
+   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32) {
+       _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
 
