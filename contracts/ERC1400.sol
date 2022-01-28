@@ -12,15 +12,16 @@ contract ERC1400 {
 
      // *************************************** Strings ********************************************************* //
 
-    string internal name;   // token name
-    string internal symbol; // token symbol
+    string public name;   // token name
+    string public symbol; // token symbol
 
 
 
     // *************************************** Integers ********************************************************* //
 
-    uint256 internal granularity;   // token granularity
-    uint256 internal totalSupply; // token total supply
+    uint256 public granularity;   // token granularity
+    uint256 public totalSupply; // token total supply
+    uint256 public decimals; //token decimals
 
 
     // *************************************** Addresses ********************************************************* //
@@ -65,14 +66,15 @@ contract ERC1400 {
     mapping(bytes32 => uint256) public partitions;                          // map to store the partitions
     mapping(bytes32 => Doc) public documents;                               // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
+    mapping(address => bytes32[]) => _partitionsOf;                         // map that stores the partitions of a token holder
 
 
-
-    constructor (string memory _name, string memory _symbol, uint256 _decimal, uint256 _totalSupply) {
+    constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply) {
 
         name = _name;
         symbol = _symbol;
-        granularity = 10 ** _decimal; // for token decimals 
+        decimals = _decimals;
+        granularity = 10 ** decimals; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
 
@@ -145,7 +147,7 @@ contract ERC1400 {
     }
 
     // function to transfer tokens. the internal transfer function will be called here
-    function transfer(address _to, uint256 _amount) external returns (bool success) {
+    function transfer(address _to, uint256 _amount) public returns (bool success) {
 
         _transfer(msg.sender, _to, _amount);
         return true;
@@ -200,6 +202,14 @@ contract ERC1400 {
 
    function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
        return _balanceOfByPartition[_tokenHolder][_partition];
+   }
+
+   // function to return the partitions of a token holder
+
+   function partitionsOf(address _tokenHolder) external view returns (bytes32[]) {
+
+       return _partitionsOf[_tokenHolder];
+
    }    
 
 

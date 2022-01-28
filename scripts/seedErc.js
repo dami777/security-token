@@ -13,8 +13,8 @@ module.exports = async function(callback) {
 
         const issuer = accounts[0]
 
-        // issue tokens to self
-        await erc1400.issueTokens(issuer, 10, {from: issuer})
+        // issue 1000 tokens to self
+        await erc1400.issueTokens(issuer, 1000, {from: issuer})
 
         console.log("token sent to issuer") // token displayed on metamask
     } catch(err) {
