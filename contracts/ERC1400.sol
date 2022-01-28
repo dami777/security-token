@@ -79,7 +79,8 @@ contract ERC1400 {
     mapping(bytes32 => Doc) public documents;                               // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) => _partitionsOf;                         // map that stores the partitions of a token holder
-
+    mapping(address => bool) public isOperator;                              // map to approve or revoke  operators
+    mapping(address => bool) public isOperatorByPartition;                  // map to approve or revoke operators by partition
 
     constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply) {
 
