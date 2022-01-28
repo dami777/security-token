@@ -260,6 +260,9 @@ contract ERC1400 {
 
    // operator transfer by partition
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32) {
+
+       require(isOperator[msg.sender], "56"); // 0x56 invalid sender
+       require(isOperatorByPartition[msg.sender], "56"); // 0x56 invalid sender
        _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
