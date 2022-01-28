@@ -218,6 +218,8 @@ contract ERC1400 {
        if (_partition == "") {
            _transfer(msg.sender, _to, _value);
        }
+
+       balanceOfByPartition(_partition, msg.sender) = balanceOfByPartition(_partition, msg.sender) - _value;
  
    }    
 
