@@ -210,7 +210,9 @@ contract ERC1400 {
 
     /******************************* operators ***************************/
 
-    function ()
+    function isOperator (address _operator) public returns (bool) {
+        return _isOperator[_operator];
+    }
    
    /************************************* Partitions ****************************/
 
