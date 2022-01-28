@@ -86,7 +86,7 @@ contract ERC1400 {
     mapping(address => mapping(address => bool)) internal _isOperator;       // map to approve or revoke operators for a token holder
     
     // holder's address -> operator  address -> partition -> true/false
-    mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorByPartition;                  // map to approve or revoke operators by partition
+    mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
 
     constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply) {
 
@@ -230,17 +230,17 @@ contract ERC1400 {
         emit RevokedOperator(_operator, msg.sender);
     }
 
-    function isOperatorByPartition(address _from, address _operator, bytes32 _partition) public returns (bool) {
-        return  _isOperatorByPartition[_from][_operator][_partition];
+    function isOperatorForPartition(address _from, address _operator, bytes32 _partition) public returns (bool) {
+        return  _isOperatorForPartition[_from][_operator][_partition];
     }
     
     function authorizeOperatorByPartition (address _operator, bytes32 _partition) public  {
-        _isOperatorByPartition[msg.sender][_operator][_partition] = true;
+        _isOperatorForPartition[msg.sender][_operator][_partition] = true;
         emit AuthorizedOperatorByPartition(_partition, _operator, msg.sender);
     }
 
     function revokeOperatorByPartition (address _operator, bytes32 _partition) public {
-        _isOperatorByPartition[msg.sender][_operator][_partition] = false;
+        _isOperatorForPartition[msg.sender][_operator][_partition] = false;
         emit RevokedOperatorByPartition(_partition, _operator, msg.sender);
     }
    
@@ -296,7 +296,7 @@ contract ERC1400 {
    // operator transfer by partition
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32) {
 
-       require(isOperatorByPartition(_from, msg.sender, _partition) "56"); // 0x56 invalid sender
+       require(isOperatorForPartition(_from, msg.sender, _partition) "56"); // 0x56 invalid sender
        _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
