@@ -66,8 +66,9 @@ contract ERC1400 {
         bytes _operatorData
 
 
-    ) ;                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
+    );                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
 
+    event AuthorizedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized
 
 
      // *************************************** Mappings ********************************************************* //
