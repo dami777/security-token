@@ -216,8 +216,12 @@ contract ERC1400 {
         return _isOperator[_from][_operator];
     }
 
-    function authorizeOperator (address _operator) public returns (bool) {
+    function authorizeOperator (address _operator) public {
         _isOperator[msg.sender][_operator] = true;
+    }
+
+    function revokeOperator (address _operator) public {
+        _isOperator[msg.sender][_operator] = false;
     }
 
     function isOperatorByPartition(address _from, address _operator, bytes32 _partition) public returns (bool) {
