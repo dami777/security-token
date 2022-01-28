@@ -79,7 +79,7 @@ contract ERC1400 {
     mapping(bytes32 => Doc) public documents;                               // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) => _partitionsOf;                         // map that stores the partitions of a token holder
-    mapping(address => mapping(address => bool)) internal _isOperator;                              // map to approve or revoke operators for a token holder
+    mapping(address => mapping(address => bool)) internal _isOperator;       // map to approve or revoke operators for a token holder
     
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorByPartition;                  // map to approve or revoke operators by partition
@@ -212,12 +212,12 @@ contract ERC1400 {
 
     /******************************* operators ***************************/
 
-    function isOperator (address _operator) public returns (bool) {
-        return _isOperator[_operator];
+    function isOperator (address _from, address _operator) public returns (bool) {
+        return _isOperator[_from][_operator];
     }
 
-    function isOperatorByPartition(address _operator) public returns (bool) {
-        return  _isOperatorByPartition[_operator];
+    function isOperatorByPartition(address _from, address _operator, bytes32 _partition) public returns (bool) {
+        return  _isOperatorByPartition[_from][_operator][_partition];
     }
    
    /************************************* Partitions ****************************/
@@ -272,8 +272,8 @@ contract ERC1400 {
    // operator transfer by partition
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32) {
 
-       require(isOperator[msg.sender], "56"); // 0x56 invalid sender
-       require(isOperatorByPartition[msg.sender], "56"); // 0x56 invalid sender
+       require(isOperator(_from, msg.sender), "56"); // 0x56 invalid sender
+       require(isOperatorByPartition(_from, msg.sender, _partition) "56"); // 0x56 invalid sender
        _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
