@@ -219,7 +219,11 @@ contract ERC1400 {
            _transfer(msg.sender, _to, _value);
        }
 
+       require( balanceOfByPartition(_partition, msg.sender) >= _value); // the partiton balance of the holder must be greater than or equal to the value
        balanceOfByPartition(_partition, msg.sender) = balanceOfByPartition(_partition, msg.sender) - _value;
+       balanceOfByPartition(_partition, _to) = balanceOfByPartition(_partition, _to) + _value;
+
+       return _partition;
  
    }    
 
