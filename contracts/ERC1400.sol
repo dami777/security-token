@@ -210,6 +210,32 @@ contract ERC1400 {
    
    /************************************* Partitions ****************************/
 
+
+   /************************ Internal functions for partition ************************/
+
+    _transferByPartiton(bytes32 _partition, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
+       
+       if (_partition == "") {
+           _transfer(msg.sender, _to, _value);
+       }
+
+       require( balanceOfByPartition(_partition, msg.sender) >= _value); // the partiton balance of the holder must be greater than or equal to the value
+
+       balanceOfByPartition[_partition][msg.sender] = balanceOfByPartition(_partition, msg.sender) - _value;
+       balanceOf[msg.sender] = balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
+       
+       balanceOfByPartition[_partition][_to] = balanceOfByPartition(_partition, _to) + _value;
+       balanceOf[_to] = balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
+
+       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
+
+       return _partition;
+
+    }
+
+
+   /*********************************************************************************/
+
    // function to return partitioned token balance
 
    function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
@@ -227,21 +253,7 @@ contract ERC1400 {
    // transfer by partition
    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes _data) external returns (bytes32) {
 
-       if (_partition == "") {
-           _transfer(msg.sender, _to, _value);
-       }
-
-       require( balanceOfByPartition(_partition, msg.sender) >= _value); // the partiton balance of the holder must be greater than or equal to the value
-
-       balanceOfByPartition[_partition][msg.sender] = balanceOfByPartition(_partition, msg.sender) - _value;
-       balanceOf[msg.sender] = balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
-       
-       balanceOfByPartition[_partition][_to] = balanceOfByPartition(_partition, _to) + _value;
-       balanceOf[_to] = balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
-
-       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
-
-       return _partition;
+       _transferByPartiton(_partition, _to, _value, _data, "");
  
    }    
 
