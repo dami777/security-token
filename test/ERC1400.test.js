@@ -1,6 +1,13 @@
 const ERC1400 = artifacts.require('./ERC1400')
 const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
+const tokens=(n)=>{
+    return new web3.utils.BN(
+        web3.utils.toWei(n.toString(), 'ether')
+    )
+    
+}
+
 require("chai")
     .use(require("chai-as-promised"))
     .should()
@@ -20,7 +27,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
     //  deployment test
 
-    /*describe("deployment", ()=>{
+    describe("deployment", ()=>{
 
         it("deployed the contract", async()=>{
 
@@ -229,7 +236,7 @@ contract('ERC1400', ([address1, address2, exchange])=>{
 
         
 
-    })*/
+    })
 
 
     // token partition

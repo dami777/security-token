@@ -72,7 +72,7 @@ contract ERC1400 {
 
         name = _name;
         symbol = _symbol;
-        granularity = 10 ** _decimals; // for token decimals 
+        granularity = 10 ** _decimal; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
 
@@ -101,8 +101,8 @@ contract ERC1400 {
     function  issueTokens(address _to, uint256 _amount) external restricted {
         
         
-        require(_to != address(0));_
-        uint256 amount =  _amount * granularity;                          // the destinaton address should not be an empty address
+        require(_to != address(0));
+        uint256 amount =  _amount * granularity;                         // the destinaton address should not be an empty address
         balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
