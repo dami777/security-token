@@ -54,7 +54,19 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes32 _name, bytes32 _documentHash, string _uri);                                        // event to be emitted whenever a document is put on-chain
+    event Document (bytes32 _name, bytes32 _documentHash, string _uri);                                      // event to be emitted whenever a document is put on-chain
+    event TransferByPartition (
+
+        bytes32 indexed _fromPartition,
+        address _operator,
+        address indexed _from,
+        address indexed _to,
+        uint256 _value,
+        bytes _data,
+        bytes _operatorData
+
+
+    ) ;                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
 
 
 
