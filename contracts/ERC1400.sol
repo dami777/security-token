@@ -239,21 +239,16 @@ contract ERC1400 {
        balanceOfByPartition[_partition][_to] = balanceOfByPartition(_partition, _to) + _value;
        balanceOf[_to] = balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
-       emit TransferByPartition(
-
-           _partition,
-           msg.sender,
-           msg.sender,
-           _to,
-           _value,
-           "",
-           "",
-
-       )
+       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
 
        return _partition;
  
    }    
+
+   // operator transfer by partition
+   function operatorTransferByPartition() external returns (bytes32) {
+
+   }
 
 
 }
