@@ -249,7 +249,7 @@ contract ERC1400 {
 
    /************************ Internal functions for partition ************************/
 
-    _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
+    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
        
        if (_partition == "") {
            _transfer(msg.sender, _to, _value);
