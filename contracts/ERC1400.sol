@@ -144,7 +144,7 @@ contract ERC1400 {
 
 
     // function that returns balance
-    function balanceOf(address _tokenHolder) external returns (uint256) {
+    function balanceOf(address _tokenHolder) external view returns (uint256) {
         return _balanceOf[_tokenHolder];
     }
 
