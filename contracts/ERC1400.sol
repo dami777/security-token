@@ -110,10 +110,10 @@ contract ERC1400 {
      function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         require(_to != address(0),  "can't transfer to zero address");
-        require(balanceOf[_from] >= _amount, "insufficient amount");
+        require(_balanceOf[_from] >= _amount, "insufficient amount");
 
-        balanceOf[_from] = balanceOf[_from] - _amount;                  // reduce the sender's balance --> use safemath
-        balanceOf[_to] = balanceOf[_to] + _amount;                      // increase the value of the receiver ---> usesafemath
+        _balanceOf[_from] = _balanceOf[_from] - _amount;                  // reduce the sender's balance --> use safemath
+        _balanceOf[_to] = _balanceOf[_to] + _amount;                      // increase the value of the receiver ---> usesafemath
         emit Transfer (_from, _to, _amount);                            // emit the Tranfer event
         return true;
      }
@@ -124,7 +124,7 @@ contract ERC1400 {
         
         require(_to != address(0));
         uint256 amount =  _amount * granularity;                         // the destinaton address should not be an empty address
-        balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
+        _balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
@@ -255,18 +255,18 @@ contract ERC1400 {
 
    /************************ Internal functions for partition ************************/
 
-    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) internal returns(bytes32) {
+    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
        
        if (_partition == "") {
            _transfer(msg.sender, _to, _value);
        }
 
-       require( _balanceOfByPartition[_partition][msg.sender] >= _value); // the partiton balance of the holder must be greater than or equal to the value
+       require( _balanceOfByPartition[msg.sender][_partition] >= _value); // the partiton balance of the holder must be greater than or equal to the value
 
-       _balanceOfByPartition[_partition][msg.sender] = _balanceOfByPartition[_partition][msg.sender] - _value;
+       _balanceOfByPartition[msg.sender][_partition] = _balanceOfByPartition[msg.sender][_partition] - _value;
        _balanceOf[msg.sender] = _balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
        
-       _balanceOfByPartition[_partition][_to] = _balanceOfByPartition[_partition][_to] + _value;
+       _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
        _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
        emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
@@ -286,21 +286,21 @@ contract ERC1400 {
 
    // function to return the partitions of a token holder
 
-   function partitionsOf(address _tokenHolder) external view returns (bytes32[]) {
+   function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
        return _partitionsOf[_tokenHolder];
 
    }    
 
    // transfer by partition
-   function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes _data) external returns (bytes32) {
+   function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
 
        _transferByPartiton(_partition, msg.sender, _to, _value, _data, "");
  
    }    
 
    // operator transfer by partition
-   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32) {
+   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external returns (bytes32) {
 
        require(isOperatorForPartition(_from, msg.sender, _partition), "56"); // 0x56 invalid sender
        _transferByPartiton(_partition, _from, _to, _value, "", "");
