@@ -255,13 +255,13 @@ contract ERC1400 {
            _transfer(msg.sender, _to, _value);
        }
 
-       require( balanceOfByPartition(_partition, msg.sender) >= _value); // the partiton balance of the holder must be greater than or equal to the value
+       require( _balanceOfByPartition[_partition][msg.sender] >= _value); // the partiton balance of the holder must be greater than or equal to the value
 
-       balanceOfByPartition[_partition][msg.sender] = balanceOfByPartition(_partition, msg.sender) - _value;
-       balanceOf[msg.sender] = balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
+       _balanceOfByPartition[_partition][msg.sender] = _balanceOfByPartition[_partition][msg.sender] - _value;
+       _balanceOf[msg.sender] = _balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
        
-       balanceOfByPartition[_partition][_to] = balanceOfByPartition(_partition, _to) + _value;
-       balanceOf[_to] = balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
+       _balanceOfByPartition[_partition][_to] = _balanceOfByPartition[_partition][_to] + _value;
+       _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
        emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
 
