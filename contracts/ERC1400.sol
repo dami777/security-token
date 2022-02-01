@@ -119,7 +119,7 @@ contract ERC1400 {
      }
 
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
-    function  issueTokens(address _to, uint256 _amount) external restricted {
+    function issueTokens(address _to, uint256 _amount) external restricted {
         
         
         require(_to != address(0));
@@ -163,7 +163,7 @@ contract ERC1400 {
 
 
     // function to add an address to whitelist
-    function addToWhiteList(address _investor) external {
+    function addToWhiteList(address _investor) external restricted {
         
         require(!whitelist[_investor], "can't whitelist an address more than once");
         whitelist[_investor] = true;
