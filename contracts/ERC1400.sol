@@ -236,7 +236,7 @@ contract ERC1400 {
         emit RevokedOperator(_operator, msg.sender);
     }
 
-    function isOperatorForPartition(address _from, address _operator, bytes32 _partition) public returns (bool) {
+    function isOperatorForPartition(address _from, address _operator, bytes32 _partition) public view returns (bool) {
         return  _isOperatorForPartition[_from][_operator][_partition];
     }
     
