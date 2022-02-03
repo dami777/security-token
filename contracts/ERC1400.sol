@@ -39,6 +39,7 @@ contract ERC1400 {
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
+    bytes21[] internal defaultPartitions;
 
 
      // *************************************** Structs ********************************************************* //
@@ -92,7 +93,7 @@ contract ERC1400 {
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
 
-    constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply) {
+    constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply, bytes32[] memory _defaultPartitions) {
 
         name = _name;
         symbol = _symbol;
@@ -100,6 +101,7 @@ contract ERC1400 {
         granularity = 10 ** decimals; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
+        _totalPartitions = _defaultPartitions;
 
     }
 
