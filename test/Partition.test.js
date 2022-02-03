@@ -27,8 +27,11 @@ contract("ERC1400", ([address1, address2, operator])=>{
 
     describe("partitions of a token holder", ()=>{
 
-        it("returns an empty array of partitions", async()=>{
-            console.log('okay')
+        it("returns an array of the initialized partitions", async()=>{
+            const partitions = await erc1400.totalPartitions()
+            console.log(partitions)
+            partitions.should.not.be.equal([], "the partition is not empty")
+            //console.log(partitons)
         })
 
     })
