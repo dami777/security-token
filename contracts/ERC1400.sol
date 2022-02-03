@@ -36,6 +36,10 @@ contract ERC1400 {
     bool private isIssuable;    //  manage when a token can be issued
     
 
+    // ************************ Array ******************************//
+
+    bytes32[] internal _totalPartitions;
+
 
      // *************************************** Structs ********************************************************* //
 
@@ -79,7 +83,7 @@ contract ERC1400 {
     mapping(address => bool) private whitelist;                             //  whitelist map
     mapping(address => mapping(address => uint256)) private allowance;      // set the address of the allowed external operator
     mapping(address => uint256) internal _balanceOf;                           // map to store the token balances of token holders
-    mapping(bytes32 => uint256) public partitions;                          // map to store the partitions
+    mapping(bytes32 => uint256) public partitions;                          // map to store the total supply of each partitions partitions
     mapping(bytes32 => Doc) public documents;                               // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) internal _partitionsOf;                         // map that stores the partitions of a token holder

@@ -23,6 +23,8 @@ contract("ERC1400", ([address1, address2, operator])=>{
             erc1400.address.should.not.be.equal("", "it has a contract address")
         })
 
+    describe("")
+
     })
 
 })
