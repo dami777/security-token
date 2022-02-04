@@ -32,6 +32,8 @@ contract("ERC1400", ([address1, address2, operator])=>{
             erc1400.address.should.not.be.equal("", "it has a contract address")
         })
 
+    })
+
     describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
@@ -103,8 +105,6 @@ contract("ERC1400", ([address1, address2, operator])=>{
         })
 
         
-
-    })
 
     })
 
