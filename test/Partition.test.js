@@ -28,11 +28,16 @@ contract("ERC1400", ([address1, address2, operator])=>{
     describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
+
             const partitions = await erc1400.totalPartitions()
-            console.log(partitions)
             partitions.should.not.be.equal([], "the partition is not empty")
-            //console.log(partitons)
+        
         })
+
+        it("returns a zero balance in share class A for address1", async()=>{
+            const balance = await erc1400.balanceOfByPartition(classA, address1)
+            balance.toString().should.be.equal("0", "address1 has 0 balance in class A")
+        })  
 
     })
 

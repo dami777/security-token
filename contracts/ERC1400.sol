@@ -316,5 +316,10 @@ contract ERC1400 {
        _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
+   // function to issue new tokens by partition
+   function issueByPartition(bytes32 _partition, address _tokenHolder, ) external {
+
+   }
+
 
 }
