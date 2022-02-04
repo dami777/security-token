@@ -77,7 +77,7 @@ contract ERC1400 {
     event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
     event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
     event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
-
+    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
 
      // *************************************** Mappings ********************************************************* //
 
@@ -321,6 +321,7 @@ contract ERC1400 {
 
         _balanceOfByPartition[_partition][_tokenHolder] += _value;   // increment the partition's token balance of this token holder
         _balanceOf[_tokenHolder] += _value; // increment the total balance of this token holder 
+        emit IssuedByPartition()
 
    }
 
