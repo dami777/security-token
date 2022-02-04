@@ -321,7 +321,7 @@ contract ERC1400 {
 
         _balanceOfByPartition[_partition][_tokenHolder] += _value;   // increment the partition's token balance of this token holder
         _balanceOf[_tokenHolder] += _value; // increment the total balance of this token holder 
-        emit IssuedByPartition()
+        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, _value, _data, "");
 
    }
 
