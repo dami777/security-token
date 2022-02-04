@@ -65,7 +65,10 @@ contract("ERC1400", ([address1, address2, operator])=>{
                 address2TotalBalance.toString().should.be.equal(tokens(5).toString(), "total balance increased")
             })
 
-            
+            it("updates the balance of the token holder in class A", async()=>{
+                const classAbalance = await erc1400.balanceOfByPartition(classA, address2)
+                classAbalance.toString().should.be.equal(tokens(5).toString(), "it updates the class A token balance of the holder")
+            })
 
         })
 
