@@ -54,7 +54,7 @@ contract("ERC1400", ([address1, address2, operator])=>{
 
         beforeEach(async()=>{
 
-            issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex("us"))
+            issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex(""))
             
         })
 
@@ -74,6 +74,21 @@ contract("ERC1400", ([address1, address2, operator])=>{
                 const classBbalance = await erc1400.balanceOfByPartition(classB, address2)
                 classBbalance.toString().should.be.equal(tokens(0).toString(), "issuance to class A doesn't affect class B balance")
             })
+
+        })
+
+        describe("issuance of class B tokens", ()=>{
+
+            beforeEach(async()=>{
+
+                issueClassB = await erc1400.issueByPartition(classB, address2, tokens(10), web3.utils.toHex(""))
+
+            })
+
+           it("updates the global balance of the token holder", async()=>{
+                const address2TotalBalance = await erc1400.balanceOf(address2)
+                address2TotalBalance.toString().should.be.equal(tokens(15).toString(), "the global balance of the token holder increases after being issued class B tokens")
+           })
 
         })
 
