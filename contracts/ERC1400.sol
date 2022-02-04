@@ -317,7 +317,7 @@ contract ERC1400 {
    }
 
    // function to issue new tokens by partition
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external  {
+   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
 
         _balanceOfByPartition[_tokenHolder][_partition] += _value;   // increment the partition's token balance of this token holder
         _balanceOf[_tokenHolder] += _value; // increment the total balance of this token holder 
