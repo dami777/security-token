@@ -70,7 +70,7 @@ contract("ERC1400", ([address1, address2, operator])=>{
                 classAbalance.toString().should.be.equal(tokens(5).toString(), "it updates the class A token balance of the holder")
             })
 
-            it("didn't affect balance in other partitions", async()=>{
+            it("doesn't affect balance in other partitions", async()=>{
                 const classBbalance = await erc1400.balanceOfByPartition(classB, address2)
                 classBbalance.toString().should.be.equal(tokens(0).toString(), "issuance to class A doesn't affect class B balance")
             })
@@ -93,6 +93,11 @@ contract("ERC1400", ([address1, address2, operator])=>{
            it("updates class B balance of the holder", async()=>{
                 const classBbalance = await erc1400.balanceOfByPartition(classB, address2)
                 classBbalance.toString().should.be.equal(tokens(10).toString(), "it updates the class B balance of the holder")
+           })
+
+           it("doesn't affect the balance in other partitions", async()=>{
+                const classAbalance = await erc1400.balanceOfByPartition(classA, address2)
+                classAbalance.toString().should.be.equal(tokens(5).toString(), "class B issuance doen't affect class A balance") 
            })
 
         })
