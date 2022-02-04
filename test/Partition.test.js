@@ -70,6 +70,11 @@ contract("ERC1400", ([address1, address2, operator])=>{
                 classAbalance.toString().should.be.equal(tokens(5).toString(), "it updates the class A token balance of the holder")
             })
 
+            it("didn't affect balance in other partitions", async()=>{
+                const classBbalance = await erc1400.balanceOfByPartition(classB, address2)
+                classBbalance.toString().should.be.equal(tokens(0).toString(), "issuance to class A doesn't affect class B balance")
+            })
+
         })
 
         
