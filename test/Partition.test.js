@@ -5,6 +5,13 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const tokens=(n)=>{
+    return new web3.utils.BN(
+        web3.utils.toWei(n.toString(), 'ether')
+    )
+    
+}
+
 contract("ERC1400", ([address1, address2, operator])=>{
 
     let erc1400
@@ -37,7 +44,32 @@ contract("ERC1400", ([address1, address2, operator])=>{
         it("returns a zero balance in share class A for address1", async()=>{
             const balance = await erc1400.balanceOfByPartition(classA, address1)
             balance.toString().should.be.equal("0", "address1 has 0 balance in class A")
-        })  
+        }) 
+
+    })
+
+    describe ("issuance of token by partition", ()=>{
+
+        let issueClassA
+
+        beforeEach(async()=>{
+
+            issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex("us"))
+            
+        })
+
+        describe("issuance of class A tokens", ()=>{
+
+            it("updates the global balance of the token holder", async()=>{
+                const address2TotalBalance = await erc1400.balanceOf(address2)
+                address2TotalBalance.toString().should.be.equal(tokens(5).toString(), "total balance increased")
+            })
+
+            
+
+        })
+
+        
 
     })
 
