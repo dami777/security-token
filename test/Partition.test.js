@@ -90,6 +90,11 @@ contract("ERC1400", ([address1, address2, operator])=>{
                 address2TotalBalance.toString().should.be.equal(tokens(15).toString(), "the global balance of the token holder increases after being issued class B tokens")
            })
 
+           it("updates class B balance of the holder", async()=>{
+                const classBbalance = await erc1400.balanceOfByPartition(classB, address2)
+                classBbalance.toString().should.be.equal(tokens(10).toString(), "it updates the class B balance of the holder")
+           })
+
         })
 
         
