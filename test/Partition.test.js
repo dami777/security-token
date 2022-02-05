@@ -205,7 +205,14 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
             let authorizeForAllPartitions
 
             beforeEach( async()=>{
-                authorizeForPartition = await erc1400.authorizeOperatorByPartition()
+                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
+            })
+
+            it("validates that an operator has been authorized by a token holder to have access to his assets", async()=>{
+
+                const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
+                operatorStatus.should.be.equal(true, "operator has been authorized to access an holder's asset")
+
             })
 
         })
