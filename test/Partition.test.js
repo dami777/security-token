@@ -1,5 +1,6 @@
 
 const ERC1400 = artifacts.require("./ERC1400")
+const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 require("chai")
     .use(require("chai-as-promised"))
@@ -154,6 +155,10 @@ contract("ERC1400", ([address1, address2, address3, operator])=>{
         })
 
         describe("failed transfer", ()=>{
+
+            it("failed to transfer tokens to ether address", async()=>{
+                await erc1400.transferByPartition(classA, ETHER_ADDRESS, tokens(2), web3.utils.toHex(""), {from: address2}).should.be.rejected
+            })
 
         })
 

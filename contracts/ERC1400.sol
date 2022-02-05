@@ -268,6 +268,7 @@ contract ERC1400 {
        }
 
        require( _balanceOfByPartition[_from][_partition] >= _value, "insufficient token in partition"); // the partiton balance of the holder must be greater than or equal to the value
+       require(_to != address(0),  "can't transfer to zero address");   //  can't send to ether address
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
