@@ -172,7 +172,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
     describe("operator's activities", ()=>{
 
         it("confirms that an unauthorized operator can't access an holder's asset", async()=>{
-            const operatorStatus = await erc1400.isOperatorForPartition(address2)
+            const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
             operatorStatus.should.be.equal(false, "unauthorized operator can't access the holder's asset")
         })
 
