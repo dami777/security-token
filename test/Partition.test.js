@@ -208,11 +208,16 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
                 authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
             })
 
-            it("validates that an operator has been authorized by a token holder to have access to his assets", async()=>{
+            it("validates that an operator has been authorized by a token holder to have access to his assets in a specific partition", async()=>{
 
                 const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
                 operatorStatus.should.be.equal(true, "operator has been authorized to access an holder's asset")
 
+            })
+
+            it("validates that the access is restricted to the authorized partition", async()=>{
+                const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classB)
+                operatorStatus.should.be.equal(false, "operator's access was restriced to holder's class A assets only, hence no access to the holder's class B assets")
             })
 
         })
