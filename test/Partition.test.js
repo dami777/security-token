@@ -12,7 +12,7 @@ const tokens=(n)=>{
     
 }
 
-contract("ERC1400", ([address1, address2, operator])=>{
+contract("ERC1400", ([address1, address2, address3, operator])=>{
 
     let erc1400
     let name = "Tangl"
@@ -119,7 +119,20 @@ contract("ERC1400", ([address1, address2, operator])=>{
         })
 
         describe("successful transfer", ()=>{
-            
+
+            let classAtokenTransfer
+
+            beforeEach(async()=>{
+                classAtokenTransfer = await erc1400.transferByPartition(classA, address3, tokens(2), web3.utils.toHex(""), {from: address2})
+            })
+
+           it("transfers tokens in class A from address 2 to address3", async()=>{
+               
+                const address1ClassABalance = await erc1400.balanceOfByPartition(classA, address2)
+                address1ClassABalance.toString().should.be.equal(tokens(3).toString(), "class A balance of sender reduced accordingly")
+
+            })
+
         })
 
         describe("failed transfer", ()=>{
