@@ -108,4 +108,18 @@ contract("ERC1400", ([address1, address2, operator])=>{
 
     })
 
+    describe("partitions of a token holder", ()=>{
+
+
+        let issueClassA
+        let issueClassB
+
+        beforeEach(async()=>{
+            issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex(""))
+        })
+
+    })
+
+
+
 })

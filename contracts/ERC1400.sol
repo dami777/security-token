@@ -267,15 +267,16 @@ contract ERC1400 {
            _transfer(msg.sender, _to, _value);
        }
 
-       require( _balanceOfByPartition[msg.sender][_partition] >= _value); // the partiton balance of the holder must be greater than or equal to the value
+       require( _balanceOfByPartition[_from][_partition] >= _value); // the partiton balance of the holder must be greater than or equal to the value
 
-       _balanceOfByPartition[msg.sender][_partition] = _balanceOfByPartition[msg.sender][_partition] - _value;
-       _balanceOf[msg.sender] = _balanceOf[msg.sender] - _value; // the value should reflect in the global token balance of the sender
+       _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
+       _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
        
        _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
        _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
        emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
+       emit Transfer(_from, _to, _value);
 
        return _partition;
 
@@ -296,16 +297,24 @@ contract ERC1400 {
 
    // function to return the partitions of a token holder
 
-   function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
+  /* function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
+       _partitionsOf[_tokenHolder] = bytes32[];
+       for (uint256 index = 0; index <= _totalPartitions.length; index++) {
+
+            if (_balanceOfByPartition[_tokenHolder][_totalPartitions[index]] > 0) {
+               _partitionsOf[_tokenHolder].push(_totalPartitions[index]);
+            }
+
+       }
        return _partitionsOf[_tokenHolder];
 
-   }    
+   }    */
 
    // transfer by partition
    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
 
-       _transferByPartiton(_partition, msg.sender, _to, _value, _data, "");
+       _transferByPartiton(_partition, msg.sender, _to, _value, "" , "");
  
    }    
 
