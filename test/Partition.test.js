@@ -145,6 +145,12 @@ contract("ERC1400", ([address1, address2, address3, operator])=>{
                 address3GlobalBalance.toString().should.be.equal(tokens(2).toString(), "the global balance of the receiver updates after transfer")
             })
 
+            it("emits events", async()=>{
+                classAtokenTransfer.logs[0].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                classAtokenTransfer.logs[1].event.should.be.equal("Transfer", "it emits the transfer event")
+                
+            })
+
         })
 
         describe("failed transfer", ()=>{
