@@ -128,9 +128,21 @@ contract("ERC1400", ([address1, address2, address3, operator])=>{
 
            it("transfers tokens in class A from address 2 to address3", async()=>{
                
-                const address1ClassABalance = await erc1400.balanceOfByPartition(classA, address2)
-                address1ClassABalance.toString().should.be.equal(tokens(3).toString(), "class A balance of sender reduced accordingly")
+                const address2ClassABalance = await erc1400.balanceOfByPartition(classA, address2)
+                address2ClassABalance.toString().should.be.equal(tokens(3).toString(), "class A balance of sender reduced accordingly")
 
+                const address3ClassABalance = await erc1400.balanceOfByPartition(classA, address3)
+                address3ClassABalance.toString().should.be.equal(tokens(2).toString(), "class A balance of token receiver increases as expected")
+
+
+            })
+
+            it("reflects in the global balance of the sender and receiver", async()=>{
+                const address2GlobalBalance = await erc1400.balanceOf(address2)
+                address2GlobalBalance.toString().should.be.equal(tokens(3).toString(), "the global balance of the sender updates after transfer")
+
+                const address3GlobalBalance = await erc1400.balanceOf(address3)
+                address3GlobalBalance.toString().should.be.equal(tokens(2).toString(), "the global balance of the receiver updates after transfer")
             })
 
         })
