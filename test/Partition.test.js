@@ -13,7 +13,7 @@ const tokens=(n)=>{
     
 }
 
-contract("ERC1400", ([address1, address2, address3, operator])=>{
+contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
     let erc1400
     let name = "Tangl"
@@ -164,9 +164,21 @@ contract("ERC1400", ([address1, address2, address3, operator])=>{
                 await erc1400.transferByPartition(classB, address3, tokens(2), web3.utils.toHex(""), {from: address2}).should.be.rejected
             ])
 
+
         })
 
     })
+
+    describe("operator's activities", ()=>{
+
+        it("confirms that an unauthorized operator can't access an holder's asset", async()=>{
+            const operatorStatus = await erc1400.isOperatorForPartition(address2)
+            operatorStatus.should.be.equal(false, "unauthorized operator can't access the holder's asset")
+        })
+
+    })
+
+
 
 
 
