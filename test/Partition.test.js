@@ -108,14 +108,22 @@ contract("ERC1400", ([address1, address2, operator])=>{
 
     })
 
-    describe("partitions of a token holder", ()=>{
+    describe("tokens transfer from partitons", ()=>{
 
 
         let issueClassA
-        let issueClassB
+        //let issueClassB
 
         beforeEach(async()=>{
             issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex(""))
+        })
+
+        describe("successful transfer", ()=>{
+            
+        })
+
+        describe("failed transfer", ()=>{
+
         })
 
     })
