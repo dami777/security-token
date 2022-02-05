@@ -171,6 +171,16 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
     describe("operator's activities", ()=>{
 
+        let issueClassA
+
+        beforeEach(async()=>{
+
+            issueClassA = await erc1400.issueByPartition(classA, address2, tokens(5), web3.utils.toHex(""))
+            
+        })
+
+        
+
         it("confirms that an unauthorized operator can't access an holder's asset", async()=>{
             const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
             operatorStatus.should.be.equal(false, "unauthorized operator can't access the holder's asset")
@@ -179,10 +189,23 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
         
         describe("failed operator's activities", ()=>{
 
+
+
             it("failed to send tokens by an unauthorized operator from an address", async()=>{
 
                 await erc1400.operatorTransferByPartition(classA, address2, address3, tokens(1), web3.utils.toHex(""), web3.utils.toHex("")).should.be.rejected
 
+            })
+
+        })
+
+        describe("authorize operator", ()=>{
+
+            let authorizeForPartition
+            let authorizeForAllPartitions
+
+            beforeEach( async()=>{
+                authorizeForPartition = await erc1400.authorizeOperatorByPartition()
             })
 
         })
