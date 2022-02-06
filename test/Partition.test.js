@@ -424,7 +424,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
                 const transfer = await erc1400.operatorTransferByPartition(classB, address3, address4, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2})
 
-                const address3Balance = await erc1400.balanceOfByPartition(classB, address2)
+                const address3Balance = await erc1400.balanceOfByPartition(classB, address3)
                 const address4Balance = await erc1400.balanceOfByPartition(classB, address4)
 
                 address3Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from this account")
