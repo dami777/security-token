@@ -398,6 +398,10 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             })
 
+            it("fails to transfer tokens from the specified partition due to holder's insufficient token in that partition", async()=>{
+                await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(40), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1}).should.be.rejected
+            })
+
         })
 
     
