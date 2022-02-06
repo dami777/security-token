@@ -298,19 +298,11 @@ contract ERC1400 {
 
    // function to return the partitions of a token holder
 
-  /* function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
+    function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
-       _partitionsOf[_tokenHolder] = bytes32[];
-       for (uint256 index = 0; index <= _totalPartitions.length; index++) {
+        return _partitionsOf[_tokenHolder];
 
-            if (_balanceOfByPartition[_tokenHolder][_totalPartitions[index]] > 0) {
-               _partitionsOf[_tokenHolder].push(_totalPartitions[index]);
-            }
-
-       }
-       return _partitionsOf[_tokenHolder];
-
-   }    */
+   } 
 
    // transfer by partition
    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {

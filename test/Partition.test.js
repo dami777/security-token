@@ -169,7 +169,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
     })
 
-    describe("operator's activities", ()=>{
+    describe("operator's access", ()=>{
 
         let issueClassA
 
@@ -310,6 +310,62 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
         })
 
     })
+
+    describe("operator's operations on assets", ()=>{
+
+        // issuance variable for address2
+
+        let issueClassAToAdddress2
+        let issueClassBToAdddress2
+
+        // issuance variable for address3
+
+        let issueClassAToAdddress3
+        let issueClassBToAdddress3
+
+
+
+        // authorization variables to address2
+
+        let authorizeForPartitionAddress2
+        let authorizeForAllPartitionAddress2
+
+
+        // authorization variables to address3
+
+        let authorizeForPartitionAddress3
+        let authorizeForAllPartitionAddress3
+
+        beforeEach(async()=>{
+            issueClassAToAdddress2 = await erc1400.issueByPartition(classA, address2, tokens(20), web3.utils.toHex(""))    //issue class A tokens to address2
+            issueClassBToAdddress2 = await erc1400.issueByPartition(classB, address2, tokens(20), web3.utils.toHex(""))    //issue class A tokens to address2
+
+
+            issueClassAToAdddress3 = await erc1400.issueByPartition(classA, address3, tokens(20), web3.utils.toHex(""))    //issue class A tokens to address3
+            issueClassBToAdddress3 = await erc1400.issueByPartition(classB, address3, tokens(20), web3.utils.toHex(""))    //issue class A tokens to address3
+
+
+            // authorize operator accross all partitions
+
+
+
+        })
+
+        it("issued tokens to address 2 and 3", async()=>{
+            const address2Balance = await erc1400.balanceOf(address2)
+            address2Balance.toString().should.be.equal(tokens(40).toString(), "new tokens were issued to address2")
+
+            const address3Balance = await erc1400.balanceOf(address3)
+            address3Balance.toString().should.be.equal(tokens(40).toString(), "new tokens were issued to address3")
+        })
+
+    
+
+
+
+    })
+
+
 
 
 
