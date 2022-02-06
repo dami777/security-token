@@ -239,7 +239,13 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
             })
 
             it("validates that the operator has been authorized", async()=>{
-                const operatorStatus = await erc1400.isOperator()
+
+                const operatorStatus1 = await erc1400.isOperator(operator2, address2)
+                const operatorStatus2 = await erc1400.isOperator(operator2, address3)
+
+                operatorStatus1.should.be.equal(true, "operator has been authorized by this holder for all his partitioned assets")
+                operatorStatus2.should.be.equal(false, "operator has not been authorized by this holder for all his partitioned assets")
+
             })
 
         })

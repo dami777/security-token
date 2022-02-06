@@ -228,7 +228,7 @@ contract ERC1400 {
 
     /******************************* operators ***************************/
 
-    function isOperator (address _operator, address _tokenHolder) public returns (bool) {
+    function isOperator (address _operator, address _tokenHolder) public view returns (bool) {
         return _isOperator[_tokenHolder][_operator];
     }
 
