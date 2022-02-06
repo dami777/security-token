@@ -199,10 +199,10 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
         })
 
-        describe("authorize operator", ()=>{
+        describe("authorize operator for a specific partition", ()=>{
 
             let authorizeForPartition
-            let authorizeForAllPartitions
+            //let authorizeForAllPartitions
 
             beforeEach( async()=>{
                 authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
@@ -217,8 +217,20 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
             it("validates that the access is restricted to the authorized partition", async()=>{
                 const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classB)
-                operatorStatus.should.be.equal(false, "operator's access was restriced to holder's class A assets only, hence no access to the holder's class B assets")
+                operatorStatus.should.be.equal(false, "operator's can only access to holder's class A assets only as he was authorized, hence no access to the holder's class B assets")
             })
+
+            it("emits an event after authorization", async()=>{
+                authorizeForPartition.logs[0].event.should.be.equal("AuthorizedOperatorByPartition", "it emits the event expected to be emitted")
+            })
+
+            /*it("authorizes an operator to have access to all partitions of an holder", async()=>{
+
+            })*/
+
+        })
+
+        describe("authorizes an operator for all partition", ()=>{
 
         })
 
