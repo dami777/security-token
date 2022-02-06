@@ -35,7 +35,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    /*describe("partitions of a token holder", ()=>{
+    describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
 
@@ -309,7 +309,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-    })*/
+    })
 
     describe("operator's operations on assets", ()=>{
 
@@ -420,7 +420,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             })
 
 
-            it("transfers tokens from class B partition it has been givn access to", async()=>{
+            it("transfers tokens from class B partition it has been given access to", async()=>{
 
                 const transfer = await erc1400.operatorTransferByPartition(classB, address3, address4, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2})
 
@@ -432,6 +432,11 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             })
 
+            it("rejects an operator's transfer operation from partitions it has no access to", async()=>{
+                await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2}).should.be.rejected
+                await erc1400.operatorTransferByPartition(classA, address3, address5, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2}).should.be.rejected
+            })
+
         })
 
     
@@ -439,11 +444,5 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
 
     })
-
-
-
-
-
-
 
 })
