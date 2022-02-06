@@ -371,7 +371,8 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         describe("operator 1 transfer activities", ()=>{
 
-            it("transfers tokens from address2's class A and class B partitions to other addresses", async()=>{
+            it("transfers tokens from address2's class A tokens to other addresses", async()=>{
+
 
                 const transfer = await erc1400.operatorTransferByPartition(classA, address2, address4, tokens(5), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1})
 
@@ -379,7 +380,21 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                 const address4Balance = await erc1400.balanceOfByPartition(classA, address4)
 
                 address2Balance.toString().should.be.equal(tokens(15).toString(), "operator sent tokens from this account")
-                address4Balance.toString().should.be.equal(tokens(5).toString(), "operator sent tokens to this account")
+                address4Balance.toString().should.be.equal(tokens(5).toString(), "operator sent tokens from an account to this account")
+
+            })
+
+
+            it("transfers tokens from address2's class B tokens to other addresses", async()=>{
+
+
+                const transfer = await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1})
+
+                const address2Balance = await erc1400.balanceOfByPartition(classB, address2)
+                const address5Balance = await erc1400.balanceOfByPartition(classB, address5)
+
+                address2Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from this account")
+                address5Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from an account to this account")
 
             })
 
