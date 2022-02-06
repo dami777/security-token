@@ -248,6 +248,10 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
             })
 
+            it("emits the event for authorization of all partitions", async()=>{
+                authorizeForAllPartitions.logs[0].event.should.be.equal("AuthorizedOperator", "emits the required event when an operator is authorized by an holder to access all his assets")
+            })
+
         })
 
     })
