@@ -228,8 +228,8 @@ contract ERC1400 {
 
     /******************************* operators ***************************/
 
-    function isOperator (address _from, address _operator) public returns (bool) {
-        return _isOperator[_from][_operator];
+    function isOperator (address _operator, address _tokenHolder) public returns (bool) {
+        return _isOperator[_tokenHolder][_operator];
     }
 
     function authorizeOperator (address _operator) public {

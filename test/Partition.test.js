@@ -202,7 +202,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
         describe("authorize operator for a specific partition", ()=>{
 
             let authorizeForPartition
-            //let authorizeForAllPartitions
+            
 
             beforeEach( async()=>{
                 authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
@@ -231,6 +231,16 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
         })
 
         describe("authorizes an operator for all partition", ()=>{
+
+            let authorizeForAllPartitions
+
+            beforeEach(async()=>{
+                authorizeForAllPartitions = await erc1400.authorizeOperator(operator2, {from: address2})
+            })
+
+            it("validates that the operator has been authorized", async()=>{
+                const operatorStatus = await erc1400.isOperator()
+            })
 
         })
 
