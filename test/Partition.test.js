@@ -266,7 +266,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
             })
 
             it("revokes an operator's access to specific partition", async()=>{
-                const revokeOperatorToPartition = await erc1400.revokeOperatorByPartition(classA, operator1)
+                const revokeOperatorToPartition = await erc1400.revokeOperatorByPartition(classA, operator1, {from: address2})
                 const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
                 operatorStatus.should.be.equal(false, "operator has been revoked to access class A tokens of an holder's asset")
 
