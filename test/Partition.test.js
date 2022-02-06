@@ -13,7 +13,7 @@ const tokens=(n)=>{
     
 }
 
-contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
+contract("ERC1400", ([address1, address2, address3, address4, address5, address6, operator1, operator2,])=>{
 
     let erc1400
     let name = "Tangl"
@@ -345,7 +345,11 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
             issueClassBToAdddress3 = await erc1400.issueByPartition(classB, address3, tokens(20), web3.utils.toHex(""))    //issue class A tokens to address3
 
 
-            // authorize operator accross all partitions
+            // authorize operator1 accross all partitions
+
+
+
+            // authorize operator2 accross specific partitions
 
 
 
