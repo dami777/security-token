@@ -224,13 +224,10 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
                 authorizeForPartition.logs[0].event.should.be.equal("AuthorizedOperatorByPartition", "it emits the event expected to be emitted")
             })
 
-            /*it("authorizes an operator to have access to all partitions of an holder", async()=>{
-
-            })*/
 
         })
 
-        describe("authorizes an operator for all partition", ()=>{
+        describe("authorizes an operator for all partitions", ()=>{
 
             let authorizeForAllPartitions
 
@@ -238,7 +235,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
                 authorizeForAllPartitions = await erc1400.authorizeOperator(operator2, {from: address2})
             })
 
-            it("validates that the operator has been authorized", async()=>{
+            it("validates that an operator has been authorized", async()=>{
 
                 const operatorStatus1 = await erc1400.isOperator(operator2, address2)
                 const operatorStatus2 = await erc1400.isOperator(operator2, address3)
@@ -250,6 +247,29 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
             it("emits the event for authorization of all partitions", async()=>{
                 authorizeForAllPartitions.logs[0].event.should.be.equal("AuthorizedOperator", "emits the required event when an operator is authorized by an holder to access all his assets")
+            })
+
+        })
+
+        describe("revoke operators", ()=>{
+
+            let authorizeForPartition
+            
+
+            beforeEach( async()=>{
+                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
+            })
+
+            it("authorizes an operator to a specific partition", ()=>{
+                const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
+                operatorStatus.should.be.equal(true, "operator has been authorized to access class A tokens of an holder's asset")
+            })
+
+            it("revokes an operator's access to specific partition", async()=>{
+                const revokeOperatorToPartition = await erc1400.revokeOperatorByPartition(classA, operator1)
+                const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
+                operatorStatus.should.be.equal(false, "operator has been revoked to access class A tokens of an holder's asset")
+
             })
 
         })
