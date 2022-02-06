@@ -182,7 +182,7 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
         
 
         it("confirms that an unauthorized operator can't access an holder's asset", async()=>{
-            const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
+            const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
             operatorStatus.should.be.equal(false, "unauthorized operator can't access the holder's asset")
         })
 
@@ -210,13 +210,13 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
 
             it("validates that an operator has been authorized by a token holder to have access to his assets in a specific partition", async()=>{
 
-                const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classA)
+                const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
                 operatorStatus.should.be.equal(true, "operator has been authorized to access an holder's asset")
 
             })
 
             it("validates that the access is restricted to the authorized partition", async()=>{
-                const operatorStatus = await erc1400.isOperatorForPartition(address2, operator1, classB)
+                const operatorStatus = await erc1400.isOperatorForPartition(classB, operator1, address2)
                 operatorStatus.should.be.equal(false, "operator's can only access to holder's class A assets only as he was authorized, hence no access to the holder's class B assets")
             })
 
