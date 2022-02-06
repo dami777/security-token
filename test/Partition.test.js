@@ -297,7 +297,11 @@ contract("ERC1400", ([address1, address2, address3, operator1, operator2])=>{
                     const operatorStatus = await erc1400.isOperator(operator2, address2)
                     operatorStatus.should.be.equal(false, "operator has been revoked from accessing all partitions in an holder's asset")
 
+                    revokeOperatorToAllPartitions.logs[0].event.should.be.equal("RevokedOperator", "emits the event required to be emitted whenever an operator is revoked for all partitions")
+
                 })
+
+               
 
             })
 
