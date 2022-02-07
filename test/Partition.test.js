@@ -381,6 +381,9 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
                 address2Balance.toString().should.be.equal(tokens(15).toString(), "operator sent tokens from this account")
                 address4Balance.toString().should.be.equal(tokens(5).toString(), "operator sent tokens from an account to this account")
+                
+                transfer.logs[0].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                transfer.logs[1].event.should.be.equal("Transfer", "it emits the transfer event")
 
             })
 
