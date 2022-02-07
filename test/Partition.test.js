@@ -467,6 +467,29 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
+
+        describe("holder burnt his tokens in a partition", ()=>{
+
+            let tokenBurn
+
+            beforeEach(async()=>{
+
+                tokenBurn = await erc1400.redeemByPartition(classA, tokens(1), web3.utils.toHex(""), {from: address2})
+
+            })
+
+            it("burnt tokens successfully", async()=>{
+
+                const balanceOfByPartition = await erc1400.balanceOfByPartition(classA, address2)
+                balanceOfByPartition.toString().should.be.equal(tokens(19).toString(), "tokens reduced in the specific partition of the token holder after burning")
+
+                const balance = await erc1400.balanceOf(address2)
+                balance.toString().should.be.equal(tokens(39).toString(), "total balance of the holder reduced after burning tokens in a partition")
+
+            })
+
+        })
+
     })
 
 })
