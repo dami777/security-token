@@ -339,7 +339,10 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes _data) external {
 
-       
+       require(msg.sender != address(0), "invalid sender");
+       require(_balanceOfByPartition[msg.sender][_partition] >= _value, "insufficient amount to burn");
+       _transferByPartiton(_partition, msg.sender, address(0), "", "");
+       totalSupply -= _value; 
 
    }
 
