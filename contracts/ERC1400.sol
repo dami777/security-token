@@ -78,6 +78,8 @@ contract ERC1400 {
     event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
     event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
     event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
+    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
+
 
      // *************************************** Mappings ********************************************************* //
 
@@ -349,7 +351,8 @@ contract ERC1400 {
        require(msg.sender != address(0), "invalid sender");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
        _transferByPartiton(_partition, _tokenHolder, address(0), _data, _operatorData);
-       totalSupply -= _value; 
+       totalSupply -= _value;
+       
 
 
    }
