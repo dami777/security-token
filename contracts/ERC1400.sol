@@ -357,7 +357,11 @@ contract ERC1400 {
 
        require(msg.sender != address(0), "invalid sender");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
-       _transferByPartiton(_partition, _tokenHolder, address(0), _value, _data, _operatorData);
+       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
+       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+       
+       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
+       _balanceOf[address(0)] = _balanceOf[address(0)] + _value; // the value should reflect in the global token balance of the receiver
        totalSupply -= _value;
        emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 
