@@ -314,7 +314,7 @@ contract ERC1400 {
            return (_data, "invalid receiver", _partition);
        }
 
-       if (value > _balanceOfByPartition[_from][_partition]) {
+       if (_value > _balanceOfByPartition[_from][_partition]) {
            return (_data, "insufficient balance", _partition);
        }
 
