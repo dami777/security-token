@@ -347,7 +347,7 @@ contract ERC1400 {
 
    function operatorRedeemByPartitition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _operatorData) external {
 
-       require(_isOperator[_tokenHolder][msg.sender] || isOperatorForPartition[_tokenHolder][msg.sender][_partition], "invalid sender");
+       require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "invalid sender");
        _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
 
    }
@@ -357,7 +357,7 @@ contract ERC1400 {
 
        require(msg.sender != address(0), "invalid sender");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
-       _transferByPartiton(_partition, _tokenHolder, address(0), _data, _operatorData);
+       _transferByPartiton(_partition, _tokenHolder, address(0), _value, _data, _operatorData);
        totalSupply -= _value;
        emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 

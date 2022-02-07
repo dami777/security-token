@@ -435,8 +435,38 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })*/
 
-    /*describe("redemption by partitition", ()=>{
+    describe("redemption by partitition", ()=>{
 
-    })*/
+        let issueClassAToAdddress2
+        let issueClassBToAdddress2
+
+        beforeEach(async()=>{
+
+            issueClassAToAdddress2 = await erc1400.issueByPartition(classA, address2, 20, web3.utils.toHex(""))    //issue class A tokens to address2
+            issueClassBToAdddress2 = await erc1400.issueByPartition(classB, address2, 20, web3.utils.toHex(""))    //issue class A tokens to address2
+
+            // authorize operator 1 to all partitions
+
+            await erc1400.authorizeOperator(operator1, {from: address2})
+            
+
+            // authorize operator2 to specific partitions
+
+            await erc1400.authorizeOperatorByPartition(classA, operator2, {from: address2}) // authorize operator2 to class A only
+           
+        })
+
+        it("issued tokens to address2", async()=>{
+            const balance = await erc1400.balanceOf(address2)
+            balance.toString().should.be.equal(tokens(40).toString(), "tokens were issued to address 2")
+        })
+
+        it("updated the total supply", async()=>{
+            const totalSupply = await erc1400.totalSupply()
+            totalSupply.toString().should.be.equal(tokens(40).toString(), "total supply was updated")
+
+        })
+
+    })
 
 })
