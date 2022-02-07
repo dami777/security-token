@@ -571,6 +571,12 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                     operator2Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
                 })
 
+                it("rejects an operator's operation to burn tokens from a specific partition due to his unauthorized access to that partition", async()=>{
+
+                    await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), web3.utils.toHex(""), {from: operator2}).should.be.rejected
+
+                })
+
             })
 
         })
