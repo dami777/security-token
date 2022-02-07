@@ -352,8 +352,7 @@ contract ERC1400 {
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
        _transferByPartiton(_partition, _tokenHolder, address(0), _data, _operatorData);
        totalSupply -= _value;
-       
-
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 
    }
 
