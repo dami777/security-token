@@ -488,6 +488,11 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             })
 
+            it("reduced the total supply accross all partitions after burning tokens", async()=>{
+                const totalSupply = await erc1400.totalSupply()
+                totalSupply.toString().should.be.equal(tokens(39).toString(), "total supply accross all partitions reduces after holder burnt tokens")
+            })
+
         })
 
     })
