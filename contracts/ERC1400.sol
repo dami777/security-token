@@ -306,7 +306,22 @@ contract ERC1400 {
 
    } 
 
+   // can transfer by partition
+
+   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes _data) external {
+
+       if (_to == address(0)) {
+           return (_data, "invalid receiver", _partition);
+       }
+
+       if (value > _balanceOfByPartition[_from][_partition]) {
+           return (_data, "insufficient balance", _partition);
+       }
+
+   }
+
    // transfer by partition
+
    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
 
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
