@@ -325,7 +325,7 @@ contract ERC1400 {
 
    // function to issue new tokens by partition
 
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
+   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
 
         uint256 amount =  _value * granularity; 
         _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
@@ -339,14 +339,18 @@ contract ERC1400 {
 
    // function to redeem by partition
 
-   function redeemByPartition(bytes32 _partition, uint256 _value, bytes _data) external {
+   function redeemByPartition(bytes32 _partition, uint256 _value, bytes calldata _data) external {
 
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
 
+   function operatorRedeemByPartitition() external {
 
-   function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes _data, bytes _operatorData) internal {
+   }
+
+
+   function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) internal {
 
        require(msg.sender != address(0), "invalid sender");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
