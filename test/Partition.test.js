@@ -35,7 +35,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    describe("partitions of a token holder", ()=>{
+    /*describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
 
@@ -323,19 +323,6 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
         let issueClassAToAdddress3
         let issueClassBToAdddress3
 
-
-
-        // authorization variables to address2
-
-        let authorizeForPartitionAddress2
-        let authorizeForAllPartitionAddress2
-
-
-        // authorization variables to address3
-
-        let authorizeForPartitionAddress3
-        let authorizeForAllPartitionAddress3
-
         beforeEach(async()=>{
             issueClassAToAdddress2 = await erc1400.issueByPartition(classA, address2, 20, web3.utils.toHex(""))    //issue class A tokens to address2
             issueClassBToAdddress2 = await erc1400.issueByPartition(classB, address2, 20, web3.utils.toHex(""))    //issue class A tokens to address2
@@ -446,6 +433,10 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
 
 
-    })
+    })*/
+
+    /*describe("redemption by partitition", ()=>{
+
+    })*/
 
 })

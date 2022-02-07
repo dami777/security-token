@@ -318,7 +318,11 @@ contract ERC1400 {
        _transferByPartiton(_partition, _from, _to, _value, "", "");
    }
 
+
+   // ************************* issuance / redemption ******************************//
+
    // function to issue new tokens by partition
+
    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
 
         uint256 amount =  _value * granularity; 
@@ -327,6 +331,15 @@ contract ERC1400 {
         totalSupply += amount; // increase the total supply
         emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
     
+
+   }
+
+
+   // function to redeem by partition
+
+   function redeemByPartition(bytes32 _partition, uint256 _value, bytes _data) external {
+
+       
 
    }
 
