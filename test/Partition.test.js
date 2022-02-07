@@ -544,6 +544,35 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             })
 
+            describe("operator 2 burns token", ()=>{
+
+                beforeEach(async()=>{
+                    operator2Burn = await erc1400.operatorRedeemByPartition(classA, address2, tokens(5), web3.utils.toHex(""), {from: operator2})
+                })
+
+
+                it("reduces the total supply", async()=>{
+                    const totalSupply = await erc1400.totalSupply()
+                    totalSupply.toString().should.be.equal(tokens(35).toString(), "total supply reduces after operator burns tokens from an holder's partition")
+                })
+
+                it("reduces the balance of the holder", async()=>{
+                    const balanceOfByPartition = await erc1400.balanceOfByPartition(classA, address2)
+                    balanceOfByPartition.toString().should.be.equal(tokens(15).toString(), "tokens reduced in the specific partition of the token holder after burning")
+
+                    const balance = await erc1400.balanceOf(address2)
+                    balance.toString().should.be.equal(tokens(35).toString(), "total balance of the holder reduced after burning tokens in a partition")
+                })
+
+                it("emits redeemed by partition event", async()=>{
+                    operator2Burn.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition after an operator burns tokens from an holder's partition")
+                    operator2Burn.logs[0].args._operator.should.be.equal(operator2, "emits the operator's address")
+                    operator2Burn.logs[0].args._from.should.be.equal(address2, "it emits the holder's address")
+                    operator2Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
+                })
+
+            })
+
         })
 
     })
