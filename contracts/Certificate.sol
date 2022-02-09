@@ -15,13 +15,18 @@ contract Certificate {
     //  5. Verify the signature
 
 
-    function generateMessageHash(string memory _message) public view returns (bytes32) {
+    function generateMessageHash(string memory _message) public returns (bytes32) {
 
         return keccak256(abi.encodePacked(_message);)
 
     }
 
-    function generateHashToSign() {
+    function generateHashToSign(bytes32 _hashedMessage) public returns (bytes32) {
+
+        return keccak256(abi.encodePacked(
+            "x19Ethereum Signed Message:\n32",
+            _hashedMessage
+        ));
 
     }
 
