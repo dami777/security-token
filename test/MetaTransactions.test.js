@@ -1,3 +1,4 @@
+
 const Cert = artifacts.require("./Certificate")
 
 require("chai")
@@ -9,7 +10,17 @@ contract("Cert", ([account1, account2])=>{
     let cert 
 
     beforeEach(async()=>{
-        await cert.new()
+        cert = await Cert.new()
+    })
+
+    describe("deployment", ()=>{
+
+        it("has a contract address", async()=>{
+
+            cert.address.should.not.be.equal("", "it has contract address")
+
+        })
+
     })
 
 })

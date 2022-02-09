@@ -15,7 +15,7 @@ contract Certificate {
     //  5. Verify the signature
 
 
-    function generateMessageHash() {
+    /*function generateMessageHash() {
 
     }
 
@@ -25,7 +25,7 @@ contract Certificate {
 
     function verifySignature() {
 
-    }
+    }*/
 
 
 }
