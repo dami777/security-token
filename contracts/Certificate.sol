@@ -15,8 +15,8 @@ contract Certificate {
     //  5. Verify the signature
 
 
-    bytes32 messageToSign;
-
+    bytes32 public messageToSign;
+    address public returnedSigner;
 
     function generateMessageHash(string memory _message) public returns (bytes32) {
 
@@ -39,6 +39,8 @@ contract Certificate {
 
     function _split(bytes memory _signature) returns (bytes32 r, bytes32 s, uint8 v)  {
 
+        require(_signature.length == 65, "invalid signature length");
+
         assembly {
 
             r := mload(add(_signature, 32))
@@ -49,7 +51,14 @@ contract Certificate {
 
     }
 
-    function verifySignature() {
+    function verifySignature(string memory _message, bytes memory _signature) public {
+
+            bytes32 _messageHash = generateMessageHash(_message);
+            bytes32 _messageToSign = generateHashToSign(_messageHash)
+
+            (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
+
+            returnedSigner = erecover(_messageToSign, r, s, v);
 
     }
 
