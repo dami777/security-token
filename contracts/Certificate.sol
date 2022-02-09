@@ -15,7 +15,9 @@ contract Certificate {
     //  5. Verify the signature
 
 
-    /*function generateMessageHash() {
+    function generateMessageHash(string memory _message) public view returns (bytes32) {
+
+        return keccak256(abi.encodePacked(_message);)
 
     }
 
@@ -25,7 +27,7 @@ contract Certificate {
 
     function verifySignature() {
 
-    }*/
+    }
 
 
 }
