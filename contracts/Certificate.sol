@@ -37,7 +37,17 @@ contract Certificate {
     }
 
 
-    function recover(bytes32 )
+    function _split(bytes memory _signature) returns (bytes32 r, bytes32 s, uint8 v)  {
+
+        assembly {
+
+            r := mload(add(_signature, 32))
+            s := mload(add(_signature, 64))
+            v := byte(0, mload(add(_signature, 96)))
+
+        }
+
+    }
 
     function verifySignature() {
 
