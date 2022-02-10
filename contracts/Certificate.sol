@@ -20,7 +20,7 @@ contract Certificate {
 
     function generateMessageHash(string memory _message) public returns (bytes32) {
 
-        return keccak256(abi.encodePacked(_message);)
+        return keccak256(abi.encodePacked(_message));
 
     }
 
@@ -37,7 +37,7 @@ contract Certificate {
     }
 
 
-    function _split(bytes memory _signature) returns (bytes32 r, bytes32 s, uint8 v)  {
+    function _split(bytes memory _signature) public returns (bytes32 r, bytes32 s, uint8 v) {
 
         require(_signature.length == 65, "invalid signature length");
 
@@ -51,14 +51,14 @@ contract Certificate {
 
     }
 
-    function verifySignature(string memory _message, bytes memory _signature) public {
+    function verifySignature(string memory _message, bytes memory _signature) public returns (address) {
 
             bytes32 _messageHash = generateMessageHash(_message);
-            bytes32 _messageToSign = generateHashToSign(_messageHash)
+            bytes32 _messageToSign = generateHashToSign(_messageHash);
 
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
-            returnedSigner = erecover(_messageToSign, r, s, v);
+            returnedSigner = ecrecover(_messageToSign, v, r, s);
 
     }
 
