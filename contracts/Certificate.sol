@@ -11,8 +11,8 @@ contract Certificate {
     //  1. Have the message (structured data should be EIP 712 standard)
     //  2. Hash the Message
     //  3. Sign the hashed Message
-    //  4. Hash the signed message
-    //  5. Verify the signer using the signature hash and the signature
+    //  4. Hash the hashed message by prefixing it with "\x19Ethereum Signed Message:\n32"
+    //  5. Verify the signer using the hash gotten in 4 and the signature
 
 
     bytes32 public messageToSign;
