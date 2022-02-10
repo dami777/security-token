@@ -10,29 +10,31 @@ contract Certificate {
 
     //  1. Have the message (structured data should be EIP 712 standard)
     //  2. Hash the Message
-    //  3. Generate another hash of the hash message in 3
-    //  4. Sign the hashed message offchain
-    //  5. Verify the signature
+    //  3. Sign the hashed Message
+    //  4. Hash the signed message
+    //  5. Verify the signer using the signature hash and the signature
 
 
     bytes32 public messageToSign;
+    bytes32 public hashedSignature;
     address public returnedSigner;
 
     function generateMessageHash(string memory _message) public returns (bytes32) {
 
-        return keccak256(abi.encodePacked(_message));
+
+        messageToSign = keccak256(abi.encodePacked(_message));
+        return messageToSign;
 
     }
 
-    function generateHashToSign(bytes32 _hashedMessage) public returns (bytes32) {
+    function generateEthSignHash(bytes32 _signedData) public returns (bytes32) {
 
-
-        messageToSign =  keccak256(abi.encodePacked(
-            "x19Ethereum Signed Message:\n32",
-            _hashedMessage
+        hashedSignature =  keccak256(abi.encodePacked(
+            "\x19Ethereum Signed Message:\n32",
+            _signedData
         ));
 
-        return messageToSign;
+        return hashedSignature;
 
     }
 
@@ -51,14 +53,11 @@ contract Certificate {
 
     }
 
-    function verifySignature(string memory _message, bytes memory _signature) public returns (address) {
-
-            bytes32 _messageHash = generateMessageHash(_message);
-            bytes32 _messageToSign = generateHashToSign(_messageHash);
+    function verifySignature(bytes32 _hashedSignature, bytes memory _signature) public returns (address) {
 
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
-            returnedSigner = ecrecover(_messageToSign, v, r, s);
+            returnedSigner = ecrecover(_hashedSignature, v, r, s);
 
     }
 
