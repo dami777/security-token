@@ -52,7 +52,7 @@ contract("Cert", ([account1, account2])=>{
 
             beforeEach(async()=>{
 
-                await cert.generateEthSignHash(signature)
+                await cert.generateEthSignHash(messageHash)
                 signatureHash = await cert.hashedSignature()
 
             })
