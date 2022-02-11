@@ -23,5 +23,27 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
 
     })
 
+    describe("Identity hashing", ()=>{
+
+        let identity = {
+
+            _from: address1,
+            _to: address2,
+            _amount: 10
+
+        }
+
+        let identityHash
+
+        beforeEach(async()=>{
+            identityHash = await certificate.hashIdentity(identity)
+        })
+
+        it("hashed the identity object", ()=>{
+            console.log(identityHash)
+        })
+
+    })
+
 
 })
