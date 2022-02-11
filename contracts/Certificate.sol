@@ -19,6 +19,9 @@ contract Certificate {
     bytes32 public hashedSignature;
     address public returnedSigner;
 
+
+    // generate the message hash
+
     function generateMessageHash(string memory _message) public returns (bytes32) {
 
 
@@ -27,11 +30,13 @@ contract Certificate {
 
     }
 
-    function generateEthSignHash(bytes32 _signedData) public returns (bytes32) {
+    //  generate a signed hash of the message hash
+
+    function generateEthSignHash(bytes32 _messageHash) public returns (bytes32) {
 
         hashedSignature =  keccak256(abi.encodePacked(
             "\x19Ethereum Signed Message:\n32",
-            _signedData
+            _messageHash
         ));
 
         return hashedSignature;
@@ -53,11 +58,13 @@ contract Certificate {
 
     }
 
-    function verifySignature(bytes32 _hashedSignature, bytes memory _signature) public returns (address) {
+    // verify the signer using the ethereum signed hash and the signature
+
+    function verifySignature(bytes32 _signedHash, bytes memory _signature) public returns (address) {
 
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
-            returnedSigner = ecrecover(_hashedSignature, v, r, s);
+            returnedSigner = ecrecover(_signedHash, v, r, s);
 
     }
 

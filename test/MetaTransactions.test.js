@@ -46,7 +46,7 @@ contract("Cert", ([account1, account2])=>{
 
         describe("signature verification", ()=>{
 
-            const signature = "0xf05510998daddf485a4d8a3a6bbd56840200ae9c44801f35ecefc4cd8013b9b827d6f9e1f57913f08f1e83be2c71c71b8b55bd6151ed7a4226e981f9dbdab1261b"
+            const signature = "0x9d92e98dc1595a1056b08370167700effa4cac27707573ea806448d97709c1500236d1415a6908858cf3249cc8c015a01ec07243451212b306909ae5e20938d41b"
 
 
 
@@ -59,10 +59,13 @@ contract("Cert", ([account1, account2])=>{
 
             it("verifies the signer", async()=>{
 
+                const signerAddress = "0x3b38b124019267a4A12505CBc9D81eD14461165A"
+
                 await cert.verifySignature(signatureHash, signature)
-                const address = await cert.returnedSigner()
-                console.log(address)
-                console.log(account1)
+                const returnedAddress = await cert.returnedSigner()
+                returnedAddress.should.be.equal(signerAddress, "returned the correct signer of the message")
+                console.log(returnedAddress, " is the signer's address")
+               
             })
 
         })
