@@ -34,14 +34,22 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
         }
 
         let identityHash
+        let ethHash
 
         beforeEach(async()=>{
             identityHash = await certificate.hashIdentity(identity)
+            await certificate.ethHash(identity)
         })
 
         it("hashed the identity object", ()=>{
             identityHash.should.not.be.equal("", "the identity object has been hashed")
             console.log(identityHash, "identity object")
+        })
+
+        it("generates an hashed value of the hased Identity", async()=>{
+            ethHash = await certificate._ethHash()
+            ethHash.should.not.be.equal("", "generated ethereum hash is not empty")
+            console.log(ethHash)
         })
 
     })

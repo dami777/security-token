@@ -22,6 +22,7 @@ contract EIP712 {
     bytes32 constant salt = 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d;      // an hardcoded salt value
     string constant EIP712_DOMAIN_HASH_TYPE = "EIP712Domain(string name, string version, uint256 chainId, address verifyingContract, bytes32 salt)";
 
+    bytes32 public _ethHash;
 
     bytes32 DOMAIN_SEPARATOR = keccak256(abi.encodePacked(
 
@@ -45,15 +46,18 @@ contract EIP712 {
 
     // function to hash the hashed Identity
 
-    function ethHash(Identitty memory _identity) public pure returns (bytes32) {
-        return keccak256(
+    function ethHash(Identitty memory _identity) public returns (bytes32) {
+        
+        _ethHash =  keccak256(
             abi.encodePacked(
                 "\\x19\\x01",
                 DOMAIN_SEPARATOR,
                 hashIdentity(_identity)
                 
             )
-        )
+        );
+
+        return _ethHash;
     }
 
 
