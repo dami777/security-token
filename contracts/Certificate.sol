@@ -5,8 +5,9 @@ pragma solidity 0.8.10;
 
 contract Certificate {
 
-    //  this contract is to test data signing
-    //  steps:
+    //  this contract is to test data how data signature and signature verification works
+
+    //  ********************** steps *************************************** //
 
     //  1. Have the message (structured data should be EIP 712 standard)
     //  2. Hash the Message
