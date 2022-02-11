@@ -34,10 +34,26 @@ contract EIP712 {
 
     ));
 
+    // function to hash the Identity data
+
     function hashIdentity(Identitty memory _identity) public pure returns (bytes32) {
 
         return keccak256(abi.encodePacked(IDENTITY_TYPEHASH, _identity._from, _identity._to, _identity._amount));
 
+    }
+
+
+    // function to hash the hashed Identity
+
+    function ethHash(Identitty memory _identity) public pure returns (bytes32) {
+        return keccak256(
+            abi.encodePacked(
+                "\\x19\\x01",
+                DOMAIN_SEPARATOR,
+                hashIdentity(_identity)
+                
+            )
+        )
     }
 
 
