@@ -40,7 +40,8 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
         })
 
         it("hashed the identity object", ()=>{
-            console.log(identityHash)
+            identityHash.should.not.be.equal("", "the identity object has been hashed")
+            console.log(identityHash, "identity object")
         })
 
     })

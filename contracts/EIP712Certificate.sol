@@ -23,7 +23,7 @@ contract EIP712 {
     string constant EIP712_DOMAIN_HASH_TYPE = "EIP712Domain(string name, string version, uint256 chainId, address verifyingContract, bytes32 salt)";
 
 
-    bytes32 constant DOMAIN_SEPARATOR = keccak256(abi.encodePacked(
+    bytes32 DOMAIN_SEPARATOR = keccak256(abi.encodePacked(
 
         EIP712_DOMAIN_HASH_TYPE,
         keccak256(bytes("Dapp Name")),
