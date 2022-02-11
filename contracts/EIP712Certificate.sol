@@ -12,7 +12,7 @@ contract EIP712 {
 
     }
 
-    string constant IDENTITY_TYPE = "Identity(address _from, address _to, uint256 _amount)";
+    string constant IDENTITY_TYPEHASH = "Identity(address _from, address _to, uint256 _amount)";
 
 
     // ******* Define the Domain Separator Values ****** //
@@ -36,7 +36,7 @@ contract EIP712 {
 
     function hashIdentity(Identitty memory _identity) public pure returns (bytes32) {
 
-        return keccak256(abi.encodePacked(_identity._from, _identity._to, _identity._amount));
+        return keccak256(abi.encodePacked(IDENTITY_TYPEHASH, _identity._from, _identity._to, _identity._amount));
 
     }
 
