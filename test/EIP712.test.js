@@ -65,6 +65,18 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
             {name: "salt", type: "bytes32"}
         ]
 
+
+        let identity = [
+            {name: "_from", type: "address"},
+            {name: "_to", type: "address"},
+            {name: "_amount", type: "uint256"}
+        ]
+
+
+        let domainData = {
+            
+        }
+
     })
 
 
