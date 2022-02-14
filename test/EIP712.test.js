@@ -80,6 +80,23 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
             verifyingContract: certificate.this
         }
 
+        let message = {
+            amount: 100,
+            from: "Mr Tommy Shelby",
+            to: "Miss Eda Shelby"
+        }
+
+        let data = JSON.stringify({
+            types : {
+                EIP712Domain: domain,
+                Identity: identity
+            },
+
+            domain: domainData,
+            primaryType: "Identity",
+            message: message
+        })
+
     })
 
 
