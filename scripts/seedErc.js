@@ -7,6 +7,8 @@ module.exports = async function(callback) {
     try {
         const accounts = await web3.eth.getAccounts()
 
+    
+
         // fetch the deployed contract
         const erc1400 = await ERC1400.deployed()
 
