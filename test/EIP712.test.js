@@ -74,7 +74,10 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
 
 
         let domainData = {
-            
+            name: "Dapp Name",
+            version: "1",
+            chainId: 5777,
+            verifyingContract: certificate.this
         }
 
     })
