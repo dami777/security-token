@@ -6,8 +6,8 @@ contract EIP712 {
 
     struct Identitty {
 
-        address _from;
-        address _to;
+        string _from;
+        string _to;
         uint256 _amount;
 
     }
@@ -17,8 +17,8 @@ contract EIP712 {
 
     // ******* Define the Domain Separator Values ****** //
 
-    uint256 constant chainId = 5777;
-    address verifyingContract = address(this);
+    uint256 constant chainId = 4;
+    address verifyingContract = 0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83;
     bytes32 constant salt = 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d;      // an hardcoded salt value
     string constant EIP712_DOMAIN_HASH_TYPE = "EIP712Domain(string name, string version, uint256 chainId, address verifyingContract, bytes32 salt)";
 
@@ -27,7 +27,7 @@ contract EIP712 {
     bytes32 DOMAIN_SEPARATOR = keccak256(abi.encodePacked(
 
         EIP712_DOMAIN_HASH_TYPE,
-        keccak256(bytes("Dapp Name")),
+        keccak256(bytes("TANGL")),
         keccak256(bytes("1")),
         chainId,
         verifyingContract,
@@ -59,7 +59,9 @@ contract EIP712 {
 
         return _ethHash;
     }
+    
 
+    // recover function
 
 
 

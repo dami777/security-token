@@ -55,48 +55,9 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
     })
 
 
-    describe("signing code", ()=>{
+    describe("signing data", ()=>{
 
-        let domain = [
-            {name: "name", type: "string"},
-            {name: "version", type: "string"},
-            {name: "chainId", type: "uint256"},
-            {name: "verifyingContract", type: "address"},
-            {name: "salt", type: "bytes32"}
-        ]
-
-
-        let identity = [
-            {name: "_from", type: "address"},
-            {name: "_to", type: "address"},
-            {name: "_amount", type: "uint256"}
-        ]
-
-
-        let domainData = {
-            name: "Dapp Name",
-            version: "1",
-            chainId: 5777,
-            verifyingContract: certificate.this
-        }
-
-        let message = {
-            amount: 100,
-            from: "Mr Tommy Shelby",
-            to: "Miss Eda Shelby"
-        }
-
-        let data = JSON.stringify({
-            types : {
-                EIP712Domain: domain,
-                Identity: identity
-            },
-
-            domain: domainData,
-            primaryType: "Identity",
-            message: message
-        })
-
+        
     })
 
 
