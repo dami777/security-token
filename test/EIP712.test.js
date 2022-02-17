@@ -63,6 +63,11 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
             console.log("returned signer ", returnedSigner)
         })
 
+        it("returns chain Id", async()=>{
+            const chainId = await certificate.chainId()
+            console.log("chain Id  ----> ", chainId)
+        })
+
     })
 
 

@@ -4,6 +4,8 @@ contract EIP712 {
 
     //  EIP712 standard for signing a structured data
 
+
+
     struct Identity {
 
         string _from;
@@ -13,6 +15,7 @@ contract EIP712 {
     }
 
     address public returnedSigner;
+    uint256 chainId;
 
     
 
@@ -22,7 +25,7 @@ contract EIP712 {
     // ******* Define the Domain Separator Values ****** //
 
     uint256 constant chainId = 4;
-    address verifyingContract = 0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83;
+    address verifyingContract = 0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83; // an hardcoded contract address
     bytes32 constant salt = 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d;      // an hardcoded salt value
     bytes32 constant EIP712_DOMAIN_HASH_TYPE = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)");
 
@@ -70,6 +73,7 @@ contract EIP712 {
             r := mload(add(_signature, 32))
             s := mload(add(_signature, 64))
             v := byte(0, mload(add(_signature, 96)))
+            chainId := chainid
 
         }
 
