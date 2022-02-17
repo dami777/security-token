@@ -1,3 +1,5 @@
+const { verify } = require("crypto")
+
 const Certificate = artifacts.require("./EIP712")
 
 require("chai")
@@ -23,13 +25,11 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
 
     })
 
-    describe("Identity hashing", ()=>{
+    describe("Identity hashing and signing", ()=>{
 
         let identity = {
 
-            _from: address1,
-            _to: address2,
-            _amount: 10
+            _amount: 100
 
         }
 
@@ -52,13 +52,20 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
             console.log(ethHash)
         })
 
+        it("verifies the signer", async()=>{
+            const signature = "0x17cbf6b4b20b9d589964240082e191e19af162c5afa798d7708af4a379366c865f50ece85b288fd2c57292b9f7867af98d112bb9dd4964593b3f0c81dd839dc51b"
+           
+            console.log("signature length ---->", signature.length)
+
+            await certificate.verifySignature(signature)
+            const returnedSigner = await certificate.returnedSigner()
+            console.log("returned signer ", returnedSigner)
+        })
+
     })
 
 
-    describe("signing data", ()=>{
-
-        
-    })
+    
 
 
 })

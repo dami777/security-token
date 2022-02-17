@@ -4,15 +4,19 @@ contract EIP712 {
 
     //  EIP712 standard for signing a structured data
 
-    struct Identitty {
+    struct Identity {
 
-        string _from;
-        string _to;
+        //string _from;
+        //string _to;
         uint256 _amount;
 
     }
 
-    string constant IDENTITY_TYPEHASH = "Identity(address _from, address _to, uint256 _amount)";
+    address public returnedSigner;
+
+    
+
+    bytes32 constant IDENTITY_TYPEHASH = keccak256("Identity(uint256 _amount)");
 
 
     // ******* Define the Domain Separator Values ****** //
@@ -20,11 +24,11 @@ contract EIP712 {
     uint256 constant chainId = 4;
     address verifyingContract = 0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83;
     bytes32 constant salt = 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d;      // an hardcoded salt value
-    string constant EIP712_DOMAIN_HASH_TYPE = "EIP712Domain(string name, string version, uint256 chainId, address verifyingContract, bytes32 salt)";
+    bytes32 constant EIP712_DOMAIN_HASH_TYPE = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)");
 
     bytes32 public _ethHash;
 
-    bytes32 DOMAIN_SEPARATOR = keccak256(abi.encodePacked(
+    bytes32 DOMAIN_SEPARATOR = keccak256(abi.encode(
 
         EIP712_DOMAIN_HASH_TYPE,
         keccak256(bytes("TANGL")),
@@ -37,31 +41,49 @@ contract EIP712 {
 
     // function to hash the Identity data
 
-    function hashIdentity(Identitty memory _identity) public pure returns (bytes32) {
+    function hashIdentity(Identity memory _identity) public pure returns (bytes32) {
+ 
 
-        return keccak256(abi.encodePacked(IDENTITY_TYPEHASH, _identity._from, _identity._to, _identity._amount));
+        return keccak256(abi.encode(IDENTITY_TYPEHASH, _identity._amount));
 
     }
 
 
     // function to hash the hashed Identity
 
-    function ethHash(Identitty memory _identity) public returns (bytes32) {
+    function ethHash(Identity memory _identity) public returns (bytes32) {
         
-        _ethHash =  keccak256(
-            abi.encodePacked(
-                "\\x19\\x01",
-                DOMAIN_SEPARATOR,
-                hashIdentity(_identity)
-                
-            )
-        );
+        _ethHash =  keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hashIdentity(_identity)));
 
         return _ethHash;
     }
     
 
     // recover function
+
+    function _split(bytes memory _signature) public returns (bytes32 r, bytes32 s, uint8 v) {
+
+        require(_signature.length == 65, "invalid signature length");
+
+        assembly {
+
+            r := mload(add(_signature, 32))
+            s := mload(add(_signature, 64))
+            v := byte(0, mload(add(_signature, 96)))
+
+        }
+
+    }
+
+    // verify the signer using the ethereum signed hash and the signature
+
+    function verifySignature(bytes memory _signature) public returns (address) {
+
+            (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
+
+            returnedSigner = ecrecover(_ethHash, v, r, s);
+
+    }
 
 
 
