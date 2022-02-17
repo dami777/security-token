@@ -6,7 +6,7 @@ contract EIP712 {
 
     struct Identity {
 
-        //string _from;
+        string _from;
         //string _to;
         uint256 _amount;
 
@@ -16,7 +16,7 @@ contract EIP712 {
 
     
 
-    bytes32 constant IDENTITY_TYPEHASH = keccak256("Identity(uint256 _amount)");
+    bytes32 constant IDENTITY_TYPEHASH = keccak256("Identity(string _from,uint256 _amount)");
 
 
     // ******* Define the Domain Separator Values ****** //
@@ -44,7 +44,7 @@ contract EIP712 {
     function hashIdentity(Identity memory _identity) public pure returns (bytes32) {
  
 
-        return keccak256(abi.encode(IDENTITY_TYPEHASH, _identity._amount));
+        return keccak256(abi.encode(IDENTITY_TYPEHASH, keccak256(bytes(_identity._from)),  _identity._amount));
 
     }
 

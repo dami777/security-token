@@ -29,6 +29,7 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
 
         let identity = {
 
+            _from: "Mr Thomas Shelby",
             _amount: 100
 
         }
@@ -53,7 +54,7 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
         })
 
         it("verifies the signer", async()=>{
-            const signature = "0x17cbf6b4b20b9d589964240082e191e19af162c5afa798d7708af4a379366c865f50ece85b288fd2c57292b9f7867af98d112bb9dd4964593b3f0c81dd839dc51b"
+            const signature = "0x06453f929f6a5e3dd10fafb072fceb3993badf86d148540db56c6114aceae35b4d0462bd7ff24191bc840a6cae1f235de49e59053b123024af5587db7fa8e11a1b"
            
             console.log("signature length ---->", signature.length)
 
