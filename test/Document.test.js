@@ -20,6 +20,8 @@ contract("ERC1400", ([address1])=>{
     let symbol = "TAN"
     let decimal = 18
     let totalSupply = 0
+    let classA = web3.utils.asciiToHex("CLASS A")
+    let classB = web3.utils.asciiToHex("CLASS B")
 
     beforeEach( async()=>{
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
