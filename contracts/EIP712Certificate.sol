@@ -15,7 +15,7 @@ contract EIP712 {
     }
 
     address public returnedSigner;
-    uint256 chainId;
+    
 
     
 
@@ -73,7 +73,7 @@ contract EIP712 {
             r := mload(add(_signature, 32))
             s := mload(add(_signature, 64))
             v := byte(0, mload(add(_signature, 96)))
-            chainId := chainid
+           
 
         }
 
@@ -83,9 +83,21 @@ contract EIP712 {
 
     function verifySignature(bytes memory _signature) public returns (address) {
 
+
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
             returnedSigner = ecrecover(_ethHash, v, r, s);
+
+    }
+
+    function chainID() external view returns (uint256) {
+
+        uint256 id;
+        assembly {
+            id := chainid()
+        }
+
+        return id;
 
     }
 

@@ -64,8 +64,11 @@ contract("EIP712 Standard", ([address1, address2, address3])=>{
         })
 
         it("returns chain Id", async()=>{
-            const chainId = await certificate.chainId()
-            console.log("chain Id  ----> ", chainId)
+            const chainId = await certificate.chainID()
+            console.log("chain Id  ----> ", chainId.toString())
+
+            
+
         })
 
     })
