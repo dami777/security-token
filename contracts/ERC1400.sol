@@ -59,7 +59,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes32 _name, bytes32 _documentHash, string _uri);                                      // event to be emitted whenever a document is put on-chain
+    event DocumentUpdated (bytes32 indexed _name, string _uri, bytes32 _documentHash);                                      // event to be emitted whenever a document is put on-chain
     event TransferByPartition (
 
         bytes32 indexed _fromPartition,
@@ -211,7 +211,7 @@ contract ERC1400 {
 
     // set document
 
-    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash, ) external  {
+    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
         emit Document(_name, _documentHash, _uri);              // emit event when document is set on chain

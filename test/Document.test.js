@@ -44,11 +44,11 @@ contract("ERC1400", ([address1])=>{
         let setDocument
 
 
-        it("sets the document onchain", ()=>{
+        it("sets the document onchain", async()=>{
 
-            setDocument = erc1400.setDocument(documentName, documentUri, documentHash)
+            setDocument = await erc1400.setDocument(documentName, documentUri, documentHash)
             setDocument.logs[0].event.should.be.equal("Document", "it emits the document event")
-
+            
         })
 
     })
