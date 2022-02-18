@@ -35,4 +35,22 @@ contract("ERC1400", ([address1])=>{
 
     })
 
+    describe("document upload",()=>{
+
+        let documentName = web3.utils.asciiToHex("contract")    // convert string to hex. This is the datatype that web3 understands for bytes32 datatype
+        let documentUri = "pinata.com"
+        let documentHash = web3.utils.asciiToHex("qr4353tfgbdfry54y45")
+
+        let setDocument
+
+
+        it("sets the document onchain", ()=>{
+
+            setDocument = erc1400.setDocument(documentName, documentUri, documentHash)
+            setDocument.logs[0].event.should.be.equal("Document", "it emits the document event")
+
+        })
+
+    })
+
 })
