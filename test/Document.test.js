@@ -47,7 +47,7 @@ contract("ERC1400", ([address1])=>{
         it("sets the document onchain", async()=>{
 
             setDocument = await erc1400.setDocument(documentName, documentUri, documentHash)
-            setDocument.logs[0].event.should.be.equal("Document", "it emits the document event")
+            setDocument.logs[0].event.should.be.equal("DocumentUpdated", "it emits the document event")
             
         })
 
