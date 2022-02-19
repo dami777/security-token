@@ -217,6 +217,7 @@ contract ERC1400 {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
         _allDocuments.push(_name);
+        _indexOfDocument[_name] = _allDocuments.length;
         emit DocumentUpdated(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
