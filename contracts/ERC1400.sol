@@ -396,12 +396,20 @@ contract ERC1400 {
 
    }
 
-   function _redeem(addres _tokenHolder, uint256 _value, bytes calldata _data) external {
+   // internal redeem function
+
+   function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
        require(_balanceOf[_tokenHolder] >= _value, "insufficient balance");
        _transfer(_tokenHolder, address(0), _value);
        totalSupply -= _value;
        emit Redeemed(msg.sender, _tokenHolder, _value, _data);
+
+   }
+
+   function redeem(uint256 _value, bytes calldata _data) external {
+
+       _redeem(msg.sender, _value, _data);
 
    }
 
