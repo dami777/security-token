@@ -413,6 +413,13 @@ contract ERC1400 {
 
    }
 
+   function redeemFrom(address _tokenHolder, uint256 _value, bytes calldata _data) external {
+
+        require(allowance[_tokenHolder][msg.sender] >= _value);
+        _redeem(_tokenHolder, _value, _data);
+
+   }
+
 
    
 
