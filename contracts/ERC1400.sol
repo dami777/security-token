@@ -213,6 +213,17 @@ contract ERC1400 {
 
     // *********************    TRANSFERS
 
+    // approve tokens to external operators
+    
+    function approve(address _externalAddress, uint256 _value) external returns (bool success) {
+
+        require(_externalAddress != address(0), "56");                  //0x56   invalid external address
+        allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
+        emit Approval(msg.sender, _externalAddress, _value);            // emit the approved event
+        return true;
+
+    }
+
 
     // function to transfer tokens. the internal transfer function will be called here
     
@@ -317,7 +328,7 @@ contract ERC1400 {
     
     function issue(address _tokenHolder, uint256 _value, bytes _data) external restricted {
         
-        
+        require(_isIssuable, "can't issue tokens for now");
         require(_tokenHolder != address(0));
         uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
         _balanceOf_tokenHolder] += amount;                              
@@ -328,15 +339,27 @@ contract ERC1400 {
     }
 
 
-    // approve tokens to external operators
-    function approve(address _externalAddress, uint256 _value) external returns (bool success) {
+     // function to issue new tokens by partition
 
-        require(_externalAddress != address(0), "56");                  //0x56   invalid external address
-        allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
-        emit Approval(msg.sender, _externalAddress, _value);            // emit the approved event
-        return true;
+   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
 
-    }
+        require(_isIssuable, "can't issue tokens for now");
+        uint256 amount =  _value * granularity; 
+        _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
+        _balanceOf[_tokenHolder] += amount; // increment the total balance of this token holder 
+        totalSupply += amount; // increase the total supply
+        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
+    
+
+   }
+
+
+   // *********************    TRANSFER VALIDITY
+
+
+
+
+    
 
 
     
@@ -397,18 +420,7 @@ contract ERC1400 {
 
    // ************************* issuance / redemption ******************************//
 
-   // function to issue new tokens by partition
-
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
-
-        uint256 amount =  _value * granularity; 
-        _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
-        _balanceOf[_tokenHolder] += amount; // increment the total balance of this token holder 
-        totalSupply += amount; // increase the total supply
-        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
-    
-
-   }
+  
 
 
    // function to redeem by partition
