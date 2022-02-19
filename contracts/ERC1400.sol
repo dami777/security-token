@@ -313,18 +313,14 @@ contract ERC1400 {
     }
 
 
-
-
-
-
-
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
-    function issueTokens(address _to, uint256 _amount) external restricted {
+    
+    function issue(address _tokenHolder, uint256 _value, bytes _data) external restricted {
         
         
-        require(_to != address(0));
-        uint256 amount =  _amount * granularity;                         // the destinaton address should not be an empty address
-        _balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
+        require(_tokenHolder != address(0));
+        uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
+        _balanceOf_tokenHolder] += amount;                              
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
