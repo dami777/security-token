@@ -60,7 +60,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event DocumentUpdated (bytes32 indexed _name, string _uri, bytes32 _documentHash);                                      // event to be emitted whenever a document is put on-chain
+    event DocumentUpdated (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
     event TransferByPartition (
 
         bytes32 indexed _fromPartition,
@@ -84,15 +84,15 @@ contract ERC1400 {
 
      // *************************************** Mappings ********************************************************* //
 
-    mapping(address => bool) private whitelist;                             //  whitelist map
-    mapping(address => mapping(address => uint256)) private allowance;      // set the address of the allowed external operator
-    mapping(address => uint256) internal _balanceOf;                           // map to store the token balances of token holders
-    mapping(bytes32 => uint256) public partitions;                          // map to store the total supply of each partitions partitions
-    mapping(bytes32 => Doc) internal _documents;                               // map to store the documents
-    mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
-    mapping(address => bytes32[]) internal _partitionsOf;                         // map that stores the partitions of a token holder
-    mapping(address => mapping(address => bool)) internal _isOperator;       // map to approve or revoke operators for a token holder
-    mapping(bytes32 => uint256) internal _indexOfDocument;                     // map to store thei index position of a document
+    mapping(address => bool) private whitelist;                                     //  whitelist map
+    mapping(address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
+    mapping(address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
+    mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
+    mapping(bytes32 => Doc) internal _documents;                                    // map to store the documents
+    mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
+    mapping(address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
+    mapping(address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
+    mapping(bytes32 => uint256) public _indexOfDocument;                          // map to store thei index position of a document
 
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
