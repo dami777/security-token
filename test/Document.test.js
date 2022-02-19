@@ -51,16 +51,11 @@ contract("ERC1400", ([address1])=>{
 
         it("emits an event when document is set onchain", async()=>{
 
-            setDocument.logs[0].event.should.be.equal("DocumentUpdated", "it emits the document upload event")
+            setDocument.logs[0].event.should.be.equal("Document", "it emits the document upload event")
             
         })
 
-        it("sets the document in the document array", async()=>{
-
-            const index = await erc1400._indexOfDocument(documentName)
-            index.toString().should.be.equal("1", "the index of the document is correctly positioned")
-
-        })
+        
 
     })
 

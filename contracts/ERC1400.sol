@@ -40,7 +40,7 @@ contract ERC1400 {
 
     bytes32[] internal _totalPartitions;
     bytes32[] internal defaultPartitions;
-    bytes32[] internal _allDocuments;    // an array to store all the documents stored onchain
+    //bytes32[] internal _allDocuments;    // an array to store all the documents stored onchain
 
 
      // *************************************** Structs ********************************************************* //
@@ -60,7 +60,7 @@ contract ERC1400 {
     event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event DocumentUpdated (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
+    event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
     event TransferByPartition (
 
         bytes32 indexed _fromPartition,
@@ -92,7 +92,7 @@ contract ERC1400 {
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
     mapping(address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
-    mapping(bytes32 => uint256) public _indexOfDocument;                          // map to store thei index position of a document
+    //mapping(bytes32 => uint256) internal _indexOfDocument;                          // map to store thei index position of a document
 
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
@@ -216,9 +216,9 @@ contract ERC1400 {
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
-        _allDocuments.push(_name);
-        _indexOfDocument[_name] = _allDocuments.length;
-        emit DocumentUpdated(_name, _uri, _documentHash);              // emit event when document is set on chain
+        //_allDocuments.push(_name);
+        //_indexOfDocument[_name] = _allDocuments.length;
+        emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
 
@@ -226,7 +226,7 @@ contract ERC1400 {
     
     function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 name) {
 
-        Doc storage _document = _documents[_name];
+        Doc memory _document = _documents[_name];
 
         return (_document._uri, _document._name);  // return the document uri and name
 
