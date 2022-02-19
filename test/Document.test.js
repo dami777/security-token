@@ -55,6 +55,12 @@ contract("ERC1400", ([address1])=>{
             
         })
 
+        it("gets the document", async()=>{
+            const document = await erc1400.getDocument(documentName)
+            document.uri.should.be.equal(documentUri, "it returns the correct document uri")
+            
+        })
+
         
 
     })
