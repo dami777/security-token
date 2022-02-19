@@ -32,8 +32,8 @@ contract ERC1400 {
 
      // *************************************** Booleans ********************************************************* //
 
-    bool private lockUpTokens = false; // token lockup indicator
-    bool private isIssuable;    //  manage when a token can be issued
+    bool private _lockUpTokens = false; // token lockup indicator
+    bool private _isIssuable;    //  manage when a token can be issued
     
 
     // ************************ Array ******************************//
@@ -117,7 +117,8 @@ contract ERC1400 {
     // *************************************** Internal functions ********************************************************* //
 
     // 1. internal funtion to transfer tokens from an address to another address
-     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
+    
+    function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         require(_to != address(0),  "can't transfer to zero address");
         require(_balanceOf[_from] >= _amount, "insufficient amount");
@@ -128,60 +129,93 @@ contract ERC1400 {
         return true;
      }
 
-    // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
-    function issueTokens(address _to, uint256 _amount) external restricted {
-        
-        
-        require(_to != address(0));
-        uint256 amount =  _amount * granularity;                         // the destinaton address should not be an empty address
-        _balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
-        totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
-        
+
+     // 2. internal funtion to transfer tokens by partitions from an address to another address
+
+    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
+       
+       if (_partition == "") {
+           _transfer(_from, _to, _value);
+       }
+
+       require( _balanceOfByPartition[_from][_partition] >= _value, "insufficient token in partition"); // the partiton balance of the holder must be greater than or equal to the value
+       require(_to != address(0),  "can't transfer to zero address");   //  can't send to ether address
+
+       _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
+       _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
+       
+       _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
+       _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
+
+       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
+       emit Transfer(_from, _to, _value);
+
+       return _partition;
 
     }
 
 
-    // approve tokens to external operators
-    function approve(address _externalAddress, uint256 _value) external returns (bool success) {
 
-        require(_externalAddress != address(0), "56");                  //0x56   invalid external address
-        allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
-        emit Approval(msg.sender, _externalAddress, _value);            // emit the approved event
-        return true;
+
+
+
+
+    // **************************       ERC1400 FEATURES  ******************************************************//
+
+     
+    // *********************    DOCUMENT MANAGEMENT  ---------- ERC 1643
+
+    //  set document
+
+    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
+        
+        _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
+        //_allDocuments.push(_name);
+        //_indexOfDocument[_name] = _allDocuments.length;
+        emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
+
+    // get document
+    
+    function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 documentName) {
+
+        Doc memory _document = _documents[_name];
+
+        return (_document._uri, _document._name);  // return the document uri and name
+
+    }
+
+
+
+    // *********************    TOKEN INFORMATION
 
 
     // function that returns balance
+    
     function balanceOf(address _tokenHolder) external view returns (uint256) {
         return _balanceOf[_tokenHolder];
     }
 
+    function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
+       return _balanceOfByPartition[_tokenHolder][_partition];
+   }
+
+   // function to return the partitions of a token holder
+
+    function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
+
+        return _partitionsOf[_tokenHolder];
+
+   } 
 
 
-    // used bytes1 instead of byte as bytes1 is now an alias for byte    
-    function canTransfer(address _to, uint256 _value) public view returns (bytes1 status, bytes32 statusDescription){
 
-        if( lockUpTokens == true) {
+    // *********************    TRANSFERS
 
-            return (hex"55", "funds locked (lockup period)");
-        } 
-
-    }
-
-
-
-    // function to add an address to whitelist
-    function addToWhiteList(address _investor) external restricted {
-        
-        require(!whitelist[_investor], "can't whitelist an address more than once");
-        whitelist[_investor] = true;
-        emit WhiteList(_investor, block.timestamp);
-
-    }
 
     // function to transfer tokens. the internal transfer function will be called here
+    
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
         _transfer(msg.sender, _to, _amount);
@@ -208,35 +242,32 @@ contract ERC1400 {
     }  
 
 
+    // *********************    PARTITION TOKEN TRANSFERS
 
-    /******************************************  Document Attachment ---------- ERC 1643 **********************/
 
-    // set document
+    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
 
-    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
-        
-        _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
-        //_allDocuments.push(_name);
-        //_indexOfDocument[_name] = _allDocuments.length;
-        emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
+       _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
+ 
+   }    
 
-    }
+   // operator transfer by partition
+   
+   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external returns (bytes32) {
+      
+       require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "invalid sender"); // 0x56 invalid sender
+       _transferByPartiton(_partition, _from, _to, _value, "", "");
+   }
 
-    // get document
-    
-    function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 documentName) {
 
-        Doc memory _document = _documents[_name];
 
-        return (_document._uri, _document._name);  // return the document uri and name
+   // *********************    CONTROLLER OPERATION
 
-    }
 
-    /******************************* operators ***************************/
 
-    function isOperator (address _operator, address _tokenHolder) external view returns (bool) {
-        return _isOperator[_tokenHolder][_operator];
-    }
+   
+   // *********************    OPERATOR MANAGEMENT
+
 
     function authorizeOperator (address _operator) public {
         _isOperator[msg.sender][_operator] = true;
@@ -248,10 +279,6 @@ contract ERC1400 {
         emit RevokedOperator(_operator, msg.sender);
     }
 
-    function isOperatorForPartition(bytes32 _partition, address _operator, address _tokenHolder) external view returns (bool) {
-        return  _isOperatorForPartition[_tokenHolder][_operator][_partition];
-    }
-    
     function authorizeOperatorByPartition (bytes32 _partition, address _operator) public  {
         _isOperatorForPartition[msg.sender][_operator][_partition] = true;
         emit AuthorizedOperatorByPartition(_partition, _operator, msg.sender);
@@ -261,33 +288,85 @@ contract ERC1400 {
         _isOperatorForPartition[msg.sender][_operator][_partition] = false;
         emit RevokedOperatorByPartition(_partition, _operator, msg.sender);
     }
-   
-   /************************************* Partitions ****************************/
 
 
-   /************************ Internal functions for partition ************************/
 
-    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
-       
-       if (_partition == "") {
-           _transfer(_from, _to, _value);
-       }
+    // *********************    OPERATOR INFORMATION
 
-       require( _balanceOfByPartition[_from][_partition] >= _value, "insufficient token in partition"); // the partiton balance of the holder must be greater than or equal to the value
-       require(_to != address(0),  "can't transfer to zero address");   //  can't send to ether address
 
-       _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
-       _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
-       
-       _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
-       _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
-       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, "", "");
-       emit Transfer(_from, _to, _value);
+     function isOperator (address _operator, address _tokenHolder) external view returns (bool) {
+        return _isOperator[_tokenHolder][_operator];
+    }
 
-       return _partition;
+    
+    function isOperatorForPartition(bytes32 _partition, address _operator, address _tokenHolder) external view returns (bool) {
+        return  _isOperatorForPartition[_tokenHolder][_operator][_partition];
+    }
+
+
+
+    // *********************    TOKEN ISSUANCE
+
+    //function isIssuable() external view 
+
+
+
+
+
+
+
+    // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+    function issueTokens(address _to, uint256 _amount) external restricted {
+        
+        
+        require(_to != address(0));
+        uint256 amount =  _amount * granularity;                         // the destinaton address should not be an empty address
+        _balanceOf[_to] += amount;                                       // use safemath library to avoid under and overflow
+        totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        
 
     }
+
+
+    // approve tokens to external operators
+    function approve(address _externalAddress, uint256 _value) external returns (bool success) {
+
+        require(_externalAddress != address(0), "56");                  //0x56   invalid external address
+        allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
+        emit Approval(msg.sender, _externalAddress, _value);            // emit the approved event
+        return true;
+
+    }
+
+
+    
+
+
+
+    // used bytes1 instead of byte as bytes1 is now an alias for byte    
+    function canTransfer(address _to, uint256 _value) public view returns (bytes1 status, bytes32 statusDescription){
+
+        if( _lockUpTokens == true) {
+
+            return (hex"55", "funds locked (lockup period)");
+        } 
+
+    }
+
+
+
+    // function to add an address to whitelist
+    function addToWhiteList(address _investor) external restricted {
+        
+        require(!whitelist[_investor], "can't whitelist an address more than once");
+        whitelist[_investor] = true;
+        emit WhiteList(_investor, block.timestamp);
+
+    }
+
+    
 
 
    /*********************************************************************************/
@@ -298,17 +377,7 @@ contract ERC1400 {
        return _totalPartitions;
    }
 
-   function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
-       return _balanceOfByPartition[_tokenHolder][_partition];
-   }
-
-   // function to return the partitions of a token holder
-
-    function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
-
-        return _partitionsOf[_tokenHolder];
-
-   } 
+   
 
    // can transfer by partition
 
@@ -324,21 +393,9 @@ contract ERC1400 {
 
    }
 
-   // transfer by partition
+   
 
-   function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
-
-       _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
- 
-   }    
-
-   // operator transfer by partition
-   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external returns (bytes32) {
-      
-       require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "invalid sender"); // 0x56 invalid sender
-       _transferByPartiton(_partition, _from, _to, _value, "", "");
-   }
-
+   
 
    // ************************* issuance / redemption ******************************//
 
