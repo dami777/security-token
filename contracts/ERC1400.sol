@@ -308,7 +308,9 @@ contract ERC1400 {
 
     // *********************    TOKEN ISSUANCE
 
-    //function isIssuable() external view 
+    function isIssuable() external view returns (bool) {
+        return _isIssuable;
+    }
 
 
 
