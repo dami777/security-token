@@ -39,7 +39,8 @@ contract ERC1400 {
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
-    bytes21[] internal defaultPartitions;
+    bytes32[] internal defaultPartitions;
+    bytes32[] internal _allDocuments;    // an array to store all the documents stored onchain
 
 
      // *************************************** Structs ********************************************************* //
@@ -91,7 +92,8 @@ contract ERC1400 {
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) internal _partitionsOf;                         // map that stores the partitions of a token holder
     mapping(address => mapping(address => bool)) internal _isOperator;       // map to approve or revoke operators for a token holder
-    
+   mapping(bytes32 => uint256) internal _indexOfDocument;
+
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
 
