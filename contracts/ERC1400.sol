@@ -92,7 +92,7 @@ contract ERC1400 {
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition;        // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) internal _partitionsOf;                         // map that stores the partitions of a token holder
     mapping(address => mapping(address => bool)) internal _isOperator;       // map to approve or revoke operators for a token holder
-   mapping(bytes32 => uint256) internal _indexOfDocument;
+    mapping(bytes32 => uint256) internal _indexOfDocument;                     // map to store thei index position of a document
 
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
@@ -216,6 +216,7 @@ contract ERC1400 {
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
+        _allDocuments.push(_name);
         emit DocumentUpdated(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
