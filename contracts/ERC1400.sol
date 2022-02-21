@@ -425,7 +425,13 @@ contract ERC1400 {
         if( _lockUpTokens == true) {
 
             return (hex"55", "funds locked (lockup period)");
+        }
+
+        if(_to == address(0)) {
+            return (hex"57", "invalid receiver");
         } 
+
+        
 
     }
 
