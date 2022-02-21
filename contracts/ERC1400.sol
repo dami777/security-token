@@ -303,6 +303,10 @@ contract ERC1400 {
 
    // *********************    CONTROLLER OPERATION
 
+   function isControllable() external view returns (bool) {
+       return _isControllable;
+   }
+
 
 
    
