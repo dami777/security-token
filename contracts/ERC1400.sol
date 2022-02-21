@@ -308,7 +308,11 @@ contract ERC1400 {
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external {
+       _transfer(_from, _to, _value);
+   }
 
+   function controllerRedeem(address _tokenHolder, _value, bytes _data, bytes _operatorData) {
+       _redeem(_tokenHolder,  _value, _data);
    }
 
 
