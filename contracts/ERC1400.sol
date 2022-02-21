@@ -354,7 +354,7 @@ contract ERC1400 {
 
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
     
-    function issue(address _tokenHolder, uint256 _value, bytes _data) external restricted {
+    function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
         require(_isIssuable, "can't issue tokens for now");
         require(_tokenHolder != address(0));
