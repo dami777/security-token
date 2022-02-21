@@ -435,6 +435,8 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
+        return (hex"51", "transfer success");
+
     }
 
 
