@@ -454,6 +454,12 @@ contract ERC1400 {
             return (hex"57", "invalid receiver");
         } 
 
+        if(_isOperator[_from][msg.sender]) {
+            return (hex"58", "invalid operator");
+        } 
+
+
+
 
     }
 
