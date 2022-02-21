@@ -442,6 +442,12 @@ contract ERC1400 {
 
     function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bytes1 code, bytes32 reason) {
 
+        if(_balanceOf[_from] < _value) {
+            return (hex"52", "insufficient balance");
+        }
+
+        
+
     }
 
 
