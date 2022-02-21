@@ -446,7 +446,9 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        
+        if(allowance[_from][msg.sender] < _value) {
+            return (hex"53", "insufficient allowance");
+        }
 
     }
 
