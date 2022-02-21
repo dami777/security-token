@@ -154,6 +154,34 @@ contract ERC1400 {
 
     }
 
+    // internal redeem by partition function
+
+
+    function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
+
+       require(msg.sender != address(0), "invalid sender");
+       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
+       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
+       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+       
+       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
+       _balanceOf[address(0)] = _balanceOf[address(0)] + _value; // the value should reflect in the global token balance of the receiver
+       totalSupply -= _value;
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
+
+   }
+
+   // internal redeem function
+
+   function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
+
+       require(_balanceOf[_tokenHolder] >= _value, "insufficient balance");
+       _transfer(_tokenHolder, address(0), _value);
+       totalSupply -= _value;
+       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
+
+   }
+
 
 
 
@@ -331,7 +359,7 @@ contract ERC1400 {
         require(_isIssuable, "can't issue tokens for now");
         require(_tokenHolder != address(0));
         uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
-        _balanceOf_tokenHolder] += amount;                              
+        _balanceOf[_tokenHolder] += amount;                              
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
@@ -354,58 +382,8 @@ contract ERC1400 {
    }
 
 
-   // *********************    TRANSFER VALIDITY
-
-
-
-
    // *********************    TOKEN REDEMPTION
 
-
-   // function to redeem by partition
-
-   function redeemByPartition(bytes32 _partition, uint256 _value, bytes calldata _data) external {
-
-       _redeemByPartition(_partition, msg.sender, _value, _data, "");
-
-   }
-
-   function redeemFrom(address _tokenHolder, uint256 _value, bytes _data) external {
-
-   }
-
-   function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _operatorData) external {
-
-       require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "invalid sender");
-       _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
-
-   }
-
-
-   function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
-
-       require(msg.sender != address(0), "invalid sender");
-       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
-       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
-       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
-       
-       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
-       _balanceOf[address(0)] = _balanceOf[address(0)] + _value; // the value should reflect in the global token balance of the receiver
-       totalSupply -= _value;
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
-
-   }
-
-   // internal redeem function
-
-   function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
-
-       require(_balanceOf[_tokenHolder] >= _value, "insufficient balance");
-       _transfer(_tokenHolder, address(0), _value);
-       totalSupply -= _value;
-       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
-
-   }
 
    function redeem(uint256 _value, bytes calldata _data) external {
 
@@ -421,15 +399,32 @@ contract ERC1400 {
    }
 
 
+   // function to redeem by partition
+
+   function redeemByPartition(bytes32 _partition, uint256 _value, bytes calldata _data) external {
+
+       _redeemByPartition(_partition, msg.sender, _value, _data, "");
+
+   }
+
    
 
+   function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _operatorData) external {
+
+       require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "invalid sender");
+       _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
+
+   }
+
+
+   // *********************    TRANSFER VALIDITY
 
 
 
-    
 
+   
 
-    
+   
 
 
 
@@ -485,7 +480,7 @@ contract ERC1400 {
 
    
 
-   // ************************* issuance / redemption ******************************//
+   
 
   
 
