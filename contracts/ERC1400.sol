@@ -419,17 +419,8 @@ contract ERC1400 {
 
    // *********************    TRANSFER VALIDITY
 
-
-
-
-   
-
-   
-
-
-
     // used bytes1 instead of byte as bytes1 is now an alias for byte    
-    function canTransfer(address _to, uint256 _value) public view returns (bytes1 status, bytes32 statusDescription){
+    function canTransfer(address _to, uint256 _value, bytes _data) public view returns (bytes1 code, bytes32 reason){
 
         if( _lockUpTokens == true) {
 
