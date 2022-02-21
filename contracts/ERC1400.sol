@@ -361,7 +361,7 @@ contract ERC1400 {
         uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
         _balanceOf[_tokenHolder] += amount;                              
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_to, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }
