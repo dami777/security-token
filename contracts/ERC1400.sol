@@ -34,6 +34,7 @@ contract ERC1400 {
 
     bool private _lockUpTokens = false; // token lockup indicator
     bool private _isIssuable;    //  manage when a token can be issued
+    bool private _isControllable;   // private variable that manages the controllability of the tokens
     
 
     // ************************ Array ******************************//
@@ -460,36 +461,9 @@ contract ERC1400 {
 
         return (hex"51", "transfer success");
 
-
-
-
     }
 
-
-
-    // function to add an address to whitelist
-    function addToWhiteList(address _investor) external restricted {
-        
-        require(!whitelist[_investor], "can't whitelist an address more than once");
-        whitelist[_investor] = true;
-        emit WhiteList(_investor, block.timestamp);
-
-    }
-
-    
-
-
-   /*********************************************************************************/
-
-   // function to return partitioned token balance
-
-   function totalPartitions () external view returns (bytes32[] memory) {
-       return _totalPartitions;
-   }
-
-   
-
-   // can transfer by partition
+    // can transfer by partition
 
    function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes memory _data) external view returns(bytes1, bytes32, bytes32) {
 
@@ -501,7 +475,35 @@ contract ERC1400 {
            return (hex"55", "insufficient balance", _partition);
        }
 
+
    }
+
+
+
+
+    /* function to add an address to whitelist
+    function addToWhiteList(address _investor) external restricted {
+        
+        require(!whitelist[_investor], "can't whitelist an address more than once");
+        whitelist[_investor] = true;
+        emit WhiteList(_investor, block.timestamp);
+
+    }*/
+
+    
+
+
+   /*********************************************************************************/
+
+   /* function to return partitioned token balance
+
+   function totalPartitions () external view returns (bytes32[] memory) {
+       return _totalPartitions;
+   }*/
+
+   
+
+   
 
    
 
