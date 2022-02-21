@@ -431,7 +431,9 @@ contract ERC1400 {
             return (hex"57", "invalid receiver");
         } 
 
-        
+        if(_value < _balanceOf[msg.sender]) {
+            return (hex"52", "insufficient balance");
+        }
 
     }
 
