@@ -458,6 +458,8 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
+        return (hex"51", "transfer success");
+
 
 
 
