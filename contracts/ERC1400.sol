@@ -450,6 +450,11 @@ contract ERC1400 {
             return (hex"53", "insufficient allowance");
         }
 
+        if(_to == address(0)) {
+            return (hex"57", "invalid receiver");
+        } 
+
+
     }
 
 
