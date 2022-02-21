@@ -419,8 +419,9 @@ contract ERC1400 {
 
    // *********************    TRANSFER VALIDITY
 
-    // used bytes1 instead of byte as bytes1 is now an alias for byte    
-    function canTransfer(address _to, uint256 _value, bytes _data) public view returns (bytes1 code, bytes32 reason){
+    // used bytes1 instead of byte. bytes1 is now an alias for byte    
+
+    function canTransfer(address _to, uint256 _value, bytes _data) external view returns (bytes1 code, bytes32 reason){
 
         if( _lockUpTokens == true) {
 
@@ -436,6 +437,10 @@ contract ERC1400 {
         }
 
         return (hex"51", "transfer success");
+
+    }
+
+    function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bytes1 code, bytes32 reason) {
 
     }
 
