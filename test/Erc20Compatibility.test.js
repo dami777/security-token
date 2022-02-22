@@ -103,7 +103,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
                 transfer.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
             })
 
-            it("updates the balances of the accounts tokens were sent from and the recipient account", ()=>{
+            it("updates the balances of the accounts tokens were sent from and the recipient account", async()=>{
                 const fromBalance = await token.balanceOf(holder1)
                 const toBalance = await token.balanceOf(holder2)
 
