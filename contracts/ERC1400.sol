@@ -284,6 +284,18 @@ contract ERC1400 {
     }  
 
 
+    // tranfer with data
+
+    function transferWithData() external {
+
+    }
+    
+
+    function transferFromWithData() external {
+        
+    }
+
+
     // *********************    PARTITION TOKEN TRANSFERS
 
 
