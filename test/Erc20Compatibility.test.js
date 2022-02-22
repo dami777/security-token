@@ -57,6 +57,14 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
             it("emits the transfer event", async()=>{
                 transfer.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
             })
+
+            it("updates the balances of the sender and receiver", async()=>{
+                const senderBalance = await token.balanceOf(holder1)
+                const receiverBalance = await token.balanceOf(holder2)
+
+                senderBalance.toString().should.be.equal(tokens(7).toString(), "the sender balance was deducted accordingly")
+                receiverBalance.toString().should.be.equal(tokens(3).toString(), "the receiver balance increased accordingly")
+            })
         })
 
         
