@@ -22,10 +22,46 @@ contract("ERC20 compatibility", (holder1, holder2, escrow)=>{
     let symbol = "TAN"
     let decimal = 18
     let totalSupply = 0
+    let classA = web3.utils.asciiToHex("CLASS A")
+    let classB = web3.utils.asciiToHex("CLASS B")
+
+
 
     beforeEach( async()=>{
-        token = await ERC1400.new(name, symbol, decimal, totalSupply)
+        token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
     })
     
+
+    describe("contract address", ()=>{
+
+        it("has contract address", ()=>{
+            token.address.should.not.be.equal("", "the contract has an address")
+        })
+
+    })
+
+    describe("token transfer", ()=>{
+
+        beforeEach(async()=>{
+            await token.issue(holder1, 10, web3.utils.tohex(""))
+        })
+
+        describe("success cases", ()=>{
+
+            let tranfer
+
+            beforeEach(()=>{
+                transfer = token.transfer(holder2, tokens(3))
+            })
+
+            it("emits the transfer event", async()=>{
+                transfer.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
+            })
+        })
+
+        describe("failed cases", ()=>{
+
+        })
+    })
 
 })
