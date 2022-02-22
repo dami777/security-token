@@ -316,6 +316,7 @@ contract ERC1400 {
 
    function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
        _redeem(_tokenHolder,  _value, _data);
+       emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
 
