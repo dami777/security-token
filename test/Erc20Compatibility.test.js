@@ -114,6 +114,22 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
         })
 
+        describe("failed cases", ()=>{
+
+            let approval
+            let transfer
+
+            beforeEach(async()=>{
+                approval = await token.approve(escrow, tokens(5), {from: holder1})      // approve tokens to the escrow
+                await token.issue(holder1, 10, web3.utils.toHex(""))    // issue tokens to this holder
+                
+            })
+
+            it("fails to send due to insufficient approval", async()=>{
+                await token.transferFrom(holder1, holder2, tokens(7), { from:escrow }).should.be.rejected
+            })
+        })
+
     })
 
 })
