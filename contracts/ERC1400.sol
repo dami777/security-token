@@ -311,7 +311,7 @@ contract ERC1400 {
        _transfer(_from, _to, _value);
    }
 
-   function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) {
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
        _redeem(_tokenHolder,  _value, _data);
    }
 
