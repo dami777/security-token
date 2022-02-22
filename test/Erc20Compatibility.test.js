@@ -68,8 +68,13 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
         })
 
         describe("failed cases", ()=>{
+
             it("fails to send tokens to address zero", async()=>{
                 await token.transfer(ETHER_ADDRESS, tokens(3), {from: holder1}).should.be.rejected
+            })
+
+            it("fails to send due to insufficient token balance", async()=>{
+                await token.transfer(holder2, tokens(30), {from: holder1}).should.be.rejected
             })
         })
 
