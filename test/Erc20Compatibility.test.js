@@ -81,4 +81,24 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
         
     })
 
+    describe("token transfer by external operators such as escrows", ()=>{
+
+        describe("success cases", ()=>{
+
+            let approval
+
+            beforeEach(()=>{
+                approval = await token.approve(escrow, tokens(5))      // approve tokens to the escrow
+                await token.issue(holder1, 10, web3.utils.toHex(""))    // issue tokens to this holder
+            })
+
+
+            it("emits the approve event", async()=>{
+                approval.logs[0].event.should.be.equal("approve", "it emits the approve event")
+            })
+
+        })
+
+    })
+
 })

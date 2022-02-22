@@ -273,7 +273,7 @@ contract ERC1400 {
         // _to is the destinantion address
         //  msg.sender is the external address calling this function
         // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
-        require(allowance[_from][msg.sender] >= _value);           // the allowed value approved by the token holder must not be less than the amount
+        require(allowance[_from][msg.sender] >= _value, "insufficient allowance");           // the allowed value approved by the token holder must not be less than the amount
         _transfer(_from, _to, _value);                             // transfer the tokens
 
         // reset the allowance value
