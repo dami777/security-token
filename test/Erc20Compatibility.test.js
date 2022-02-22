@@ -94,7 +94,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
 
             it("emits the approve event", ()=>{
-                approval.logs[0].event.should.be.equal("Approval", "it emits the approve event")
+                approval.logs[0].event.should.be.equal("Approval", "it emits the Approval event")
             })
 
         })
