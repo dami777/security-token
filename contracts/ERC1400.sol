@@ -307,11 +307,11 @@ contract ERC1400 {
        return _isControllable;
    }
 
-   function controllerTransfer(address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external {
+   function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
        _transfer(_from, _to, _value);
    }
 
-   function controllerRedeem(address _tokenHolder, _value, bytes _data, bytes _operatorData) {
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) {
        _redeem(_tokenHolder,  _value, _data);
    }
 
@@ -436,7 +436,7 @@ contract ERC1400 {
 
     // used bytes1 instead of byte. bytes1 is now an alias for byte    
 
-    function canTransfer(address _to, uint256 _value, bytes _data) external view returns (bytes1 code, bytes32 reason){
+    function canTransfer(address _to, uint256 _value, bytes calldata _data) external view returns (bytes1 code, bytes32 reason){
 
         if( _lockUpTokens == true) {
 
@@ -455,7 +455,7 @@ contract ERC1400 {
 
     }
 
-    function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bytes1 code, bytes32 reason) {
+    function canTransferFrom(address _from, address _to, uint256 _value, bytes calldata _data) external view returns (bytes1 code, bytes32 reason) {
 
         if(_balanceOf[_from] < _value) {
             return (hex"52", "insufficient balance");
@@ -479,7 +479,7 @@ contract ERC1400 {
 
     // can transfer by partition
 
-   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes memory _data) external view returns(bytes1, bytes32, bytes32) {
+   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes calldata _data) external view returns(bytes1, bytes32, bytes32) {
 
        if (_to == address(0)) {
            return (hex"55", "invalid receiver", _partition);
