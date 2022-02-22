@@ -135,7 +135,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
             it("fails due to insufficient balalnce", async()=>{
                 approval = await token.approve(escrow, tokens(15), {from: holder1})      // approve tokens to the escrow
-                await token.transferFrom(holder1, holder2, tokens(17), { from: escrow }).should.be.rejected
+                await token.transferFrom(holder1, holder2, tokens(15), { from: escrow }).should.be.rejected
             })
 
 
