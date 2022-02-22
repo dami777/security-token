@@ -48,10 +48,10 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
         describe("success cases", ()=>{
 
-            let tranfer
+            let transfer
 
-            beforeEach(()=>{
-                transfer = token.transfer(holder2, tokens(3))
+            beforeEach(async()=>{
+                transfer = await token.transfer(holder2, tokens(3))
             })
 
             it("emits the transfer event", async()=>{
@@ -59,9 +59,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
             })
         })
 
-        describe("failed cases", ()=>{
-
-        })
+        
     })
 
 })
