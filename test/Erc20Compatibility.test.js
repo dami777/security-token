@@ -87,13 +87,13 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
             let approval
 
-            beforeEach(()=>{
+            beforeEach(async()=>{
                 approval = await token.approve(escrow, tokens(5))      // approve tokens to the escrow
                 await token.issue(holder1, 10, web3.utils.toHex(""))    // issue tokens to this holder
             })
 
 
-            it("emits the approve event", async()=>{
+            it("emits the approve event", ()=>{
                 approval.logs[0].event.should.be.equal("approve", "it emits the approve event")
             })
 
