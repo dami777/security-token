@@ -40,7 +40,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
     })
 
-    describe("token transfer", ()=>{
+    describe("token transfer by holder", ()=>{
 
         beforeEach(async()=>{
             await token.issue(holder1, 10, web3.utils.toHex(""))
@@ -51,7 +51,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
             let transfer
 
             beforeEach(async()=>{
-                transfer = await token.transfer(holder2, tokens(3))
+                transfer = await token.transfer(holder2, tokens(3), {from:holder1})
             })
 
             it("emits the transfer event", async()=>{
@@ -64,6 +64,12 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
                 senderBalance.toString().should.be.equal(tokens(7).toString(), "the sender balance was deducted accordingly")
                 receiverBalance.toString().should.be.equal(tokens(3).toString(), "the receiver balance increased accordingly")
+            })
+        })
+
+        describe("failed cases", ()=>{
+            it("fails to send tokens to address zero", async()=>{
+                await token.transfer(ETHER_ADDRESS, tokens(3), {from: holder1}).should.be.rejected
             })
         })
 
