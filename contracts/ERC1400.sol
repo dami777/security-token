@@ -286,13 +286,19 @@ contract ERC1400 {
 
     // tranfer with data
 
-    function transferWithData() external {
-
+    function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
+        _transfer(_to, _value);
     }
     
 
-    function transferFromWithData() external {
-        
+    function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
+         require(allowance[_from][msg.sender] >= _amount);           // the allowed value approved by the token holder must not be less than the amount
+        _transfer(_from, _to, _amount);                             // transfer the tokens
+
+        // reset the allowance value
+
+        allowance[_from][msg.sender] =  0;   
+        return true;
     }
 
 
