@@ -15,7 +15,7 @@ require("chai")
     .should()
 
 
-contract("ERC20 compatibility", (holder1, holder2, escrow)=>{
+contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
     let token
     let name = "Tangl"
@@ -43,7 +43,7 @@ contract("ERC20 compatibility", (holder1, holder2, escrow)=>{
     describe("token transfer", ()=>{
 
         beforeEach(async()=>{
-            await token.issue(holder1, 10, web3.utils.tohex(""))
+            await token.issue(holder1, 10, web3.utils.toHex(""))
         })
 
         describe("success cases", ()=>{
