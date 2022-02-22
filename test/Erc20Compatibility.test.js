@@ -89,9 +89,9 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
             let transfer
 
             beforeEach(async()=>{
-                approval = await token.approve(escrow, tokens(5))      // approve tokens to the escrow
+                approval = await token.approve(escrow, tokens(5), {from: holder1})      // approve tokens to the escrow
                 await token.issue(holder1, 10, web3.utils.toHex(""))    // issue tokens to this holder
-                transfer = await token.transferFrom(holder1, holder2, {from:escrow})
+                transfer = await token.transferFrom(holder1, holder2, tokens(5), { from:escrow })
             })
 
 
