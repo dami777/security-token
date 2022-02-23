@@ -21,7 +21,7 @@ contract("Decode Bytes Contract", ()=>{
 
     })
 
-    describe("decoding", ()=>{
+    describe("decoding single data", ()=>{
 
         it("encoded the data", async()=>{
             const encode = await decodeContract.encode()
@@ -35,6 +35,20 @@ contract("Decode Bytes Contract", ()=>{
             console.log(decode)
         })
 
+    })
+
+    describe("decoding struct", ()=>{ 
+
+        let data = {
+            month: 2,
+            name: "Shelby"
+        }
+
+        it("encodes the struct data", async()=>{
+            const encode = await decodeContract.encodeStruct(data)
+            encode.should.not.be.equal("", "it returns an encoded data")
+            console.log(encode)
+        })
     })
 
 })
