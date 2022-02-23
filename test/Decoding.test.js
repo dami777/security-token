@@ -51,7 +51,7 @@ contract("Decode Bytes Contract", ()=>{
         })
 
         it("decodes the data", async()=>{
-            const decoded = await decodeStruct(data)
+            const decoded = await decodeContract.decodeStruct(data)
             decoded["0"].toString().should.be.equal(data.month.toString(), "it decodes the month from the data")
         })
     })
