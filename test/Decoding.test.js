@@ -54,7 +54,7 @@ contract("Decode Bytes Contract", ()=>{
             const decoded = await decodeContract.decodeStruct(data)
             decoded["0"].toString().should.be.equal(data.month.toString(), "it decodes the month from the data")
             decoded["1"].should.be.equal(data.name, "it decodes the name from the data")
-            console.log(decoded["0"], decoded["1"])
+            console.log(decoded["0"].toString(), decoded["1"])
 
         })
     })
