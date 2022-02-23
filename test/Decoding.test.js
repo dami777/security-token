@@ -19,4 +19,18 @@ contract("Decode Bytes Contract", ()=>{
 
     })
 
+    describe("decoding", ()=>{
+
+        it("encoded the data", async()=>{
+            const encode = await decodeContract.encode()
+            encode.should.not.be.equal("", "returns an encoded data")
+            console.log(encode)
+        })
+
+        it("decoded the data as expected", ()=>{
+            
+        })
+
+    })
+
 })
