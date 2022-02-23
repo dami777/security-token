@@ -27,7 +27,7 @@ contract DecodeBytes{
 
     function decodeStruct(Data calldata _data) public pure returns (uint256, string memory) {
         bytes memory data = encodeStruct(_data);
-        (uint256 _month, string memory _name) = abi.decode(data);
+        (uint256 _month, string memory _name) = abi.decode(data, (uint256, string));
         return (_month, _name);
     }
 
