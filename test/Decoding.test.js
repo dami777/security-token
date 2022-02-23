@@ -1,3 +1,5 @@
+const { decode } = require("punycode")
+
 const DecodeContract = artifacts.require("./DecodeBytes")
 require("chai")
     .use(require("chai-as-promised"))
@@ -27,8 +29,10 @@ contract("Decode Bytes Contract", ()=>{
             console.log(encode)
         })
 
-        it("decoded the data as expected", ()=>{
-            
+        it("decoded the data as expected", async()=>{
+            const decode = await decodeContract.decode()
+            decode.should.be.equal("test", "it decodes the data accurately")
+            console.log(decode)
         })
 
     })
