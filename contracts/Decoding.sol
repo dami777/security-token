@@ -3,6 +3,14 @@ pragma solidity 0.8.10;
 
 contract DecodeBytes{
 
+
+    struct Data {
+
+        uint256 month;
+        string name;
+
+    }
+
     function encode() public pure returns (bytes memory) {
         return abi.encode("test");
     }
@@ -18,7 +26,7 @@ contract DecodeBytes{
     }
 
     function decodeStruct() {
-        
+
     }
 
 }
