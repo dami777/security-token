@@ -49,6 +49,11 @@ contract("Decode Bytes Contract", ()=>{
             encode.should.not.be.equal("", "it returns an encoded data")
             console.log(encode)
         })
+
+        it("decodes the data", async()=>{
+            const decoded = await decodeStruct(data)
+            decoded["0"].toString().should.be.equal(data.month.toString(), "it decodes the month from the data")
+        })
     })
 
 })
