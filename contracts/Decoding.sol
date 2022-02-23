@@ -13,4 +13,12 @@ contract DecodeBytes{
         return value;
     }
 
+    function encodeStruct(type name) {
+        
+    }
+
+    function decodeStruct() {
+        
+    }
+
 }
