@@ -21,8 +21,8 @@ contract DecodeBytes{
         return value;
     }
 
-    function encodeStruct(type name) {
-        
+    function encodeStruct(Data calldata _data) public pure returns (bytes memory) {
+        return abi.encode(_data.month, _data.name);
     }
 
     function decodeStruct() {
