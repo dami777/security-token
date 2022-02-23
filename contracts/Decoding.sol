@@ -7,7 +7,7 @@ contract DecodeBytes{
 
     }
 
-    function decode() public {
+    function decode() public view returns (string memory) {
 
     }
 
