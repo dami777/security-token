@@ -137,9 +137,9 @@ contract ERC1400 {
 
     function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
        
-       if (_partition == "") {
+       /*if (_partition == "") {
            _transfer(_from, _to, _value);
-       }
+       }*/
 
        require( _balanceOfByPartition[_from][_partition] >= _value, "insufficient token in partition"); // the partiton balance of the holder must be greater than or equal to the value
        require(_to != address(0),  "can't transfer to zero address");   //  can't send to ether address
@@ -158,7 +158,14 @@ contract ERC1400 {
     }
 
     // function to transfer by default Partitions
-    function _transferByDefaultPartitions
+    
+    function _transferByDefaultPartitions(address _from, address _to, uint256 _value) {
+
+        for (uint256 index = 0; index < _defaultPartitions.length; index++) {
+            _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
+        }
+
+    }
 
     // internal redeem by partition function
 
