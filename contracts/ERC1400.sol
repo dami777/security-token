@@ -157,6 +157,9 @@ contract ERC1400 {
 
     }
 
+    // function to transfer by default Partitions
+    function _transferByDefaultPartitions
+
     // internal redeem by partition function
 
 
