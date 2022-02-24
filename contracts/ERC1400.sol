@@ -158,8 +158,8 @@ contract ERC1400 {
     }
 
     // function to transfer by default Partitions
-    
-    function _transferByDefaultPartitions(address _from, address _to, uint256 _value) {
+
+    function _transferByDefaultPartitions(address _from, address _to, uint256 _value) internal {
 
         for (uint256 index = 0; index < _defaultPartitions.length; index++) {
             _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
