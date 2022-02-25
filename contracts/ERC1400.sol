@@ -96,6 +96,7 @@ contract ERC1400 {
     mapping(address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
     mapping(address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
     //mapping(bytes32 => uint256) internal _indexOfDocument;                          // map to store thei index position of a document
+    mapping(bytes32 => uint256) internal _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
@@ -115,6 +116,14 @@ contract ERC1400 {
     modifier restricted {
         require(msg.sender == owner, "0x56");
         _;
+    }
+
+    // function to create partitions
+    
+    function createPartition(bytes32 _partition) external {
+        _totalPartitions.push(_partition);
+        _indexOfPartitions[_partition] = _totalPartitions.length;
+
     }
 
     // *************************************** Internal functions ********************************************************* //
@@ -161,6 +170,8 @@ contract ERC1400 {
 
     function _transferByDefaultPartitions(address _from, address _to, uint256 _value) internal {
 
+
+        require(_balanceOf[_from] >= _value);        
         for (uint256 index = 0; index < _defaultPartitions.length; index++) {
             _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
         }
@@ -246,6 +257,8 @@ contract ERC1400 {
 
     function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
+        
+        
         return _partitionsOf[_tokenHolder];
 
    } 

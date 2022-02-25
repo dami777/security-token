@@ -39,7 +39,7 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
     })
 
-    describe("token transfer by holder", ()=>{
+    /*describe("token transfer by holder", ()=>{
 
         beforeEach(async()=>{
             await token.issue(holder1, 10, web3.utils.toHex(""))
@@ -140,6 +140,14 @@ contract("ERC20 compatibility", ([holder1, holder2, escrow])=>{
 
         })
 
-    })
+    })*/
 
+
+    describe("token transfer by token holder", ()=>{
+
+        beforeEach(async()=>{
+            
+        })
+
+    })
 })
