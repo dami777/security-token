@@ -108,7 +108,7 @@ contract ERC1400 {
         granularity = 10 ** decimals; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
-        _defaultPartitions; = defaultPartitions;
+        _defaultPartitions = defaultPartitions;
 
     }
 
@@ -174,7 +174,7 @@ contract ERC1400 {
 
        require(msg.sender != address(0), "invalid sender");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
-       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
+       _balanceOfByPartition9y[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
        _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
        
        _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
