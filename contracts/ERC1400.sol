@@ -121,6 +121,7 @@ contract ERC1400 {
     // function to create partitions
     
     function createPartition(bytes32 _partition) external {
+
         _totalPartitions.push(_partition);
         _indexOfPartitions[_partition] = _totalPartitions.length;
 
@@ -257,9 +258,15 @@ contract ERC1400 {
 
     function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
+        bytes32[] memory _partitions;
+        for (uint256 index = 0; index < _totalPartitions.length; index++) {
+            if (_balanceOfByPartition[_tokenHolder][_totalPartitions[index]] > 0) {
+                _partitions.push(_totalPartitions[index])
+            }
+        }
+
+        return _partitions;
         
-        
-        return _partitionsOf[_tokenHolder];
 
    } 
 
