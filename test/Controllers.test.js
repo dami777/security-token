@@ -38,7 +38,7 @@ contract("Controllers", ([holder1, holder2, escrow])=>{
 
     })
 
-    describe("controllability", ()=>{
+    describe("controllability status", ()=>{
 
         it("can control tokens", async()=>{
 
@@ -52,5 +52,11 @@ contract("Controllers", ([holder1, holder2, escrow])=>{
             canControl.should.be.equal(false, "tokens can'e be controlled")
         })
     })
+
+    describe("controller can transfer", ()=>{
+        
+    })
+
+
 
 })

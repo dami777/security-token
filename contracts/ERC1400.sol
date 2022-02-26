@@ -100,6 +100,7 @@ contract ERC1400 {
 
     // holder's address -> operator  address -> partition -> true/false
     mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
+    mapping(address => bool) private _isController;                                 // map to store the addresses of approved controllers
 
     constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
