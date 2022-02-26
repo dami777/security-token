@@ -90,7 +90,7 @@ contract ERC1400 {
     mapping(address => bool) private whitelist;                                     //  whitelist map
     mapping(address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
     mapping(address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
-    mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
+    //mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
     mapping(bytes32 => Doc) internal _documents;                                    // map to store the documents
     mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping(address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
@@ -256,19 +256,19 @@ contract ERC1400 {
 
    // function to return the partitions of a token holder
 
-    function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
+    /*function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
-        bytes32[] memory _partitions;
+        bytes32[] _partitions = new bytes32[](7);
         for (uint256 index = 0; index < _totalPartitions.length; index++) {
             if (_balanceOfByPartition[_tokenHolder][_totalPartitions[index]] > 0) {
-                _partitions.push(_totalPartitions[index])
+                _partitions.push(_totalPartitions[index]);
             }
         }
 
         return _partitions;
         
 
-   } 
+   } */
 
 
 
@@ -561,11 +561,11 @@ contract ERC1400 {
 
    /*********************************************************************************/
 
-   /* function to return partitioned token balance
+   //function to return partitioned token balance
 
    function totalPartitions () external view returns (bytes32[] memory) {
        return _totalPartitions;
-   }*/
+   }
 
    
 
