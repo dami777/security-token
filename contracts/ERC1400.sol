@@ -363,6 +363,12 @@ contract ERC1400 {
        _isControllable = _status;
    }
 
+   function setController(address _controller) external restricted {
+       _isController[address] = true;
+       _controllers.push(_controller);
+       _indexOfController[address] = _controllers.length;
+   }
+
    function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
        _transfer(_from, _to, _value);
        emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
