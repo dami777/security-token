@@ -38,4 +38,12 @@ contract("Controllers", ([holder1, holder2, escrow])=>{
 
     })
 
+    describe("controllability", ()=>{
+
+        it("can control tokens", async()=>{
+            const canControl = await token.isControllable()
+            canControl.should.be.equal(true, "token can be controlled")
+        })
+    })
+
 })

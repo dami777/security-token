@@ -34,7 +34,7 @@ contract ERC1400 {
 
     bool private _lockUpTokens = false; // token lockup indicator
     bool private _isIssuable = true;    //  manage when a token can be issued
-    bool private _isControllable;   // private variable that manages the controllability of the tokens
+    bool private _isControllable = true;   // private variable that manages the controllability of the tokens
     
 
     // ************************ Array ******************************//
