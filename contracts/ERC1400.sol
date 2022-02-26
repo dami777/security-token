@@ -358,7 +358,7 @@ contract ERC1400 {
    }
 
    function setControllability(bool _status) external {
-       return _isControllable = _status;
+       _isControllable = _status;
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
