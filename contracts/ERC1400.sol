@@ -364,9 +364,14 @@ contract ERC1400 {
    }
 
    function setController(address _controller) external restricted {
+       require(_controller != address(0));
        _isController[address] = true;
        _controllers.push(_controller);
        _indexOfController[address] = _controllers.length;
+   }
+
+   function removeController(address _controller) external restricted {
+
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
