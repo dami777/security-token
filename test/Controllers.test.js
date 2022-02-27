@@ -13,7 +13,7 @@ require("chai")
     .should()
 
 
-contract("Controllers", ([issuer, holder2, escrow])=>{
+contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
     let token
     let name = "Tangl"
@@ -54,6 +54,15 @@ contract("Controllers", ([issuer, holder2, escrow])=>{
     })
 
     describe("controller can transfer", ()=>{
+
+        beforeEach(async()=>{
+            await setController(controller1)    //  set controllers on chain
+            await setController(controller1)
+        })
+
+        /*it("approves a controller", async()=>{
+            await 
+        })*/
 
     })
 
