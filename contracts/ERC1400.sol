@@ -378,21 +378,21 @@ contract ERC1400 {
 
    function removeController(address _controller) external restricted {
 
-       require(_controller != address(0), "invalid address");
-       require(_isController[_controller], "not recognized as a controller");
-       _isController[_controller] = false;
-      delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
+        require(_controller != address(0), "invalid address");
+        require(_isController[_controller], "not recognized as a controller");
+        _isController[_controller] = false;
+        delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
        
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-       _transfer(_from, _to, _value);
-       emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
+        _transfer(_from, _to, _value);
+        emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
    function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-       _redeem(_tokenHolder,  _value, _data);
-       emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
+        _redeem(_tokenHolder,  _value, _data);
+        emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
 
