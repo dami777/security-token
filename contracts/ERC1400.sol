@@ -372,7 +372,7 @@ contract ERC1400 {
        require(_controller != address(0), "invalid address");
        _isController[_controller] = true;
        _controllers.push(_controller);
-       _indexOfController[_controller] = _controllers.length;
+       _indexOfController[_controller] = _controllers.length - 1;
 
    }
 

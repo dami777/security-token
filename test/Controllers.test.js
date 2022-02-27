@@ -73,6 +73,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
             it("returns the size of the array of controllers", async()=>{
                 const allControllers = await token.getControllers()
                 allControllers.length.toString().should.be.equal("2", "returns the size of the array of controllers")
+                console.log(allControllers)
             })
 
         })
@@ -81,12 +82,22 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
             beforeEach(async()=>{
                 await token.removeController(controller1)
+                console.log(controller1)
             })
+
 
             it("disabled and removed controller1 from the allowed controllers", async()=>{
                 const isController1 = await token.isController(controller1)
                 isController1.should.be.equal(false, "controller was disabled")
             })
+
+            it("returns the original array of controllers with the index of the disabled controller", async()=>{
+                const allControllers = await token.getControllers()
+                allControllers.length.toString().should.be.equal("2", "returns the size of the array of controllers")
+                console.log(allControllers)
+            })
+
+    
         })
 
         
