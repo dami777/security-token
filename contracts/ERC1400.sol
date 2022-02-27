@@ -376,6 +376,10 @@ contract ERC1400 {
 
    }
 
+   function getControllers() external view returns (address[] memory) {
+       return _controllers;
+   }
+
    function removeController(address _controller) external restricted {
 
         require(_controller != address(0), "invalid address");

@@ -70,7 +70,13 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
                 isController2.should.be.equal(true, "address was approved to be a controller")
             })
 
+            it("returns the size of the array of controllers", async()=>{
+
+            })
+
         })
+
+        describe("")
 
         
 
