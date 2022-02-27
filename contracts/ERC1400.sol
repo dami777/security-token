@@ -347,7 +347,7 @@ contract ERC1400 {
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external returns (bytes32) {
 
-       if(_isControllable == true || _isController[msg.sender]) {
+       if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
