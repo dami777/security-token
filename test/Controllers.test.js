@@ -120,15 +120,30 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
     describe("controller can transfer without operator management", ()=>{
 
         beforeEach(async()=>{
-            await token.issueByPartition(classA, holder2, tokens(5), web3.utils.toHex(""))  // issue tokens to an holder's partiton
+            await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
             await token.setController(controller1)    //  set controller on chain
         })
 
         describe("token information", ()=>{
             
             it("updates the balance of the recipient", async()=>{
-                const balance = await token.balanceOfByPartition(holder2, classA)
-                balance.toString().should.be.equal(token(5).toString(), "it updates the balance of the recipient")
+                const balance = await token.balanceOfByPartition(classA, holder2)
+                balance.toString().should.be.equal(tokens(5).toString(), "it updates the balance of the recipient")
+            })
+
+        })
+
+        describe("forced transfer by partition by regulator/controller", ()=>{
+            
+            let transfer
+
+            beforeEach(async()=>{
+                transfer = await token.operatorTransferByPartition(classA, holder, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""))
+            })
+
+            it("emits events", async()=>{
+                transfer.logs[0].event.should.be.equal("TransferByPartition", "it emit the transfer by partition event")
+                transfer.logs[1].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
             })
 
         })
