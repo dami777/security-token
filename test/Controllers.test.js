@@ -77,6 +77,11 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
                 
             })
 
+
+            it("fails to reapprove an address that is already recognized as a controller", async()=>{
+                await token.setController(controller3).should.be.rejected
+            })
+
         })
 
         describe("removal of controllers", ()=>{
