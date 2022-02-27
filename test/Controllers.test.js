@@ -56,8 +56,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
     describe("controller can transfer", ()=>{
 
         beforeEach(async()=>{
-            await setController(controller1)    //  set controllers on chain
-            await setController(controller1)
+            await token.setController(controller1)    //  set controllers on chain
+            await token.setController(controller1)
         })
 
         it("approves a controller", async()=>{
