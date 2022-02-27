@@ -143,7 +143,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
             it("emits events", async()=>{
                 transfer.logs[0].event.should.be.equal("TransferByPartition", "it emit the transfer by partition event")
-                transfer.logs[1].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
+                transfer.logs[2].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
             })
 
         })

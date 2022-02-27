@@ -352,10 +352,12 @@ contract ERC1400 {
            _transferByPartiton(_partition, _from, _to, _value, "", "");
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
 
+       } else {
+            require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "invalid sender"); // 0x56 invalid sender
+            _transferByPartiton(_partition, _from, _to, _value, "", "");
        }
       
-       require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "invalid sender"); // 0x56 invalid sender
-       _transferByPartiton(_partition, _from, _to, _value, "", "");
+       
    }
 
 
