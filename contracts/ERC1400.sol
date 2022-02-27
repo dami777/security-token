@@ -370,6 +370,7 @@ contract ERC1400 {
    function setController(address _controller) external restricted {
 
        require(_controller != address(0), "invalid address");
+       require(!_isController[_controller], "address is currently a controller");
        _isController[_controller] = true;
        _controllers.push(_controller);
        _indexOfController[_controller] = _controllers.length - 1;

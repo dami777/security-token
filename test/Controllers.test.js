@@ -13,7 +13,7 @@ require("chai")
     .should()
 
 
-contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
+contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, controller3])=>{
 
     let token
     let name = "Tangl"
@@ -58,6 +58,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
         beforeEach(async()=>{
             await token.setController(controller1)    //  set controllers on chain
             await token.setController(controller2)
+            await token.setController(controller3)
         })
 
         describe("Contoller's approval", ()=>{
@@ -72,8 +73,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
             it("returns the size of the array of controllers", async()=>{
                 const allControllers = await token.getControllers()
-                allControllers.length.toString().should.be.equal("2", "returns the size of the array of controllers")
-                console.log(allControllers)
+                allControllers.length.toString().should.be.equal("3", "returns the size of the array of controllers")
+                
             })
 
         })
@@ -82,7 +83,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
             beforeEach(async()=>{
                 await token.removeController(controller1)
-                console.log(controller1)
+                
             })
 
 
@@ -93,8 +94,15 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
             it("returns the original array of controllers with the index of the disabled controller", async()=>{
                 const allControllers = await token.getControllers()
-                allControllers.length.toString().should.be.equal("2", "returns the size of the array of controllers")
-                console.log(allControllers)
+                allControllers.length.toString().should.be.equal("3", "returns the size of the array of controllers")
+            })
+
+            it("reverts when the address to be removed is an ether address", async()=>{
+                await token.removeController(ETHER_ADDRESS).should.be.rejected
+            })
+
+            it("reverts when the address to be removed is not recognized as a controller", async()=>{
+                await token.removeController(escrow).should.be.rejected
             })
 
     
@@ -103,6 +111,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
         
 
     })
+
+
 
 
 
