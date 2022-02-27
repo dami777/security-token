@@ -138,7 +138,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             let transfer
 
             beforeEach(async()=>{
-                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""))
+                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1})
             })
 
             it("emits events", async()=>{
