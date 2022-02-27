@@ -53,7 +53,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
         })
     })
 
-    describe("controller can transfer", ()=>{
+    describe("setting and removal of controllers", ()=>{
 
         beforeEach(async()=>{
             await token.setController(controller1)    //  set controllers on chain
@@ -77,7 +77,17 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
         })
 
-        describe("")
+        describe("removal of controllers", ()=>{
+
+            beforeEach(async()=>{
+                await token.removeController(controller1)
+            })
+
+            it("disabled and removed controller1 from the allowed controllers", async()=>{
+                const isController1 = await token.isController(controller1)
+                isController1.should.be.equal(false, "controller was disabled")
+            })
+        })
 
         
 
