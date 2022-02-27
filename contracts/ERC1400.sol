@@ -363,7 +363,7 @@ contract ERC1400 {
        return _isController[_controller];
    }
 
-   function setControllability(bool _status) external {
+   function setControllability(bool _status) external restricted{
        _isControllable = _status;
    }
 

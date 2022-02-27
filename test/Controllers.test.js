@@ -60,9 +60,10 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
             await setController(controller1)
         })
 
-        /*it("approves a controller", async()=>{
-            const isController1 = await token.isCon
-        })*/
+        it("approves a controller", async()=>{
+            const isController1 = await token.isContoller(controller1)
+            isController1.should.be.equal("true", "address was approved to be a controller")
+        })
 
     })
 
