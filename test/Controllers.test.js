@@ -62,7 +62,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
         it("approves a controller", async()=>{
             const isController1 = await token.isController(controller1)
-            isController1.should.be.equal("true", "address was approved to be a controller")
+            isController1.should.be.equal(true, "address was approved to be a controller")
         })
 
     })
