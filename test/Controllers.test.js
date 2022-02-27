@@ -117,6 +117,25 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
     })
 
+    describe("controller can transfer without operator management", ()=>{
+
+        beforeEach(async()=>{
+            await token.issueByPartition(classA, holder2, token(5), web3.utils.toHex(""))  // issue tokens to an holder's partiton
+        })
+
+        describe("token information", ()=>{
+            
+            it("updates the balance of the recipient", async()=>{
+                const balance = await token.balanceOfByPartition(holder2, classA)
+                balance.toString().should.be.equal(token(5).toString(), "it updates the balance of the recipient")
+            })
+
+        })
+
+        
+
+    })
+
 
 
 
