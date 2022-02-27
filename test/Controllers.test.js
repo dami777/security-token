@@ -146,6 +146,14 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
                 transfer.logs[2].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
             })
 
+            it("updates the balances of the accounts", async()=>{
+                const balanceFrom = await token.balanceOfByPartition(classA, holder2)
+                const balanceTo = await token.balanceOfByPartition(classA, escrow)
+
+                balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
+                balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
+            })
+
         })
 
 
