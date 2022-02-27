@@ -57,16 +57,22 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
 
         beforeEach(async()=>{
             await token.setController(controller1)    //  set controllers on chain
-            await token.setController(controller1)
+            await token.setController(controller2)
         })
 
-        it("approves a controller", async()=>{
-            const isController1 = await token.isController(controller1)
-            const isController2 = await token.isController(controller2)
+        describe("Contoller's approval", ()=>{
 
-            isController1.should.be.equal(true, "address was approved to be a controller")
-            isController2.should.be.equal(true, "address was approved to be a controller")
+            it("approves a controller", async()=>{
+                const isController1 = await token.isController(controller1)
+                const isController2 = await token.isController(controller2)
+    
+                isController1.should.be.equal(true, "address was approved to be a controller")
+                isController2.should.be.equal(true, "address was approved to be a controller")
+            })
+
         })
+
+        
 
     })
 
