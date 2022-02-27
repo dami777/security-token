@@ -13,7 +13,7 @@ require("chai")
     .should()
 
 
-contract("Controllers", ([holder1, holder2, escrow])=>{
+contract("Controllers", ([issuer, holder2, escrow])=>{
 
     let token
     let name = "Tangl"
@@ -54,7 +54,7 @@ contract("Controllers", ([holder1, holder2, escrow])=>{
     })
 
     describe("controller can transfer", ()=>{
-        
+
     })
 
 

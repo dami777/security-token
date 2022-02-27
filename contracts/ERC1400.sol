@@ -373,10 +373,12 @@ contract ERC1400 {
    }
 
    function removeController(address _controller) external restricted {
+
        require(_controller != address(0), "invalid address");
        require(_isController[_controller], "not recognized as a controller");
        _isController[_controller] = false;
-       _controllers.pop(_indexOfController[_controller]);   // remove the controller from the array of controllers
+      //_controllers.pop(_indexOfController[_controller]);   
+      delete _controllers[_indexOfController[_controller]];// remove the controller from the array of controllers
        
    }
 
