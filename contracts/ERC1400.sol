@@ -359,6 +359,10 @@ contract ERC1400 {
        return _isControllable;
    }
 
+   function isController(address _controller) external view returns(bool) {
+       return _isController[_controller];
+   }
+
    function setControllability(bool _status) external {
        _isControllable = _status;
    }

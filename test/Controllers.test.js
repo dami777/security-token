@@ -61,7 +61,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
         })
 
         /*it("approves a controller", async()=>{
-            await 
+            const isController1 = await token.isCon
         })*/
 
     })
