@@ -30,7 +30,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
     })
     
 
-    describe("contract address", ()=>{
+    /*describe("contract address", ()=>{
 
         it("has contract address", ()=>{
             token.address.should.not.be.equal("", "the contract has an address")
@@ -115,12 +115,13 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
         
 
-    })
+    })*/
 
     describe("controller can transfer without operator management", ()=>{
 
         beforeEach(async()=>{
-            await token.issueByPartition(classA, holder2, token(5), web3.utils.toHex(""))  // issue tokens to an holder's partiton
+            await token.issueByPartition(classA, holder2, tokens(5), web3.utils.toHex(""))  // issue tokens to an holder's partiton
+            await token.setController(controller1)    //  set controller on chain
         })
 
         describe("token information", ()=>{
@@ -132,7 +133,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
         })
 
-        
+
 
     })
 
