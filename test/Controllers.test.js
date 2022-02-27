@@ -30,7 +30,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
     })
     
 
-    /*describe("contract address", ()=>{
+    describe("contract address", ()=>{
 
         it("has contract address", ()=>{
             token.address.should.not.be.equal("", "the contract has an address")
@@ -115,7 +115,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
         
 
-    })*/
+    })
 
     describe("controller can transfer without operator management", ()=>{
 
@@ -159,9 +159,5 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
 
     })
-
-
-
-
 
 })
