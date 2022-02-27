@@ -368,7 +368,7 @@ contract ERC1400 {
        require(_controller != address(0), "invalid address");
        _isController[address] = true;
        _controllers.push(_controller);
-       _indexOfController[address] = _controllers.length;
+       _indexOfController[_controller] = _controllers.length;
 
    }
 
@@ -377,8 +377,7 @@ contract ERC1400 {
        require(_controller != address(0), "invalid address");
        require(_isController[_controller], "not recognized as a controller");
        _isController[_controller] = false;
-      //_controllers.pop(_indexOfController[_controller]);   
-      delete _controllers[_indexOfController[_controller]];// remove the controller from the array of controllers
+      delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
        
    }
 
