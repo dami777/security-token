@@ -71,7 +71,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2])=>{
             })
 
             it("returns the size of the array of controllers", async()=>{
-
+                const allControllers = await token.getControllers()
+                allControllers.length.toString().should.be.equal("2", "returns the size of the array of controllers")
             })
 
         })
