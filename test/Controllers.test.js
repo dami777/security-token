@@ -156,8 +156,26 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
         })
 
+        
+
 
 
     })
+
+    describe("forced transfer cannot happen when the control is turned off", ()=>{
+
+        beforeEach(async()=>{
+            await token.setControllability(false)
+            await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+            await token.setController(controller1)    //  set controller on chain
+        })
+
+        it("fails to force token transfer because because the control is turned off", async()=>{
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1}).should.be.rejected
+        })
+
+    })
+
+
 
 })
