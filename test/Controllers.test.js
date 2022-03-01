@@ -1,3 +1,5 @@
+const { red } = require("bn.js")
+
 const ERC1400 = artifacts.require('./ERC1400')
 const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -38,7 +40,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
     })
 
-    describe("controllability status", ()=>{
+    /*describe("controllability status", ()=>{
 
         it("can control tokens", async()=>{
 
@@ -186,8 +188,37 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             
         })  
 
+    })*/
+
+    describe("controller redemption", ()=>{
+
+        describe("redemption by control", ()=>{
+
+            let redeem
+
+            beforeEach(async()=>{
+                await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+                await token.setController(controller1)    //  set controller on chain
+                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""))
+
+            })
+
+
+            it("emits Controller Redemption event", async()=>{
+                redeem.logs[1].event.should.be.equal("ControllerRedemption", "it emits ControllerRedemption")
+            })
+
+            it("updates the balance of the token holder", async()=>{
+                const balance = await token.balanceOfByPartition(classA, holder2)
+                balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
+            })
+
+        })
+
+
+
+        
+
     })
-
-
 
 })
