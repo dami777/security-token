@@ -40,7 +40,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
     })
 
-    /*describe("controllability status", ()=>{
+    describe("controllability status", ()=>{
 
         it("can control tokens", async()=>{
 
@@ -188,7 +188,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             
         })  
 
-    })*/
+    })
 
     describe("controller redemption", ()=>{
 
