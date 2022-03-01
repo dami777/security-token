@@ -213,11 +213,22 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
             })
 
+        })   
+
+        describe("redemption by approving operator when control is turned off", ()=>{
+            
+            await token.setControllability(false)
+            await token.setController(controller1) 
+
+            beforeEach(async()=>{
+                await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+                
+            })
+
+            it("fails to redeem because control is turned off", async()=>{
+                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller1}).should.be.reverted
+            })
         })
-
-
-
-        
 
     })
 
