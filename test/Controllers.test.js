@@ -230,6 +230,16 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             it("fails to redeem because control is turned off", async()=>{
                 await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller1}).should.be.rejected
             })
+
+            it("redeems after approving contoller as an operator by the token holder", async()=>{
+                await token.authorizeOperator(controller2, {from: holder2})
+                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller2})
+                const balance = await token.balanceOfByPartition(classA, holder2)
+
+                balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
+                redeem.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeem by partition event")
+
+            })
         })
 
     })
