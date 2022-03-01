@@ -174,7 +174,15 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1}).should.be.rejected
         })
 
-        it("approves controller as an operator by the holder since control is turned", async()=>{
+        it("transfers after approving controller as an operator by the holder since control is turned", async()=>{
+            await token.authorizeOperator(controller2, {from: holder2})
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller2})
+            const balanceFrom = await token.balanceOfByPartition(classA, holder2)
+            const balanceTo = await token.balanceOfByPartition(classA, escrow)
+
+            balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
+            balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
+            
             
         })  
 
