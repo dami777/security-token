@@ -199,7 +199,7 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             beforeEach(async()=>{
                 await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(controller1)    //  set controller on chain
-                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""))
+                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller1})
 
             })
 
