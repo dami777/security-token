@@ -82,27 +82,29 @@ contract ERC1400 {
     event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
     event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
     event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
-    event Redeemed(address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
-    event ControllerTransfer(address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
-    event ControllerRedemption(address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
+    event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
+    event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
+    event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
 
      // *************************************** Mappings ********************************************************* //
 
-    mapping(address => bool) private whitelist;                                     //  whitelist map
-    mapping(address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
-    mapping(address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
+    mapping (address => bool) private whitelist;                                     //  whitelist map
+    mapping (address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
+    mapping (address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
     //mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
-    mapping(bytes32 => Doc) internal _documents;                                    // map to store the documents
-    mapping(address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
-    mapping(address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
-    mapping(address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
+    mapping (bytes32 => Doc) internal _documents;                                    // map to store the documents
+    mapping (address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
+    mapping (address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
+    mapping (address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
     //mapping(bytes32 => uint256) internal _indexOfDocument;                          // map to store thei index position of a document
-    mapping(bytes32 => uint256) internal _indexOfPartitions;
+    mapping (bytes32 => uint256) internal _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
-    mapping(address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
-    mapping(address => bool) private _isController;                                 // map to store the addresses of approved controllers
-    mapping(address => uint256) private _indexOfController;                         // map to store the index position of controllers
+    mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
+    mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
+    mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
+
+
     constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
         name = _name;
@@ -120,14 +122,6 @@ contract ERC1400 {
         _;
     }
 
-    // function to create partitions
-    
-    function createPartition(bytes32 _partition) external {
-
-        _totalPartitions.push(_partition);
-        _indexOfPartitions[_partition] = _totalPartitions.length;
-
-    }
 
     // *************************************** Internal functions ********************************************************* //
 
@@ -305,6 +299,7 @@ contract ERC1400 {
         // _to is the destinantion address
         //  msg.sender is the external address calling this function
         // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
+
         require(allowance[_from][msg.sender] >= _value, "insufficient allowance");           // the allowed value approved by the token holder must not be less than the amount
         _transfer(_from, _to, _value);                             // transfer the tokens
 
@@ -372,7 +367,7 @@ contract ERC1400 {
        return _isController[_controller];
    }
 
-   function setControllability(bool _status) external restricted{
+   function setControllability(bool _status) external restricted {
        _isControllable = _status;
    }
 
