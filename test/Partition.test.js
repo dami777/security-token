@@ -51,7 +51,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    /*describe ("issuance of token by partition", ()=>{
+    describe ("issuance of token by partition", ()=>{
 
         let issueClassA
 
@@ -580,6 +580,6 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-    })*/
+    })
 
 })

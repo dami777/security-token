@@ -174,6 +174,10 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1}).should.be.rejected
         })
 
+        it("approves controller as an operator by the holder since control is turned", async()=>{
+            
+        })  
+
     })
 
 
