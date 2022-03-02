@@ -3,7 +3,7 @@ pragma solidity 0.8.10;
 
 
 
-contract Certificate {
+contract SignedMessage {
 
     //  this contract is to test data how data signature and signature verification works
 

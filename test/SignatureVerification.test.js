@@ -1,5 +1,5 @@
 
-const Cert = artifacts.require("./Certificate")
+const Cert = artifacts.require("./SignedMessage")
 
 require("chai")
     .use(require("chai-as-promised"))
