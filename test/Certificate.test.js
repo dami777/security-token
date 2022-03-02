@@ -39,6 +39,9 @@ contract("Certificate Data Test", ()=>{
         let prefixedHash
         let signature = "0xd86a15acf203b4602a59ba476f9edac51817085e2a26e843ddc85f0c5e04bc2d104d443efdb530614a9ba3af70cb02a2b8b4c9a4157c9a45e20fd774784c21441b"
         let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+        let r = "0xd86a15acf203b4602a59ba476f9edac51817085e2a26e843ddc85f0c5e04bc2d"
+        let s = "0x104d443efdb530614a9ba3af70cb02a2b8b4c9a4157c9a45e20fd774784c2144"
+        let v = 27
 
         beforeEach(async()=>{
             prefixed = await cert.hashTransfer(from, to, 100)
@@ -50,10 +53,10 @@ contract("Certificate Data Test", ()=>{
         })
 
         it("verifies the signer", async()=>{
-            await cert.verifySignature(signature, prefixed)
-            const returnedSigner = await cert.returnedSigner()
+            const returnedSigner = await cert.verifySignature(r, s, v, prefixed)
+            //const returnedSigner = await cert.returnedSigner()
             returnedSigner.should.be.equal(signer, "it verifies the signer and generates the right signer")
-            //console.log(returnedSigner)
+            console.log(returnedSigner)
         })
 
     })
