@@ -28,6 +28,9 @@ contract Certificate {
     bytes32 private constant TRANSFER_TYPED_HASH = keccak256("Transfer(Person from, Person to, uint256 amount)Person(string firstName, string lastName, string location, walletAddress)");
 
 
+    function generateDomainSepartor (address verifyingContract) internal view returns (bytes32) {
+
+    }
     /*function generateHash () {
 
     }
