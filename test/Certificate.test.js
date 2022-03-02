@@ -56,7 +56,7 @@ contract("Certificate Data Test", ()=>{
         })
 
         it("verifies the signer", async()=>{
-            const returnedSigner = await cert.verifySignature(r, s, v, prefixed)
+            const returnedSigner = await cert.verifySignature(signature, prefixed)
             returnedSigner.should.be.equal(signer, "it verifies the signer and generates the right signer")
             
         })
