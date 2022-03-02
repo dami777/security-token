@@ -112,11 +112,6 @@ contract Certificate {
 
     function verifySignature(bytes32 r, bytes32 s, uint8 v, bytes32 _ethHash) external view returns (address) {
 
-            
-            // (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
-
-            // returnedSigner =  ecrecover(_ethHash, v, r, s);
-
            return ecrecover(_ethHash, v, r, s);
 
     }
