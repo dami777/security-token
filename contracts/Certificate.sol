@@ -47,19 +47,19 @@ contract Certificate {
     }
 
 
-    function hashPerson(Person calldata _person) internal view returns (bytes32) {
+    function hashPerson(Person memory _person) internal view returns (bytes32) {
 
-        return keccak256(abi.encode(PERSON_TYPED_HASH, keccak256(bytes(_person.firstName, _person.lastName, _person.location, _person.walletAddress))));
+        return keccak256(abi.encode(PERSON_TYPED_HASH, keccak256(bytes(_person.firstName)),  keccak256(bytes(_person.lastName)), keccak256(bytes(_person.location)), _person.walletAddress));
         
     }
 
 
 
     /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
-    /// @param  the first argument takes the struct of the _from address, second argument takes the struct of the destination address
+    /// @param  // first argument takes the struct of the _from address, second argument takes the struct of the destination address
     /// @dev    the hashPerson function hashes the _from and _to separately as they are different Persons entirely
 
-    function hashTransfer(Person calldata _from, Person calldata _to, uint256 _amount) public view returns (bytes32) {
+    function hashTransfer(Person memory _from, Person memory _to, uint256 _amount) public view returns (bytes32) {
         return keccak256(
             abi.encodePacked(
                 "\x19\x01", 
