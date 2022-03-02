@@ -63,7 +63,7 @@ contract Certificate {
         return keccak256(
             abi.encodePacked(
                 "\x19\x01", 
-                generateDomainSepartor(),
+                generateDomainSepartor(0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83, "1", 1337, 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d),
                 keccak256(abi.encode(
                     TRANSFER_TYPED_HASH,
                     hashPerson(_from),
