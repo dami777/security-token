@@ -29,8 +29,12 @@ contract Certificate {
 
 
    
-    /// @notice this function generates the domain separator for the signature
+    /// @notice this function generates hashes the domain separator for the signature
     /// @dev Enclose the strings in bytes during encoding
+    /// @param verifyingContract The contract that will be used to verify the signatue
+    /// @param version The version of the Dapp
+    /// @param chainId The chain Id where the data will be signed
+    /// @param salt An hardcoded byte32. One of the security measures for the signature
 
     function generateDomainSepartor (address verifyingContract, string memory version, uint256 chainId, bytes32 salt) internal view returns (bytes32) {
 
