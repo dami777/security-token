@@ -1,0 +1,1 @@
+const Certificate = artifacts.require("./Certificate")
