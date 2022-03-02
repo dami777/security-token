@@ -14,6 +14,14 @@ contract Certificate {
         
     }
 
+
+    struct Transfer {
+
+        Person from;
+        Person to;
+
+    }
+
     /*function generateHash () {
 
     }
