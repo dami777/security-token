@@ -30,7 +30,7 @@ contract Certificate {
 
    
     /// @notice this function generates the domain separator for the signature
-    /// @dev Explain to a developer any extra details
+    /// @dev Enclose the strings in bytes during encoding
 
     function generateDomainSepartor (address verifyingContract, string version, uint256 chainId, bytes32 salt) internal view returns (bytes32) {
 
@@ -47,15 +47,18 @@ contract Certificate {
     }
 
 
-    function generatePersonHash(Person memory _person) internal view returns (bytes32) {
+    function hashPerson(Person memory _person) internal view returns (bytes32) {
 
         return keccak256(abi.encode(PERSON_TYPED_HASH, keccak256(bytes(_person.firstName, _person.lastName, _person.location, _person.walletAddress))));
         
     }
 
 
-    /*function generatePrefixedHash () {
 
-    }*/
+    /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
+
+    function hashTransaction(Person memory _person) public view returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", generateDomainSepartor(), ))
+    }
 
 }
