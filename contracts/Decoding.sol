@@ -6,10 +6,10 @@ contract DecodeBytes{
     /* 
     
         The purpose of this contract is to illustrate how an encoded data can
-        serve as a verification mechanism for transaction. This is just one of the
-        possible ways apart from using a signature as a certificate for any transaction.
+       serve as a verification mechanism for transaction. This is just one of the
+       possible ways apart from using a signature as a certificate for any transaction.
 
-        With this method:
+       With this method:
 
         1.  Deadline for transactions can be encoded into the certificate and will decoded in the respective functions
         2.  Any form of data that can be verified on the smart contract can be encoded into the certificate

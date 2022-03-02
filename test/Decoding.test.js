@@ -1,4 +1,3 @@
-const { decode } = require("punycode")
 
 const DecodeContract = artifacts.require("./DecodeBytes")
 require("chai")
