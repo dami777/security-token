@@ -56,8 +56,8 @@ contract Certificate {
 
 
     /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
-    /// @param  _from argument takes the struct of the _from address
-    /// @param  _to argument takes the struct of the destination address
+    /// @param  _from The struct of the account to be debited
+    /// @param  _to The struct of the account to be credited
     /// @dev    the hashPerson function hashes the _from and _to separately as they are different Persons entirely
     /// @return the prefixed hash
 
@@ -80,11 +80,11 @@ contract Certificate {
 
 
     /// @notice This function computes the r s v value of a signature
-    /// @param _signature is the data generated from the signed Typed data 
-    /// @return it returns the r s v values
+    /// @param _signature The data generated from the signed Typed data 
+    /// @return r s v values
     
 
-    function _split(bytes memory _signature) public returns (bytes32 r, bytes32 s, uint8 v) {
+    function _split(bytes memory _signature) internal returns (bytes32 r, bytes32 s, uint8 v) {
 
         require(_signature.length == 65, "invalid signature length");
 
@@ -99,14 +99,14 @@ contract Certificate {
 
     }
 
-    // verify the signer using the ethereum signed hash and the signature
+    ///  verify the signer using the ethereum signed hash and the signature
 
-    function verifySignature(bytes memory _signature, bytes32 _ethHash) public returns (address) {
+    function verifySignature(bytes memory _signature, bytes32 _ethHash) external returns (address) {
 
             
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
-            returnedSigner = ecrecover(_ethHash, v, r, s);
+            return ecrecover(_ethHash, v, r, s);
 
     }
 
