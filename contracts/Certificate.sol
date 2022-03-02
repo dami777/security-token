@@ -22,6 +22,9 @@ contract Certificate {
 
     }
 
+
+    bytes32 private constant PERSON_TYPED_HASH = keccak256("Person(string firstName, string lastName, string location, walletAddress)");
+
     /*function generateHash () {
 
     }
