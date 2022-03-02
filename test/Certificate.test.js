@@ -37,7 +37,7 @@ contract("Certificate Data Test", ()=>{
         }
 
         let prefixed
-        let signature = "0xd86a15acf203b4602a59ba476f9edac51817085e2a26e843ddc85f0c5e04bc2d104d443efdb530614a9ba3af70cb02a2b8b4c9a4157c9a45e20fd774784c21441b"
+        let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
         let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
 
         /*const _signature = signature.substring(2)

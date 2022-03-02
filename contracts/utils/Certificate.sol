@@ -4,7 +4,7 @@ pragma solidity 0.8.10;
 contract Certificate {
 
 
-    struct Person {
+    struct Holder {
 
         string firstName;
         string lastName;
@@ -17,15 +17,15 @@ contract Certificate {
 
     struct Transfer {
 
-        Person from;
-        Person to;
+        Holder from;
+        Holder to;
         uint256 amount;
 
     }
 
 
-    bytes32 private constant PERSON_TYPED_HASH = keccak256("Person(string firstName,string lastName,string location,address walletAddress)");
-    bytes32 private constant TRANSFER_TYPED_HASH = keccak256("Transfer(Person from,Person to,uint256 amount)Person(string firstName,string lastName,string location,address walletAddress)");
+    bytes32 private constant HOLDER_TYPED_HASH = keccak256("Holder(string firstName,string lastName,string location,address walletAddress)");
+    bytes32 private constant TRANSFER_TYPED_HASH = keccak256("Transfer(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
     address public returnedSigner;
 
    
@@ -51,9 +51,9 @@ contract Certificate {
     }
 
 
-    function hashPerson(Person memory _person) internal view returns (bytes32) {
+    function hashHolder(Holder memory _holder) internal view returns (bytes32) {
 
-        return keccak256(abi.encode(PERSON_TYPED_HASH, keccak256(bytes(_person.firstName)),  keccak256(bytes(_person.lastName)), keccak256(bytes(_person.location)), _person.walletAddress));
+        return keccak256(abi.encode(HOLDER_TYPED_HASH, keccak256(bytes(_holder.firstName)),  keccak256(bytes(_holder.lastName)), keccak256(bytes(_holder.location)), _holder.walletAddress));
         
     }
 
@@ -62,10 +62,10 @@ contract Certificate {
     /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
     /// @param  _from The struct of the account to be debited
     /// @param  _to The struct of the account to be credited
-    /// @dev    the hashPerson function hashes the _from and _to separately as they are different Persons entirely
+    /// @dev    the hashHolder function hashes the _from and _to separately as they are different Holders entirely
     /// @return the prefixed hash
 
-    function hashTransfer(Person memory _from, Person memory _to, uint256 _amount) public view returns (bytes32) {
+    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) public view returns (bytes32) {
         
         return keccak256(
             abi.encodePacked(
@@ -73,8 +73,8 @@ contract Certificate {
                 generateDomainSepartor(0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83, "1", 1337, 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d),
                 keccak256(abi.encode(
                     TRANSFER_TYPED_HASH,
-                    hashPerson(_from),
-                    hashPerson(_to),
+                    hashHolder(_from),
+                    hashHolder(_to),
                     _amount
                 ))
 
