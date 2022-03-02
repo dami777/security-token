@@ -1,6 +1,7 @@
 // solidity version
 
 pragma solidity 0.8.10;
+import "./utils/Certificate.sol";
 
 
 contract ERC1400 {
