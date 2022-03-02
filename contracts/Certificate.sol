@@ -56,10 +56,13 @@ contract Certificate {
 
 
     /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
-    /// @param  // first argument takes the struct of the _from address, second argument takes the struct of the destination address
+    /// @param  _from argument takes the struct of the _from address
+    /// @param  _to argument takes the struct of the destination address
     /// @dev    the hashPerson function hashes the _from and _to separately as they are different Persons entirely
+    /// @return the prefixed hash
 
     function hashTransfer(Person memory _from, Person memory _to, uint256 _amount) public view returns (bytes32) {
+        
         return keccak256(
             abi.encodePacked(
                 "\x19\x01", 
@@ -72,6 +75,39 @@ contract Certificate {
                 ))
 
             ));
+    }
+
+
+
+    /// @notice This function computes the r s v value of a signature
+    /// @param _signature is the data generated from the signed Typed data 
+    /// @return it returns the r s v values
+    
+
+    function _split(bytes memory _signature) public returns (bytes32 r, bytes32 s, uint8 v) {
+
+        require(_signature.length == 65, "invalid signature length");
+
+        assembly {
+
+            r := mload(add(_signature, 32))
+            s := mload(add(_signature, 64))
+            v := byte(0, mload(add(_signature, 96)))
+           
+
+        }
+
+    }
+
+    // verify the signer using the ethereum signed hash and the signature
+
+    function verifySignature(bytes memory _signature, bytes32 _ethHash) public returns (address) {
+
+            
+            (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
+
+            returnedSigner = ecrecover(_ethHash, v, r, s);
+
     }
 
 }
