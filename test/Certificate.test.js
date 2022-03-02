@@ -45,9 +45,6 @@ contract("Certificate Data Test", ()=>{
         const s = "0x" + _signature.substring(64, 128)
         const v = parseInt(_signature.substring(128, 130), 16)
 
-        //let r = "0xd86a15acf203b4602a59ba476f9edac51817085e2a26e843ddc85f0c5e04bc2d"
-        //let s = "0x104d443efdb530614a9ba3af70cb02a2b8b4c9a4157c9a45e20fd774784c2144"
-        //let v = 27
 
         beforeEach(async()=>{
             prefixed = await cert.hashTransfer(from, to, 100)
