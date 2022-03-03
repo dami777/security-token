@@ -1,7 +1,7 @@
-//import { tokens } from "./helper";
-//import { ETHER_ADDRESS } from "./helper";
-
 require("./helper.js")
+require("chai")
+    .use(require("chai-as-promised"))
+    .should()
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -23,9 +23,12 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
     })
 
     describe("deployment", ()=>{
+
         it("has a contract address", async()=>{
+            
             token.address.should.not.be.equal("", "it has a contract address")
         })
+
     })
 
 
