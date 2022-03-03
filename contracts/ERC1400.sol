@@ -10,6 +10,7 @@ contract ERC1400 {
     /************************************************ Variable Declarations and Initaalizations ************************************/
 
 
+    Certificate certificate;
 
      // *************************************** Strings ********************************************************* //
 
@@ -315,15 +316,16 @@ contract ERC1400 {
     // tranfer with data
 
     function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
+        //address _signer = certificate.
         _transfer(msg.sender, _to, _value);
     }
     
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
          require(allowance[_from][msg.sender] >= _value);           // the allowed value approved by the token holder must not be less than the amount
-        _transfer(_from, _to, _value);                             // transfer the tokens
+        _transfer(_from, _to, _value);                              // transfer the tokens
 
-        // reset the allowance value
+        //  reset the allowance value
 
         allowance[_from][msg.sender] =  0;   
         

@@ -1,3 +1,4 @@
+const { encode } = require("punycode")
 
 const DecodeContract = artifacts.require("./DecodeBytes")
 require("chai")
@@ -56,6 +57,27 @@ contract("Decode Bytes Contract", ()=>{
             console.log(decoded["0"].toString(), decoded["1"])
 
         })
+    })
+
+    /*describe("it decodes signature from bytes", ()=>{
+
+    })*/
+
+    describe("signature encoding and decoding", ()=>{
+
+        const signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
+        let encodedSignature
+
+        it("encodes signaure", async()=>{
+            encodedSignature = await decodeContract.encodeSignature(signature)
+            
+        })
+
+        it("decodes the encoded signature", async()=>{
+            const decode = await decodeContract.decodeBytes(encodedSignature)
+            decode.should.be.equal(signature, "it decodes the signature")
+        })
+
     })
 
 })

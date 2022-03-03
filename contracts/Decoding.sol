@@ -44,4 +44,15 @@ contract DecodeBytes{
         return (_month, _name);
     }
 
+    function encodeSignature(bytes memory _data) public pure returns (bytes memory) {
+        return abi.encode(_data);
+    }
+
+    function decodeBytes(bytes memory _data) public pure returns (bytes memory) {
+
+        bytes memory signature = abi.decode(_data, (bytes));
+        return signature;
+
+    }
+
 }
