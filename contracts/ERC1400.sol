@@ -317,7 +317,7 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        (bytes _signature, bytes32 _signatureHash) = abi.decode(_data, (bytes, bytes32));
+        (bytes memory _signature, bytes32 _signatureHash) = abi.decode(_data, (bytes, bytes32));
         address _signer = certificate.verifySignature(_signature, _signatureHash);
         _transfer(msg.sender, _to, _value);
     }
