@@ -116,7 +116,7 @@ contract Certificate {
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
             address _signer = ecrecover(_ethHash, v, r, s);
             require(_signer != address(0), "signature failed");
-            return address;
+            return _signer;
 
     }
 
