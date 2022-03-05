@@ -4,7 +4,7 @@ pragma solidity 0.8.10;
 import "./utils/Certificate.sol";
 
 
-contract ERC1400 {
+contract ERC1400 is Certificate{
 
 
     /************************************************ Variable Declarations and Initaalizations ************************************/
@@ -318,8 +318,8 @@ contract ERC1400 {
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
         (bytes memory _signature, bytes32 _signatureHash) = abi.decode(_data, (bytes, bytes32));
-        address _signer = certificate.verifySignature(_signature, _signatureHash);
-        _transfer(signer, _to, _value);
+        address _signer = verifySignature(_signature, _signatureHash);
+        _transfer(msg.sender, _to, _value);
     }
     
 
