@@ -70,8 +70,8 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
                 transfer = await token.transferWithData(holder2, tokens(2), data, {from: holder1})
             })
 
-            it("emits the signer", ()=>{
-                transfer.logs[0].args._from.should.be.equal(holder1, "it emits the signer")
+            it("transfers the token with the certificate", ()=>{
+                transfer.logs[0].args._from.should.be.equal(holder1, "it emits the sender")
             })
 
         })
