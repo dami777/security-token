@@ -1,7 +1,16 @@
-require("./helper.js")
+const helper = require("./helper")
 require("chai")
     .use(require("chai-as-promised"))
     .should()
+
+const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
+
+const tokens=(n)=>{
+    return new web3.utils.BN(
+        web3.utils.toWei(n.toString(), 'ether')
+    )
+    
+}
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -9,6 +18,8 @@ const ERC1400 = artifacts.require("./ERC1400")
 contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
     let token
+    let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
+    let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
     let name = "Tangl"
     let symbol = "TAN"
     let decimal = 18
@@ -20,6 +31,7 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
     beforeEach( async()=>{
         token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
+
     })
 
     describe("deployment", ()=>{
@@ -28,6 +40,37 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
             
             token.address.should.not.be.equal("", "it has a contract address")
         })
+
+    })
+
+    describe("transfer with signature", ()=>{
+
+        beforeEach(async()=>{
+            await token.issue(holder1, 5, web3.utils.toHex(""))
+        })
+
+        describe("balances", ()=>{
+            
+            it("issued token", async()=>{
+                const balance = await token.balanceOf(holder1)
+                balance.toString().should.be.equal(tokens(5).toString(), "it updated the balance of the recipient")
+            })
+            
+        })
+
+        describe("transfer with data", ()=>{
+
+            let transfer
+            let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32"], [signature, ethHash])
+            //let data = abi.encode(signature, ethHash)
+
+            beforeEach(async()=>{
+                transfer = await token.transferWithData(holder2, tokens(2), data)
+            })
+
+        })
+
+
 
     })
 

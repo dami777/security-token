@@ -319,7 +319,7 @@ contract ERC1400 {
         
         (bytes memory _signature, bytes32 _signatureHash) = abi.decode(_data, (bytes, bytes32));
         address _signer = certificate.verifySignature(_signature, _signatureHash);
-        _transfer(msg.sender, _to, _value);
+        _transfer(signer, _to, _value);
     }
     
 

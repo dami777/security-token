@@ -52,6 +52,7 @@ contract("Certificate Data Test", ()=>{
 
         it("generates the prefixed hash", async()=>{
             await prefixed.should.not.be.equal("", "it generates the prefixed hash")
+            console.log(prefixed)
         })
 
         it("verifies the signer", async()=>{
