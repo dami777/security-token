@@ -117,6 +117,9 @@ contract Certificate {
     }
 
 
+    /// @notice decode the typed signature bytes data and the hash bytes32 data from the encoded data
+    /// @param _encodedSignature The encoded data containing the signature and the signature hash 
+    /// @return the signature and the hash
 
     function decodeData(bytes memory _encodedSignature) internal pure returns (bytes memory, bytes32) {
         return abi.decode(_encodedSignature, (bytes, bytes32));
