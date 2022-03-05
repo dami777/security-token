@@ -23,6 +23,8 @@ contract Certificate {
 
     }
 
+    mapping(bytes => bool) internal _signatures;        // this map will store the used signatures to ensure that a signature can not be reused
+
 
     bytes32 private constant HOLDER_TYPED_HASH = keccak256("Holder(string firstName,string lastName,string location,address walletAddress)");
     bytes32 private constant TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
