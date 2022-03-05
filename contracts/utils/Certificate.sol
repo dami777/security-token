@@ -116,4 +116,10 @@ contract Certificate {
 
     }
 
+
+
+    function decodeData(bytes memory _encodedSignature) internal pure returns (bytes memory, bytes32) {
+        return abi.decode(_encodedSignature, (bytes, bytes32));
+    }
+
 }

@@ -77,7 +77,6 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
         })
 
 
-
     })
 
 
