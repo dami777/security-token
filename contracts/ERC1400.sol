@@ -319,7 +319,7 @@ contract ERC1400 is Certificate{
         
         (bytes memory _signature, bytes32 _signatureHash) = decodeData(_data);
         address _signer = verifySignature(_signature, _signatureHash);
-        require (owner == _signer || _isController[_signer]);
+        require (owner == _signer || _isController[_signer], "invalid signer");
         _transfer(msg.sender, _to, _value);
     }
     
