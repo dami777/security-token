@@ -92,7 +92,7 @@ contract Certificate {
 
     function _split(bytes memory _signature) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
 
-        require(_signature.length == 65, "invalid signature length");
+        require(_signature.length == 65, "0x5f"); // invalid signature length
 
         assembly {
 
@@ -113,9 +113,9 @@ contract Certificate {
     function verifySignature(bytes memory _signature, bytes32 _ethHash) public pure returns (address) {
 
 
-            (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
-           // require (ecrecover(_ethHash, v, r, s) != address(0));
-            return ecrecover(_ethHash, v, r, s);
+        (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
+        require (ecrecover(_ethHash, v, r, s) != address(0), "0x59"); // invalid signer
+        return ecrecover(_ethHash, v, r, s);
 
     }
 
