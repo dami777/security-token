@@ -22,6 +22,7 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
     let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
     let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
     let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+    let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32"], [signature, ethHash])
     let name = "Tangl"
     let symbol = "TAN"
     let decimal = 18
@@ -33,7 +34,7 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
     beforeEach( async()=>{
         token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] ) //, {gas: 200000000000000000})
-        token.setController(signer)
+        
 
     })
 
@@ -63,8 +64,12 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
         describe("transfer with data", ()=>{
 
+            beforeEach(async()=>{
+                await token.setController(signer)
+            })
+
             let transfer
-            let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32"], [signature, ethHash])
+            
             //let data = abi.encode(signature, ethHash)
 
             beforeEach(async()=>{
@@ -76,6 +81,15 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
             })
 
         })
+
+        describe("failure to transfer with data", ()=>{
+
+            it("fails to transfer with data because the signer isn't recognized as a regulator", async()=>{
+                await token.transferWithData(holder2, tokens(2), data, {from: holder1}).should.be.rejected
+            })
+
+        })
+        
 
 
     })
