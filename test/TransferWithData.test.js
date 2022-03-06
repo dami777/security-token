@@ -32,7 +32,7 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
 
     beforeEach( async()=>{
-        token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
+        token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] ) //, {gas: 200000000000000000})
         token.setController(signer)
 
     })

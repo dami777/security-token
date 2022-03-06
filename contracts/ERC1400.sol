@@ -1,6 +1,6 @@
 // solidity version
-
 pragma solidity 0.8.10;
+
 import "./utils/Certificate.sol";
 
 
@@ -131,8 +131,8 @@ contract ERC1400 is Certificate{
     
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
-        require(_to != address(0),  "can't transfer to zero address");
-        require(_balanceOf[_from] >= _amount, "insufficient amount");
+        require(_to != address(0),  "0x57");        // invalid receiver
+        require(_balanceOf[_from] >= _amount, "0x52");      // insufficient amount
 
         _balanceOf[_from] = _balanceOf[_from] - _amount;                  // reduce the sender's balance --> use safemath
         _balanceOf[_to] = _balanceOf[_to] + _amount;                      // increase the value of the receiver ---> usesafemath
@@ -149,8 +149,8 @@ contract ERC1400 is Certificate{
            _transfer(_from, _to, _value);
        }*/
 
-       require( _balanceOfByPartition[_from][_partition] >= _value, "insufficient token in partition"); // the partiton balance of the holder must be greater than or equal to the value
-       require(_to != address(0),  "can't transfer to zero address");   //  can't send to ether address
+       require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); // the partiton balance of the holder must be greater than or equal to the value
+       require(_to != address(0),  "0x57");   //  can't send to ether address
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
@@ -182,8 +182,8 @@ contract ERC1400 is Certificate{
 
     function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
 
-       require(msg.sender != address(0), "invalid sender");
-       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "insufficient amount to burn");
+       require(msg.sender != address(0), "0x56");
+       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");  // insufficient balance
        _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
        _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
        
@@ -198,7 +198,7 @@ contract ERC1400 is Certificate{
 
    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
-       require(_balanceOf[_tokenHolder] >= _value, "insufficient balance");
+       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
        _transfer(_tokenHolder, address(0), _value);
        totalSupply -= _value;
        emit Redeemed(msg.sender, _tokenHolder, _value, _data);
@@ -276,7 +276,7 @@ contract ERC1400 is Certificate{
     
     function approve(address _externalAddress, uint256 _value) external returns (bool success) {
 
-        require(_externalAddress != address(0), "56");                  //0x56   invalid external address
+        require(_externalAddress != address(0), "0x58");                  //    0x58   invalid operator
         allowance[msg.sender][_externalAddress] = _value;              // use safemath function here to avoid under and overflow
         emit Approval(msg.sender, _externalAddress, _value);            // emit the approved event
         return true;
@@ -302,7 +302,7 @@ contract ERC1400 is Certificate{
         //  msg.sender is the external address calling this function
         // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
 
-        require(allowance[_from][msg.sender] >= _value, "insufficient allowance");           // the allowed value approved by the token holder must not be less than the amount
+        require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
         _transfer(_from, _to, _value);                             // transfer the tokens
 
         // reset the allowance value
@@ -319,13 +319,13 @@ contract ERC1400 is Certificate{
         
         (bytes memory _signature, bytes32 _signatureHash) = decodeData(_data);
         address _signer = verifySignature(_signature, _signatureHash);
-        require (owner == _signer || _isController[_signer], "invalid signer");
+        require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
         _transfer(msg.sender, _to, _value);
     }
     
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
-         require(allowance[_from][msg.sender] >= _value);           // the allowed value approved by the token holder must not be less than the amount
+         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
         _transfer(_from, _to, _value);                              // transfer the tokens
 
         //  reset the allowance value
@@ -354,7 +354,7 @@ contract ERC1400 is Certificate{
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
 
        } else {
-            require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "invalid sender"); // 0x56 invalid sender
+            require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
             _transferByPartiton(_partition, _from, _to, _value, "", "");
        }
       
@@ -379,8 +379,8 @@ contract ERC1400 is Certificate{
 
    function setController(address _controller) external restricted {
 
-       require(_controller != address(0), "invalid address");
-       require(!_isController[_controller], "address is currently a controller");
+       require(_controller != address(0), "0x58");      // invalid transfer agent
+       require(!_isController[_controller], "ACC");       // address is currently a controller
        _isController[_controller] = true;
        _controllers.push(_controller);
        _indexOfController[_controller] = _controllers.length - 1;
@@ -393,8 +393,8 @@ contract ERC1400 is Certificate{
 
    function removeController(address _controller) external restricted {
 
-        require(_controller != address(0), "invalid address");
-        require(_isController[_controller], "not recognized as a controller");
+        require(_controller != address(0), "0x58");     // invalid transfer agent
+        require(_isController[_controller], "0x58");      // not recognized as a controller
         _isController[_controller] = false;
         delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
        
@@ -466,8 +466,8 @@ contract ERC1400 is Certificate{
     
     function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
-        require(_isIssuable, "can't issue tokens for now");
-        require(_tokenHolder != address(0));
+        require(_isIssuable, "0x55");     // can't issue tokens for now
+        require(_tokenHolder != address(0), "0x57");        // invalid receiver
         uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
         _balanceOf[_tokenHolder] += amount;                              
         totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
@@ -481,7 +481,7 @@ contract ERC1400 is Certificate{
 
    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
 
-        require(_isIssuable, "can't issue tokens for now");
+        require(_isIssuable, "0x55"); // can't issue tokens for now
         uint256 amount =  _value * granularity; 
         _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
         _balanceOf[_tokenHolder] += amount; // increment the total balance of this token holder 
@@ -503,7 +503,7 @@ contract ERC1400 is Certificate{
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes calldata _data) external {
 
-        require(allowance[_tokenHolder][msg.sender] >= _value);
+        require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
         _redeem(_tokenHolder, _value, _data);
 
    }
@@ -525,7 +525,7 @@ contract ERC1400 is Certificate{
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
        } else {
-            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "invalid sender");
+            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
        }
 

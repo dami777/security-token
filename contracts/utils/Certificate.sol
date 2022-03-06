@@ -23,7 +23,7 @@ contract Certificate {
 
     }
 
-    mapping(bytes => bool) internal _signatures;        // this map will store the used signatures to ensure that a signature can not be reused
+   mapping(bytes => bool) internal _signatures;        // this map will store the used signatures to ensure that a signature can not be reused
 
 
     bytes32 private constant HOLDER_TYPED_HASH = keccak256("Holder(string firstName,string lastName,string location,address walletAddress)");
@@ -114,9 +114,8 @@ contract Certificate {
 
 
             (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
-            address _signer = ecrecover(_ethHash, v, r, s);
-            require(_signer != address(0), "signature failed");
-            return _signer;
+           // require (ecrecover(_ethHash, v, r, s) != address(0));
+            return ecrecover(_ethHash, v, r, s);
 
     }
 
