@@ -342,7 +342,7 @@ contract ERC1400 is Certificate{
     // *********************    PARTITION TOKEN TRANSFERS
 
 
-    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes calldata _data) external returns (bytes32) {
+    function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
  
