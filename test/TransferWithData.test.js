@@ -90,7 +90,7 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
         })
 
-       describe("transfer by partition with data", ()=>{
+        describe("transfer by partition with data", ()=>{
 
             let transferByPartition
             let issue
@@ -103,11 +103,23 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
 
             it("emits the data with the event", ()=>{
                 transferByPartition.logs[0].args._data.should.be.equal(data, "it emitted the injected certificate")
-                //console.log(transferByPartition.logs[0].args)
             })
 
         })
-        
+
+        describe("transfer by partition without data", ()=>{
+            let transferByPartition
+            let issue
+
+            beforeEach(async()=>{
+                issue = await token.issueByPartition(classA, holder1, 5, web3.utils.toHex(""))
+                transferByPartition = await token.transferByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from: holder1})
+            })
+
+            it("emits the data with the event", ()=>{
+                transferByPartition.logs[0].args._data.should.be.equal("0x00", "it emitted an emptyn data")
+            })  
+        })
 
 
     })

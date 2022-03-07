@@ -344,7 +344,7 @@ contract ERC1400 is Certificate{
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        if (_data.length != 0) {
+        if (_data.length != 1) {
 
             require(_verifySigner(_data));
 
@@ -622,10 +622,12 @@ contract ERC1400 is Certificate{
 
    //function to return partitioned token balance
 
-   function totalPartitions () external view returns (bytes32[] memory) {
+    function totalPartitions () external view returns (bytes32[] memory) {
        return _totalPartitions;
-   }
+    }
 
+
+    
    
 
    
