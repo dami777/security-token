@@ -102,8 +102,8 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
             })
 
             it("emits the data with the event", ()=>{
-                //transferByPartition.logs[0].args._data.should.be.equal(data, "it emitted the injected certificate")
-                console.log(transferByPartition.logs[0].args)
+                transferByPartition.logs[0].args._data.should.be.equal(data, "it emitted the injected certificate")
+                //console.log(transferByPartition.logs[0].args)
             })
 
         })
