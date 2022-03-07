@@ -328,7 +328,7 @@ contract ERC1400 is Certificate{
     }
     
 
-    function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
+    function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
          require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
         _transfer(_from, _to, _value);                              // transfer the tokens
 
