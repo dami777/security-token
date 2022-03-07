@@ -192,19 +192,26 @@ contract ERC1400 is Certificate{
        totalSupply -= _value;
        emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 
-   }
+    }
 
-   // internal redeem function
+    // internal redeem function
 
-   function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
+    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
        require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
        _transfer(_tokenHolder, address(0), _value);
        totalSupply -= _value;
        emit Redeemed(msg.sender, _tokenHolder, _value, _data);
 
-   }
+    }
 
+
+    function _verifySigner(bytes memory _data) internal view returns (bool) {
+        (bytes memory _signature, bytes32 _signatureHash) = decodeData(_data);
+        address _signer = verifySignature(_signature, _signatureHash);
+        require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
+        return true;
+    }
 
 
 
@@ -311,15 +318,6 @@ contract ERC1400 is Certificate{
         return true;           
 
     }  
-
-
-    function _verifySigner(bytes memory _data) internal view returns (bool) {
-        (bytes memory _signature, bytes32 _signatureHash) = decodeData(_data);
-        address _signer = verifySignature(_signature, _signatureHash);
-        require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
-        return true;
-    }
-
 
     // tranfer with data
 
