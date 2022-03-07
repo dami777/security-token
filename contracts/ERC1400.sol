@@ -170,7 +170,7 @@ contract ERC1400 is Certificate{
     function _transferByDefaultPartitions(address _from, address _to, uint256 _value) internal {
 
 
-        require(_balanceOf[_from] >= _value);        
+        require(_balanceOf[_from] >= _value, "0x52");        
         for (uint256 index = 0; index < _defaultPartitions.length; index++) {
             _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
         }
@@ -344,6 +344,11 @@ contract ERC1400 is Certificate{
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
+        if (_data.length != 0) {
+
+            require(_verifySigner(_data));
+
+        }
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
  
    }    
