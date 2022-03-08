@@ -571,6 +571,10 @@ contract ERC1400 is Certificate{
             return (hex"52", "insufficient balance");
         }
 
+        if( _verifySigner(_data) != true) {
+            return (hex"59", "invalid signer");
+        }
+
         return (hex"51", "transfer success");
 
     }
@@ -593,13 +597,17 @@ contract ERC1400 is Certificate{
             return (hex"58", "invalid operator");
         } 
 
+        if( _verifySigner(_data) != true) {
+            return (hex"59", "invalid signer");
+        }
+
         return (hex"51", "transfer success");
 
     }
 
     // can transfer by partition
 
-   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes calldata _data) external view returns(bytes1, bytes32, bytes32) {
+   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes memory _data) external view returns(bytes1, bytes32, bytes32) {
 
        if (_to == address(0)) {
            return (hex"55", "invalid receiver", _partition);
@@ -609,22 +617,15 @@ contract ERC1400 is Certificate{
            return (hex"55", "insufficient balance", _partition);
        }
 
+       if( _verifySigner(_data) != true) {
+            return (hex"59", "invalid signer");
+        }
+
+        return (hex"51", "transfer success");
+
 
    }
 
-
-
-
-    /* function to add an address to whitelist
-    function addToWhiteList(address _investor) external restricted {
-        
-        require(!whitelist[_investor], "can't whitelist an address more than once");
-        whitelist[_investor] = true;
-        emit WhiteList(_investor, block.timestamp);
-
-    }*/
-
-    
 
 
    /*********************************************************************************/
@@ -634,23 +635,6 @@ contract ERC1400 is Certificate{
     function totalPartitions () external view returns (bytes32[] memory) {
        return _totalPartitions;
     }
-
-
-    
-   
-
-   
-
-   
-
-   
-
-   
-
-  
-
-
-   
 
 
 }
