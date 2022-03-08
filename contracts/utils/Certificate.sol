@@ -38,7 +38,7 @@ contract Certificate {
     /// @param chainId The chain Id where the data will be signed
     /// @param salt An hardcoded byte32. One of the security measures for the signature
 
-    function generateDomainSepartor (address verifyingContract, string memory version, uint256 chainId, bytes32 salt) internal view returns (bytes32) {
+    function generateDomainSepartor (address verifyingContract, string memory version, uint256 chainId, bytes32 salt) internal pure returns (bytes32) {
 
         bytes32 EIP712_DOMAIN_HASH_TYPE = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)");
 
