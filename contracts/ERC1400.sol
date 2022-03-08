@@ -361,10 +361,11 @@ contract ERC1400 is Certificate{
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
+       require(_verifySigner(_data));
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
-           emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
+           emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
        } else {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender

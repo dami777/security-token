@@ -173,7 +173,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-   /*describe("operator's access", ()=>{
+   describe("operator's access", ()=>{
 
         let issueClassA
 
@@ -231,7 +231,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-        describe("authorizes an operator for all partitions", ()=>{
+      /*  describe("authorizes an operator for all partitions", ()=>{
 
             let authorizeForAllPartitions
 
