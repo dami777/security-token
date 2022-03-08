@@ -53,7 +53,7 @@ contract Certificate {
     }
 
 
-    function hashHolder(Holder memory _holder) internal view returns (bytes32) {
+    function hashHolder(Holder memory _holder) internal pure returns (bytes32) {
 
         return keccak256(abi.encode(HOLDER_TYPED_HASH, keccak256(bytes(_holder.firstName)),  keccak256(bytes(_holder.lastName)), keccak256(bytes(_holder.location)), _holder.walletAddress));
         
@@ -67,7 +67,7 @@ contract Certificate {
     /// @dev    the hashHolder function hashes the _from and _to separately as they are different Holders entirely
     /// @return the prefixed hash
 
-    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) public view returns (bytes32) {
+    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) public pure returns (bytes32) {
         
         return keccak256(
             abi.encodePacked(
