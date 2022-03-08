@@ -193,13 +193,26 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
         
         describe("failed operator's activities", ()=>{
 
-
+            beforeEach(async()=>{
+                await erc1400.removeController(signer)
+                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
+            })
 
             it("failed to send tokens by an unauthorized operator from an address", async()=>{
 
                 await erc1400.operatorTransferByPartition(classA, address2, address3, tokens(1), web3.utils.toHex(""), data).should.be.rejected
 
             })
+
+
+            it("failed to send tokens by an unauthorized signer", async()=>{
+
+                await erc1400.operatorTransferByPartition(classA, address2, address3, tokens(1), web3.utils.toHex(""), data, {from:operator1}).should.be.rejected
+
+            })
+
+
+            
 
         })
 
@@ -231,7 +244,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-      /*  describe("authorizes an operator for all partitions", ()=>{
+        describe("authorizes an operator for all partitions", ()=>{
 
             let authorizeForAllPartitions
 
@@ -311,11 +324,11 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             
 
-        })*/
+        })
 
     })
 
-    /*describe("operator's operations on assets", ()=>{
+    describe("operator's operations on assets", ()=>{
 
         // issuance variable for address2
 
@@ -365,7 +378,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             it("transfers tokens from address2's class A tokens to other addresses", async()=>{
 
 
-                const transfer = await erc1400.operatorTransferByPartition(classA, address2, address4, tokens(5), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1})
+                const transfer = await erc1400.operatorTransferByPartition(classA, address2, address4, tokens(5), web3.utils.toHex(""), data, {from: operator1})
 
                 const address2Balance = await erc1400.balanceOfByPartition(classA, address2)
                 const address4Balance = await erc1400.balanceOfByPartition(classA, address4)
@@ -382,7 +395,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             it("transfers tokens from address2's class B tokens to other addresses", async()=>{
 
 
-                const transfer = await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1})
+                const transfer = await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(10), web3.utils.toHex(""), data, {from: operator1})
 
                 const address2Balance = await erc1400.balanceOfByPartition(classB, address2)
                 const address5Balance = await erc1400.balanceOfByPartition(classB, address5)
@@ -393,7 +406,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             })
 
             it("fails to transfer tokens from the specified partition due to holder's insufficient token in that partition", async()=>{
-                await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(40), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator1}).should.be.rejected
+                await erc1400.operatorTransferByPartition(classB, address2, address5, tokens(40), web3.utils.toHex(""), data, {from: operator1}).should.be.rejected
             })
 
         })
@@ -402,7 +415,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             it("transfers tokens from the class A partition it has been given to", async()=>{
 
-                const transfer = await erc1400.operatorTransferByPartition(classA, address2, address5, tokens(20), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2})
+                const transfer = await erc1400.operatorTransferByPartition(classA, address2, address5, tokens(20), web3.utils.toHex(""), data, {from: operator2})
 
                 const address2Balance = await erc1400.balanceOfByPartition(classA, address2)
                 const address5Balance = await erc1400.balanceOfByPartition(classA, address5)
@@ -416,7 +429,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             it("transfers tokens from class B partition it has been given access to", async()=>{
 
-                const transfer = await erc1400.operatorTransferByPartition(classB, address3, address4, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2})
+                const transfer = await erc1400.operatorTransferByPartition(classB, address3, address4, tokens(10), web3.utils.toHex(""), data, {from: operator2})
 
                 const address3Balance = await erc1400.balanceOfByPartition(classB, address3)
                 const address4Balance = await erc1400.balanceOfByPartition(classB, address4)
@@ -439,7 +452,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    describe("redemption by partitition", ()=>{
+    /*describe("redemption by partitition", ()=>{
 
         let issueClassAToAdddress2
         let issueClassBToAdddress2
