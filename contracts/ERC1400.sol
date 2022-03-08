@@ -509,14 +509,16 @@ contract ERC1400 is Certificate{
    // *********************    TOKEN REDEMPTION
 
 
-   function redeem(uint256 _value, bytes calldata _data) external {
+   function redeem(uint256 _value, bytes memory _data) external {
 
+       require(_verifySigner(_data));
        _redeem(msg.sender, _value, _data);
 
    }
 
-   function redeemFrom(address _tokenHolder, uint256 _value, bytes calldata _data) external {
+   function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
+        require(_verifySigner(_data));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
         _redeem(_tokenHolder, _value, _data);
 
