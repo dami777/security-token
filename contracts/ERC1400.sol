@@ -221,7 +221,7 @@ contract ERC1400 is Certificate{
     //  Default Partitions
 
 
-    function setDefaultPartitions(bytes32[] defaultPartitions) external  {
+    function setDefaultPartitions(bytes32[] calldata defaultPartitions) external  {
         _defaultPartitions = defaultPartitions;
     }
      
@@ -359,7 +359,7 @@ contract ERC1400 is Certificate{
 
    // operator transfer by partition
    
-   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external returns (bytes32) {
+   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
        if(_isControllable == true && _isController[msg.sender]) {
 
