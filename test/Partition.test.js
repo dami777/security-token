@@ -194,8 +194,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
         describe("failed operator's activities", ()=>{
 
             beforeEach(async()=>{
-                await erc1400.removeController(signer)
-                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
+                await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
             })
 
             it("failed to send tokens by an unauthorized operator from an address", async()=>{
@@ -216,7 +215,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-        describe("authorize operator for a specific partition", ()=>{
+        /*describe("authorize operator for a specific partition", ()=>{
 
             let authorizeForPartition
             
@@ -225,7 +224,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                 authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: address2})  // address2 authorizes an operation to access his class A tokens
             })
 
-            it("validates that an operator has been authorized by a token holder to have access to his assets in a specific partition", async()=>{
+            it("validates that aeraton opr has been authorized by a token holder to have access to his assets in a specific partition", async()=>{
 
                 const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, address2)
                 operatorStatus.should.be.equal(true, "operator has been authorized to access an holder's asset")
@@ -324,11 +323,11 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             
 
-        })
+        })*/
 
     })
 
-    describe("operator's operations on assets", ()=>{
+    /*describe("operator's operations on assets", ()=>{
 
         // issuance variable for address2
 
@@ -450,7 +449,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
 
 
-    })
+    })*/
 
     /*describe("redemption by partitition", ()=>{
 
