@@ -618,7 +618,7 @@ contract ERC1400 is Certificate{
        }
 
        if( _verifySigner(_data) != true) {
-            return (hex"59", "invalid signer");
+            return (hex"59", "invalid signer", _partition);
         }
 
         return (hex"51", "transfer success");
