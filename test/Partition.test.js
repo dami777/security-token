@@ -39,7 +39,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    /*describe("partitions of a token holder", ()=>{
+    describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
 
@@ -111,7 +111,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         
 
-    })*/
+    })
 
     describe("tokens transfer from partitons", ()=>{
 
