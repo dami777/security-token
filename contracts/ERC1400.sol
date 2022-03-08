@@ -527,8 +527,9 @@ contract ERC1400 is Certificate{
 
    // function to redeem by partition
 
-   function redeemByPartition(bytes32 _partition, uint256 _value, bytes calldata _data) external {
+   function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
+        require(_verifySigner(_data));
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
