@@ -197,7 +197,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             it("failed to send tokens by an unauthorized operator from an address", async()=>{
 
-                await erc1400.operatorTransferByPartition(classA, address2, address3, tokens(1), web3.utils.toHex(""), web3.utils.toHex("")).should.be.rejected
+                await erc1400.operatorTransferByPartition(classA, address2, address3, tokens(1), web3.utils.toHex(""), data).should.be.rejected
 
             })
 

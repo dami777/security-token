@@ -361,7 +361,7 @@ contract ERC1400 is Certificate{
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       require(_verifySigner(_data));
+       require(_verifySigner(_operatorData));
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
