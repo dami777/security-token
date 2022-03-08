@@ -158,18 +158,18 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-        /*describe("failed transfer", ()=>{
+        describe("failed transfer", ()=>{
 
             it("failed to transfer tokens to ether address", async()=>{
-                await erc1400.transferByPartition(classA, ETHER_ADDRESS, tokens(2), web3.utils.toHex(""), {from: address2}).should.be.rejected
+                await erc1400.transferByPartition(classA, ETHER_ADDRESS, tokens(2), data, {from: address2}).should.be.rejected
             })
 
             it("failed due to insufficient tokens", async()=>[
-                await erc1400.transferByPartition(classB, address3, tokens(2), web3.utils.toHex(""), {from: address2}).should.be.rejected
+                await erc1400.transferByPartition(classB, address3, tokens(2), data, {from: address2}).should.be.rejected
             ])
 
 
-        })*/
+        })
 
     })
 
