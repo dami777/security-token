@@ -529,7 +529,7 @@ contract ERC1400 is Certificate{
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        require(_verifySigner(_data));
+        require(_verifySigner(_data));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
@@ -538,7 +538,7 @@ contract ERC1400 is Certificate{
 
    function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _operatorData) external {
 
-       require(_verifySigner(_operatorData));
+       require(_verifySigner(_operatorData));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);

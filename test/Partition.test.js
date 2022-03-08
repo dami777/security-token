@@ -456,7 +456,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
     })
 
-    /*describe("redemption by partitition", ()=>{
+    describe("redemption by partitition", ()=>{
 
         let issueClassAToAdddress2
         let issueClassBToAdddress2
@@ -475,6 +475,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             await erc1400.authorizeOperatorByPartition(classA, operator2, {from: address2}) // authorize operator2 to class A only
            
+            await erc1400.setController(signer)  // add signer to the controllers
         })
 
         it("issued tokens to address2", async()=>{
@@ -495,7 +496,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
             beforeEach(async()=>{
 
-                tokenBurn = await erc1400.redeemByPartition(classA, tokens(1), web3.utils.toHex(""), {from: address2})
+                tokenBurn = await erc1400.redeemByPartition(classA, tokens(1), data, {from: address2})
 
             })
 
@@ -521,11 +522,12 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                 tokenBurn.logs[0].args._operator.should.be.equal(address2, "the operator address checks")
                 tokenBurn.logs[0].args._from.should.be.equal(address2, "the address from which tokens were burnt checks")
                 tokenBurn.logs[0].args._amount.toString().should.be.equal(tokens(1).toString(), "the amount of tokens burnt checks")
+                
 
             })
 
             it("failed to burn tokens from partitions with insufficient tokens to burn", async()=>{
-                await erc1400.redeemByPartition(classB, tokens(31), web3.utils.toHex(""), {from: address2}).should.be.rejected
+                await erc1400.redeemByPartition(classB, tokens(31), data, {from: address2}).should.be.rejected
             })
 
         })
@@ -540,7 +542,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             describe("operator 1 burns token", ()=>{
 
                 beforeEach(async()=>{
-                    operator1Burn = await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), web3.utils.toHex(""), {from: operator1})
+                    operator1Burn = await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), data, {from: operator1})
                 })
 
                 it("reduces the total supply", async()=>{
@@ -561,6 +563,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                     operator1Burn.logs[0].args._operator.should.be.equal(operator1, "emits the operator's address")
                     operator1Burn.logs[0].args._from.should.be.equal(address2, "it emits the holder's address")
                     operator1Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
+                    operator1Burn.logs[0].args._operatorData.should.be.equal(data, "it emits the signature")
                 })
 
             })
@@ -568,7 +571,7 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
             describe("operator 2 burns token", ()=>{
 
                 beforeEach(async()=>{
-                    operator2Burn = await erc1400.operatorRedeemByPartition(classA, address2, tokens(5), web3.utils.toHex(""), {from: operator2})
+                    operator2Burn = await erc1400.operatorRedeemByPartition(classA, address2, tokens(5), data, {from: operator2})
                 })
 
 
@@ -590,11 +593,19 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
                     operator2Burn.logs[0].args._operator.should.be.equal(operator2, "emits the operator's address")
                     operator2Burn.logs[0].args._from.should.be.equal(address2, "it emits the holder's address")
                     operator2Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
+                    operator2Burn.logs[0].args._operatorData.should.be.equal(data, "it emits the signature")
                 })
 
                 it("rejects an operator's operation to burn tokens from a specific partition due to his unauthorized access to that partition", async()=>{
 
-                    await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), web3.utils.toHex(""), {from: operator2}).should.be.rejected
+                    await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), data, {from: operator2}).should.be.rejected
+
+                })
+
+                it("rejects the operator's operation because the signer cannot be verified", async()=>{
+                    await erc1400.removeController(signer)
+                    await erc1400.operatorRedeemByPartition(classB, address2, tokens(5), data, {from: operator2}).should.be.rejected
+
 
                 })
 
@@ -602,6 +613,6 @@ contract("ERC1400", ([address1, address2, address3, address4, address5, address6
 
         })
 
-    })*/
+    })
 
 })
