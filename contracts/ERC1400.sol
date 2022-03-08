@@ -556,7 +556,7 @@ contract ERC1400 is Certificate{
 
     // used bytes1 instead of byte. bytes1 is now an alias for byte    
 
-    function canTransfer(address _to, uint256 _value, bytes calldata _data) external view returns (bytes1 code, bytes32 reason){
+    function canTransfer(address _to, uint256 _value, bytes memory _data) external view returns (bytes1 code, bytes32 reason){
 
         if( _lockUpTokens == true) {
 
@@ -575,7 +575,7 @@ contract ERC1400 is Certificate{
 
     }
 
-    function canTransferFrom(address _from, address _to, uint256 _value, bytes calldata _data) external view returns (bytes1 code, bytes32 reason) {
+    function canTransferFrom(address _from, address _to, uint256 _value, bytes memory _data) external view returns (bytes1 code, bytes32 reason) {
 
         if(_balanceOf[_from] < _value) {
             return (hex"52", "insufficient balance");
