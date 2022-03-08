@@ -24,6 +24,9 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
     let totalSupply = 0
     let classA = web3.utils.asciiToHex("CLASS A")
     let classB = web3.utils.asciiToHex("CLASS B")
+    let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
+    let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
+    let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
 
 
 
@@ -140,7 +143,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             let transfer
 
             beforeEach(async()=>{
-                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1})
+                await token.setController(signer)
+                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller1})
             })
 
             it("emits events", async()=>{
@@ -158,9 +162,6 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
         })
 
-        
-
-
 
     })
 
@@ -170,15 +171,16 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             await token.setControllability(false)
             await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
             await token.setController(controller1)    //  set controller on chain
+            await token.setController(signer)
         })
 
         it("fails to force token transfer because because the control is turned off", async()=>{
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller1}).should.be.rejected
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller1}).should.be.rejected
         })
 
         it("transfers after approving controller as an operator by the holder since control is turned", async()=>{
             await token.authorizeOperator(controller2, {from: holder2})
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), web3.utils.toHex(""), {from: controller2})
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller2})
             const balanceFrom = await token.balanceOfByPartition(classA, holder2)
             const balanceTo = await token.balanceOfByPartition(classA, escrow)
 
@@ -197,10 +199,11 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
             let redeem
 
             beforeEach(async()=>{
+                await token.setController(signer)
                 await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(controller1)    //  set controller on chain
-                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller1})
-
+                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller1})
+                
             })
 
 
@@ -221,19 +224,20 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
             beforeEach(async()=>{
 
+                
                 await token.setControllability(false)
                 await token.setController(controller1) 
                 await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-                
+                await token.setController(signer)
             })
 
             it("fails to redeem because control is turned off", async()=>{
-                await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller1}).should.be.rejected
+                await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller1}).should.be.rejected
             })
 
             it("redeems after approving contoller as an operator by the token holder", async()=>{
                 await token.authorizeOperator(controller2, {from: holder2})
-                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from:controller2})
+                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller2})
                 const balance = await token.balanceOfByPartition(classA, holder2)
 
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
