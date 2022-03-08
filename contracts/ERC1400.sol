@@ -215,11 +215,15 @@ contract ERC1400 is Certificate{
 
 
 
-
-
-
     // **************************       ERC1400 FEATURES  ******************************************************//
 
+
+    //  Default Partitions
+
+
+    function setDefaultPartitions(bytes32[] defaultPartitions) external  {
+        _defaultPartitions = defaultPartitions;
+    }
      
     // *********************    DOCUMENT MANAGEMENT  ---------- ERC 1643
 
