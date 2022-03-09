@@ -90,6 +90,12 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
                 await token.transferWithData(holder2, tokens(2), data, {from: holder1}).should.be.rejected
             })
 
+            it("fails because either or neither of the accounts are whitelisted", async()=>{
+                const data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, false, toIsWhiteListed])
+                await token.transferWithData(holder2, tokens(2), data, {from: holder1}).should.be.rejected
+
+            })
+
         })
 
         describe("transfer by partition with data", ()=>{

@@ -208,7 +208,7 @@ contract ERC1400 is Certificate{
 
     function _verifySigner(bytes memory _data) internal view returns (bool) {
         (bytes memory _signature, bytes32 _signatureHash, bool _fromIsWhiteListedOrIssuer, bool _toIsWhiteListed) = decodeData(_data);
-        require(_fromIsWhiteListedOrIssuer && _toIsWhiteListed, "0x5b");    // not whitelisted
+        require(_fromIsWhiteListedOrIssuer && _toIsWhiteListed, "0x5b");    // require that the from and to accounts are whitelisted
         address _signer = verifySignature(_signature, _signatureHash);
         require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
         return true;
