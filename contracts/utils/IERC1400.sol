@@ -8,8 +8,8 @@ import "./IERC20.sol";
 interface IERC1400 is IERC20 {
 
   // Document Management
-  function getDocument(bytes32 _name) external view returns (string, bytes32);
-  function setDocument(bytes32 _name, string _uri, bytes32 _documentHash) external;
+  function getDocument(bytes32 _name) external view returns (string memory, bytes32);
+  function setDocument(bytes32 _name, string memory _uri, bytes32 _documentHash) external;
 
   // Token Information
   function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256);
