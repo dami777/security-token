@@ -16,17 +16,17 @@ interface IERC1400 is IERC20 {
   function partitionsOf(address _tokenHolder) external view returns (bytes32[]);
 
   // Transfers
-  function transferWithData(address _to, uint256 _value, bytes _data) external;
-  function transferFromWithData(address _from, address _to, uint256 _value, bytes _data) external;
+  function transferWithData(address _to, uint256 _value, bytes memory _data) external;
+  function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external;
 
   // Partition Token Transfers
-  function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes _data) external returns (bytes32);
-  function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external returns (bytes32);
+  function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32 memory);
+  function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32);
 
   // Controller Operation
   function isControllable() external view returns (bool);
-  function controllerTransfer(address _from, address _to, uint256 _value, bytes _data, bytes _operatorData) external;
-  function controllerRedeem(address _tokenHolder, uint256 _value, bytes _data, bytes _operatorData) external;
+  function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external;
+  function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external;
 
   // Operator Management
   function authorizeOperator(address _operator) external;
@@ -40,19 +40,19 @@ interface IERC1400 is IERC20 {
 
   // Token Issuance
   function isIssuable() external view returns (bool);
-  function issue(address _tokenHolder, uint256 _value, bytes _data) external;
-  function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes _data) external;
+  function issue(address _tokenHolder, uint256 _value, bytes memory _data) external;
+  function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external;
 
   // Token Redemption
-  function redeem(uint256 _value, bytes _data) external;
-  function redeemFrom(address _tokenHolder, uint256 _value, bytes _data) external;
-  function redeemByPartition(bytes32 _partition, uint256 _value, bytes _data) external;
-  function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes _operatorData) external;
+  function redeem(uint256 _value, bytes memory _data) external;
+  function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external;
+  function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external;
+  function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _operatorData) external;
 
   // Transfer Validity
-  function canTransfer(address _to, uint256 _value, bytes _data) external view returns (bytes1, bytes32);
-  function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bytes1, bytes32);
-  function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes _data) external view returns (bytes1, bytes32, bytes32);    
+  function canTransfer(address _to, uint256 _value, bytes memory _data) external view returns (bytes1, bytes32);
+  function canTransferFrom(address _from, address _to, uint256 _value, bytes memory _data) external view returns (bytes1, bytes32);
+  function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes memory _data) external view returns (bytes1, bytes32, bytes32);    
 
   // Controller Events
   event ControllerTransfer(
