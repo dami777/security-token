@@ -1,6 +1,8 @@
 /// @title IERC1400 Security Token Standard
 /// @dev See https://github.com/SecurityTokenStandard/EIP-Spec
 
+pragma solidity 0.8.10;
+
 import "IERC20.sol";
 
 interface IERC1400 is IERC20 {
