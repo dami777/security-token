@@ -13,7 +13,7 @@ interface IERC1400 is IERC20 {
 
   // Token Information
   function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256);
-  function partitionsOf(address _tokenHolder) external view returns (bytes32[]);
+  function partitionsOf(address _tokenHolder) external view returns (bytes32[] calldata);
 
   // Transfers
   function transferWithData(address _to, uint256 _value, bytes memory _data) external;
