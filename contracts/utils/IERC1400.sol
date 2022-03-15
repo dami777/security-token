@@ -50,8 +50,8 @@ interface IERC1400 is IERC20 {
   function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes _operatorData) external;
 
   // Transfer Validity
-  function canTransfer(address _to, uint256 _value, bytes _data) external view returns (byte, bytes32);
-  function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (byte, bytes32);
+  function canTransfer(address _to, uint256 _value, bytes _data) external view returns (bytes1, bytes32);
+  function canTransferFrom(address _from, address _to, uint256 _value, bytes _data) external view returns (bytes1, bytes32);
   function canTransferByPartition(address _from, address _to, bytes32 _partition, uint256 _value, bytes _data) external view returns (byte, bytes32, bytes32);    
 
   // Controller Events
