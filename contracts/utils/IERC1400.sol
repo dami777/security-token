@@ -20,7 +20,7 @@ interface IERC1400 is IERC20 {
   function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external;
 
   // Partition Token Transfers
-  function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32 memory);
+  function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32);
   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32);
 
   // Controller Operation
