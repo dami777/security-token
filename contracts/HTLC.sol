@@ -1,6 +1,6 @@
 pragma solidity 0.8.10;
 
-import "@";
+import "./utils/IERC20.sol";
 
 
 
