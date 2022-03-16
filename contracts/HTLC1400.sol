@@ -28,7 +28,18 @@ contract HTLC1400 {
 
 
 
-    IERC1400 securityToken;
+    IERC1400 public securityToken;
+
+
+    struct OrderSwap{
+
+        address _recipient;
+        uint256 _tokenValue;
+        uint256 _expiryTime;
+        bytes32 _secretHash;
+        bytes32 _secretKey;
+
+    }
 
     constructor(address _securityToken) {
 
@@ -36,16 +47,8 @@ contract HTLC1400 {
 
     }
     
-    function fund() external{
+    function openOrder() {
 
-    }
-
-    function withDraw() external {
-
-    }
-
-    function refund() external {
-        
     }
 
 }

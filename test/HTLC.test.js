@@ -30,14 +30,21 @@ contract("HTLC", ()=>{
     describe("Contract deployment", ()=>{
 
         it("has a contract address", ()=>{
+
             htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
         })
 
     })
 
-    /*describe("security token address", ()=>{
+    describe("htlc connection to the security token",  ()=>{
 
-    })*/
+        it("detects the security token contract", async()=>{
+            const token = await htlc1400.securityToken()
+            token.should.be.equal(erc1400.address, "the interface detects the token address")
+        })
+
+    })
+    
 
 })
