@@ -65,11 +65,15 @@ contract HTLC1400 {
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.issueByPartition(_partition, address(this), _tokenValue, _data);
-
+        emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
+        
     }
     
 
     /*function hashTest() external pure returns(bytes32) {
         return sha256(abi.encode("anonymous"));
     }*/
+
+
+    event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
 }
