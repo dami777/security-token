@@ -3,6 +3,7 @@ require("chai")
     .should()
 
 const { ETHER_ADDRESS, tokens } = require("./helper.js")
+const jsSHA = require("jssha");
 
 const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
@@ -65,7 +66,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
         it("prints data", async()=>{
             const data1 = await htlc1400.hashTest()
-            const data2 = web3.utils.sha3("anonymous")
+            const data2 = jsSHA.
 
             console.log(data1, "hash from solidity")
             console.log(data2, "hash from web3 js")
