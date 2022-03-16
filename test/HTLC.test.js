@@ -2,14 +2,17 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const HTLC = artifacts.require("./HTLC")
+const HTLC20 = artifacts.require("./HTLC")
+const HTLC1400 = artifacts.require("./HTLC1400")
 
 contract("HTLC", ()=>{
 
-    let htlc 
+    let htlc20 
+    let htlc1400
 
     beforeEach(async()=>{
-        htlc = await HTLC.new()
+        htlc20 = await HTLC20.new()
+        htlc1400 = await HTLC1400.new()
     })
 
 
