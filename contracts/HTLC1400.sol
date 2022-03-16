@@ -18,7 +18,17 @@ contract HTLC1400 {
     /// @dev    Secret Hash: hash of the secret. used in the construction of the HTLC
     /// @dev    Expiration: timestamp that determines when seller and buyer can redeem
 
-    uint256 public startTime;
-    uint256 public lockTime;
+    
+    function fund() {
+
+    }
+
+    function withDraw() {
+
+    }
+
+    function refund() {
+        
+    }
 
 }
