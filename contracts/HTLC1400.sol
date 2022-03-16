@@ -57,7 +57,7 @@ contract HTLC1400 {
     /// @param  _secretHash is the hash of the secret that must be provided by the recipient for the recipient to withdraw the security token
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
 
-    function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition) external {
+    function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
