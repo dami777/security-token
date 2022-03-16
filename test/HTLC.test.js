@@ -2,11 +2,13 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const { ETHER_ADDRESS, tokens } = require("./helper.js")
+
 const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
 
-contract("HTLC", ()=>{
+contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
     let htlc20 
     let htlc1400
@@ -42,6 +44,17 @@ contract("HTLC", ()=>{
         it("detects the security token contract", async()=>{
             const token = await htlc1400.ERC1400_TOKEN()
             token.should.be.equal(erc1400.address, "the interface detects the token address")
+        })
+
+    })
+
+    describe("open order", ()=>{
+
+        let secret1 = "anonymous"
+        let secret2 = "avalanche"
+
+        it("creates a swap order", async()=>{
+            console.log(ETHER_ADDRESS)
         })
 
     })

@@ -8,3 +8,5 @@ const tokens=(n)=>{
 }
 
 
+module.exports = { ETHER_ADDRESS, tokens }
+
