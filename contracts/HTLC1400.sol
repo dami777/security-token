@@ -67,5 +67,9 @@ contract HTLC1400 {
         ERC1400_TOKEN.issueByPartition(_partition, address(this), _tokenValue, _data);
 
     }
+    
 
+    function hashTest() external pure returns(bytes32) {
+        return sha256(abi.encodePacked("anonymous"));
+    }
 }

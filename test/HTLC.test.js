@@ -59,6 +59,21 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
     })
 
+    describe("sha245 hash", ()=>{
+        
+        const data = web3.eth.abi.encodeParameter("string", "anonymous")
+
+        it("prints data", async()=>{
+            const data1 = await htlc1400.hashTest()
+            const data2 = web3.utils.sha3("anonymous")
+
+            console.log(data1, "hash from solidity")
+            console.log(data2, "hash from web3 js")
+
+        })
+
+    })
+
     
 
 })
