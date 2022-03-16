@@ -4,8 +4,9 @@ import "./utils/IERC20.sol";
 import "./utils/IERC1400.sol";
 
 
+/// @title HTLC to release security from issuer to investor 
 
-contract HTLC {
+contract HTLC1400 {
 
 
     /// @notice Contract for DVP. Seller discloses the preimage of the hash. Secret is exchanged for money over the block chain
@@ -18,6 +19,7 @@ contract HTLC {
     /// @dev    Secret Hash: hash of the secret. used in the construction of the HTLC
     /// @dev    Expiration: timestamp that determines when seller and buyer can redeem
 
-    
+    uint256 public startTime;
+    uint256 public lockTime;
 
 }
