@@ -28,7 +28,7 @@ contract HTLC1400 {
 
 
 
-    IERC1400 public securityToken;
+    IERC1400 public ERC1400_TOKEN;
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
     mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
@@ -46,7 +46,7 @@ contract HTLC1400 {
 
     constructor(address _securityToken) {
 
-        securityToken = IERC1400(_securityToken);
+        ERC1400_TOKEN = IERC1400(_securityToken);
 
     }
 
@@ -61,10 +61,10 @@ contract HTLC1400 {
     function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
         /// ---> logic to check the whitelist status of the recipient should be checked here
-        
+
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
-        IERC1400(_securityToken).
+        ERC1400_TOKEN.issueByPartition(_partition, address(this), _tokenValue, _data);
 
     }
 
