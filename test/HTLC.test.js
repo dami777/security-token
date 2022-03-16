@@ -40,12 +40,12 @@ contract("HTLC", ()=>{
     describe("htlc connection to the security token",  ()=>{
 
         it("detects the security token contract", async()=>{
-            const token = await htlc1400.securityToken()
+            const token = await htlc1400.ERC1400_TOKEN()
             token.should.be.equal(erc1400.address, "the interface detects the token address")
         })
 
     })
-    
+
     
 
 })
