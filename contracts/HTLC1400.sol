@@ -30,6 +30,9 @@ contract HTLC1400 {
 
     IERC1400 public securityToken;
 
+    mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
+    mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
+
 
     struct OrderSwap{
 
