@@ -63,7 +63,7 @@ contract HTLC1400 {
         /// ---> logic to check the whitelist status of the recipient should be checked here
 
         require(!_uniqueSecret[_secretHash], "this secret has been used");
-        _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
+        _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.issueByPartition(_partition, address(this), _tokenValue, _data);
 
     }
