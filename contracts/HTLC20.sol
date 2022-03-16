@@ -6,7 +6,7 @@ import "./utils/IERC20.sol";
 contract HTLC20 {
 
 
-    function fund() {
+    /*function fund() {
 
     }
 
@@ -16,6 +16,6 @@ contract HTLC20 {
 
     function refund() {
 
-    }
+    }*/
 
 }

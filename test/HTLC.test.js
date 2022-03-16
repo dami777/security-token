@@ -2,26 +2,42 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const HTLC20 = artifacts.require("./HTLC")
+const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
+const ERC1400 = artifacts.require("./ERC1400")
 
 contract("HTLC", ()=>{
 
     let htlc20 
     let htlc1400
+    let erc1400
+
+    let name = "Tangl"
+    let symbol = "TAN"
+    let decimal = 18
+    let totalSupply = 0
+    let classA = web3.utils.asciiToHex("CLASS A")
+    let classB = web3.utils.asciiToHex("CLASS B")
 
     beforeEach(async()=>{
+
+        erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
         htlc20 = await HTLC20.new()
-        htlc1400 = await HTLC1400.new()
+        htlc1400 = await HTLC1400.new(erc1400.address)
     })
 
 
     describe("Contract deployment", ()=>{
 
         it("has a contract address", ()=>{
-            htlc.address.should.be.not.equal("", "the contract has an address")
+            htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
+            htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
         })
 
     })
+
+    /*describe("security token address", ()=>{
+
+    })*/
 
 })

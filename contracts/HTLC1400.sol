@@ -18,16 +18,33 @@ contract HTLC1400 {
     /// @dev    Secret Hash: hash of the secret. used in the construction of the HTLC
     /// @dev    Expiration: timestamp that determines when seller and buyer can redeem
 
+
+
+
+    /// issuer funds the HTLC1400
+    /// He enters the secret and withdraws the ether token
+    /// the investor gets the know the secret and withdraws the security token
+    /// incase of refund, implement timelock
+
+
+
+    IERC1400 securityToken;
+
+    constructor(address _securityToken) {
+
+        securityToken = IERC1400(_securityToken);
+
+    }
     
-    function fund() {
+    function fund() external{
 
     }
 
-    function withDraw() {
+    function withDraw() external {
 
     }
 
-    function refund() {
+    function refund() external {
         
     }
 
