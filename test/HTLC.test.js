@@ -61,9 +61,12 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
         let hash1 = ethers.utils.sha256(dataHex1)
 
         beforeEach(async()=>{
-            createOrder = await htlc1400.openOrder(recipient1, 5, 10000, hash)
+            createOrder = await htlc1400.openOrder(recipient1, 5, 10000, hash1, classA, web3.utils.toHex(""), {from: deployer})
         })
 
+        it("emits an OpenOrder event", ()=>{
+            createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
+        })
        
 
     })

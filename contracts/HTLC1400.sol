@@ -1,11 +1,12 @@
 pragma solidity 0.8.10;
 
 import "./utils/IERC1400.sol";
+import "./ERC1400.sol";
 
 
 /// @title HTLC to release security from issuer to investor 
 
-contract HTLC1400 {
+contract HTLC1400 is ERC1400 {
 
 
     /// @notice Contract for DVP. Seller discloses the preimage of the hash. Secret is exchanged for money over the block chain
@@ -64,9 +65,9 @@ contract HTLC1400 {
 
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
-        ERC1400_TOKEN.issueByPartition(_partition, address(this), _tokenValue, _data);
+        issueByPartition(_partition, address(this), _tokenValue, _data);
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
-        
+
     }
     
 

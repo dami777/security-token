@@ -494,7 +494,7 @@ contract ERC1400 is Certificate{
 
      // function to issue new tokens by partition
 
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) public restricted {
 
         require(_isIssuable, "0x55"); // can't issue tokens for now
         uint256 amount =  _value * granularity; 
