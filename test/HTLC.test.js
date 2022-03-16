@@ -2,8 +2,10 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const { ethers } = require("ethers")
 const { ETHER_ADDRESS, tokens } = require("./helper.js")
-const jsSHA = require("jssha");
+
+
 
 const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
@@ -53,27 +55,20 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
         let secret1 = "anonymous"
         let secret2 = "avalanche"
+        let createOrder
 
-        it("creates a swap order", async()=>{
-            console.log(ETHER_ADDRESS)
+        const dataHex1 = web3.eth.abi.encodeParameter("string", secret1)
+        let hash1 = ethers.utils.sha256(dataHex1)
+
+        beforeEach(async()=>{
+            createOrder = await htlc1400.openOrder(recipient1, 5, 10000, hash)
         })
+
+       
 
     })
 
-    describe("sha245 hash", ()=>{
-        
-        const data = web3.eth.abi.encodeParameter("string", "anonymous")
-
-        it("prints data", async()=>{
-            const data1 = await htlc1400.hashTest()
-            const data2 = jsSHA.
-
-            console.log(data1, "hash from solidity")
-            console.log(data2, "hash from web3 js")
-
-        })
-
-    })
+    
 
     
 

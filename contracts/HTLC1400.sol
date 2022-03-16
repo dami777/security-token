@@ -69,7 +69,7 @@ contract HTLC1400 {
     }
     
 
-    function hashTest() external pure returns(bytes32) {
-        return sha256(abi.encodePacked("anonymous"));
-    }
+    /*function hashTest() external pure returns(bytes32) {
+        return sha256(abi.encode("anonymous"));
+    }*/
 }
