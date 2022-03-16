@@ -56,9 +56,12 @@ contract HTLC1400 {
     /// @param  _expiration is the time the token withdrawal elasp. There will be a refund to the issuer's wallet if the token isn't withdrawn
     /// @param  _secretHash is the hash of the secret that must be provided by the recipient for the recipient to withdraw the security token
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
+    /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
 
     function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
+        /// ---> logic to check the whitelist status of the recipient should be checked here
+        
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         IERC1400(_securityToken).
