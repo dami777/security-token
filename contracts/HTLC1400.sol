@@ -60,6 +60,7 @@ contract HTLC1400 {
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
     /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
     /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
+    /// @notice ERC1400_TOKEN.operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
     function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
