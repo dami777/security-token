@@ -34,7 +34,7 @@ contract HTLC1400 {
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
     mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
-
+    
     
     struct OrderSwap{
 
@@ -72,6 +72,10 @@ contract HTLC1400 {
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
+
+    /// @param  _secret is the secret the recipient provides to withdraw the token from the htlc contract
+    /// @notice the existence of the hash of the secret is checked to be sure that it exist
+    /// @notice the swap validity of the secret is checked to ensure that a recipient does not attempt to withdrawal with the secret more than once
 
     function recipientWithDrawal(string _secret) {
 
