@@ -73,6 +73,10 @@ contract HTLC1400 {
 
     }
 
+    function recipientWithDrawal() {
+
+    }
+
     
     
 

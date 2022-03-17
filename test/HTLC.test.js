@@ -94,5 +94,9 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
     })
 
+    describe("swap", ()=>{
+        
+    })
+
 
 })
