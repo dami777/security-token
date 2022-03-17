@@ -1,7 +1,7 @@
 pragma solidity 0.8.10;
 
 import "./utils/IERC1400.sol";
-import "./ERC1400.sol";
+
 
 
 /// @title HTLC to release security from issuer to investor 
