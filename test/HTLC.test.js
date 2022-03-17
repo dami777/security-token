@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens } = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data} = require("./helper.js")
 
 
 
@@ -29,6 +29,8 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
         htlc20 = await HTLC20.new()
         htlc1400 = await HTLC1400.new(erc1400.address)
+
+        await erc1400.setController(signer)
     })
 
 
@@ -61,6 +63,9 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
         let hash1 = ethers.utils.sha256(dataHex1)
 
         beforeEach(async()=>{
+
+            erc1400.issueByPartition(classA, deployer, 100, data)
+            await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
             createOrder = await htlc1400.openOrder(recipient1, 5, 10000, hash1, classA, web3.utils.toHex(""), {from: deployer})
         })
 

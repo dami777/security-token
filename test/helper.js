@@ -8,5 +8,11 @@ const tokens=(n)=>{
 }
 
 
-module.exports = { ETHER_ADDRESS, tokens }
+const signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+let fromIsWhiteListedOrIssuer = true
+let toIsWhiteListed = true
+const data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
+
+
+module.exports = { ETHER_ADDRESS, tokens, signer, data }
 
