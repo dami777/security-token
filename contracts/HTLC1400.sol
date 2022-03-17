@@ -95,7 +95,7 @@ contract HTLC1400 {
     /// @notice the swap state of the secret is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. if INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
 
-    function recipientWithdrawal(string _secret) {
+    function recipientWithdrawal(string memory _secret) external {
 
         bytes32 _secretHash = sha256(abi.encode(_secret));
         require(_uniqueSecret[_secretHash], "invalid secret");
