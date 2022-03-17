@@ -21,11 +21,14 @@ contract HTLC1400 {
 
 
 
+    /// @TODO 
+    /// @dev issuer funds the HTLC1400 with open order
+    /// @dev Recipient enters the secret and withdraws the security token provided the order is still OPEN
+    /// @dev implement timelock to refund the token to the issuer if the order expires while it is still OPEN
 
-    /// issuer funds the HTLC1400
-    /// He enters the secret and withdraws the ether token
-    /// the investor gets the know the secret and withdraws the security token
-    /// incase of refund, implement timelock
+    /// @dev    The swap state solves some of the following security problem:
+    /// @notice If swap state if not monitored, recipient can attempt the expected amount to withdraw multiple times within the timeframe
+    /// @notice When the swap reaches expiration, before attempting to refund, it is needed to know the state of withdrawal. There is no need to refund the token if a withdrawal was successful
 
 
 
