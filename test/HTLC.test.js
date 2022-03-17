@@ -66,7 +66,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             erc1400.issueByPartition(classA, deployer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, data, {from: deployer})
+            createOrder = await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, data, {from: deployer})
             
         })
 
