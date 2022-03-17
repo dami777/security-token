@@ -35,7 +35,7 @@ contract HTLC1400 {
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
     mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
 
-    address securityToken;
+    
     struct OrderSwap{
 
         address _recipient;
@@ -73,17 +73,14 @@ contract HTLC1400 {
 
     }
 
-    function recipientWithDrawal() {
+    function recipientWithDrawal(string _secret) {
+
+        require(sha256(abi.encode(_secret), "invalid secret");
+        bytes32 _secretHash = sha256(abi.encode(_secret);
+        OrderSwap memory _order = _orderSwap[_secretHash];
 
     }
 
     
-    
-
-    /*function hashTest() external pure returns(bytes32) {
-        return sha256(abi.encode("anonymous"));
-    }*/
-
-
     event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
 }
