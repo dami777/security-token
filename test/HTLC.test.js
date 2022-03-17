@@ -66,6 +66,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             erc1400.issueByPartition(classA, deployer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
+            await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, data, {from: deployer})
             
         })
 
@@ -74,18 +75,15 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
             const isOperator = await erc1400.isOperator(htlc1400.address, deployer)
             isOperator.should.be.equal(true, "the htlc for the security token is an operator")
 
-            await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, data, {from: deployer})
+            
 
-            //createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
-            //console.log(data)
-
-            //await erc1400.operatorTransferByPartition(classA, deployer, htlc1400.address, tokens(5), web3.utils.toHex(""), data, {from: });
+            
         })
 
         it("opens order", async()=>{
-            //await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, web3.utils.toHex(""), {from: deployer})
-            const a = await erc1400.verifySignature(signature, ethHash)
-            console.log(a)
+           
+            createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
+
         })
 
 
