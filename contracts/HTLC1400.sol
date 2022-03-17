@@ -34,9 +34,9 @@ contract HTLC1400 {
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
     mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
+    mapping(bytes32 => SwapState) internal _swapState;      //  to keep track of the swap state of a particular secret
     
-    
-    struct OrderSwap{
+    struct OrderSwap {
 
         address _recipient;
         uint256 _tokenValue;
@@ -44,6 +44,15 @@ contract HTLC1400 {
         bytes32 _secretHash;
         bytes32 _partition;
         
+    }
+
+
+    enum SwapState {
+
+        INVALID,
+        OPEN,
+        CLOSED,
+        EXPIRED,
     }
 
     constructor(address _securityToken) {
