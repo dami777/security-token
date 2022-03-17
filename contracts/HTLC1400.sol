@@ -97,7 +97,7 @@ contract HTLC1400 {
 
     function recipientWithdrawal(string _secret) {
 
-        bytes32 _secretHash = sha256(abi.encode(_secret);
+        bytes32 _secretHash = sha256(abi.encode(_secret));
         require(_uniqueSecret[_secretHash], "invalid secret");
         require(_swapState[_secretHash] == SwapState.OPEN);
         OrderSwap memory _order = _orderSwap[_secretHash];
