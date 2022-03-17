@@ -16,5 +16,5 @@ const ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686
 const data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
 
 
-module.exports = { ETHER_ADDRESS, tokens, signer, data }
+module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash }
 

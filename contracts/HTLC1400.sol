@@ -1,6 +1,7 @@
 pragma solidity 0.8.10;
 
 import "./utils/IERC1400.sol";
+import "./ERC1400.sol";
 
 
 /// @title HTLC to release security from issuer to investor 
@@ -29,11 +30,12 @@ contract HTLC1400 {
 
 
     IERC1400 public ERC1400_TOKEN;
+   
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
     mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
 
-
+    address securityToken;
     struct OrderSwap{
 
         address _recipient;
@@ -47,7 +49,7 @@ contract HTLC1400 {
     constructor(address _securityToken) {
 
         ERC1400_TOKEN = IERC1400(_securityToken);
-
+        
     }
 
     /// @dev    when an order is opened, the issuer funds the contract with the token
