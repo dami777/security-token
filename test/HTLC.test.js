@@ -66,33 +66,33 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             erc1400.issueByPartition(classA, deployer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(deployer, 5, tokens(5), hash1, classA, data, {from: deployer})
+            createOrder = await htlc1400.openOrder(deployer, tokens(5), 10000, hash1, classA, data, {from: deployer})
             
         })
+
 
         it("made the htlc contract an operator", async ()=>{
 
             const isOperator = await erc1400.isOperator(htlc1400.address, deployer)
             isOperator.should.be.equal(true, "the htlc for the security token is an operator")
-
-            
-
             
         })
 
         it("opens order", async()=>{
-           
+            
             createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
 
         })
 
+        it("updates the balance of the balance of the htlc contract", async()=>{
+            const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
+            htlcBalance.toString().should.be.equal(tokens(5).toString(), "it has the correct balance")
+        })
 
        
+        
 
     })
 
-    
-
-    
 
 })

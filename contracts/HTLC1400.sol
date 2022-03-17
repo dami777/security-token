@@ -62,7 +62,7 @@ contract HTLC1400 {
 
     function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
-        /// ---> logic to check the whitelist status of the recipient should be checked here
+        /// --->    logic to check the whitelist status of the recipient should be checked here
 
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
