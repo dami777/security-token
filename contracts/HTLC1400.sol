@@ -85,13 +85,17 @@ contract HTLC1400 {
 
     /// @param  _secret is the secret the recipient provides to withdraw the token from the htlc contract
     /// @notice the existence of the hash of the secret is checked to be sure that it exist
-    /// @notice the swap validity of the secret is checked to ensure that a recipient does not attempt to withdrawal with the secret more than once
+    /// @notice the swap state of the secret is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. if INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
+    /// @notice that OPEN is present tense
 
-    function recipientWithDrawal(string _secret) {
+    function recipientWithdrawal(string _secret) {
 
-        require(sha256(abi.encode(_secret), "invalid secret");
         bytes32 _secretHash = sha256(abi.encode(_secret);
+        require(_uniqueSecret[_secretHash], "invalid secret");
+        require(_swapState[_secretHash] == SwapState.OPEN);
         OrderSwap memory _order = _orderSwap[_secretHash];
+
+        //// continue from here by creating modifiers and conditions that checks the validity of a swap
 
     }
 
