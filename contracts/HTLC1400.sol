@@ -59,6 +59,7 @@ contract HTLC1400 {
     /// @param  _secretHash is the hash of the secret that must be provided by the recipient for the recipient to withdraw the security token
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
     /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
+    /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
 
     function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
@@ -66,10 +67,12 @@ contract HTLC1400 {
 
         require(!_uniqueSecret[_secretHash], "this secret has been used");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
-        ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);
+        ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
+
+    
     
 
     /*function hashTest() external pure returns(bytes32) {
