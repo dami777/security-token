@@ -105,12 +105,12 @@ contract HTLC1400 {
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
         require(_orderSwap[_swapID]._expiration <= block.timestamp);
-        require(_swapState[_swapID] == SwapState.OPEN);                                                     // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
-        require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash);                          // the hash of the provided secret by the investor must match the hash in this order ID 
-        OrderSwap memory _order = _orderSwap[_swapID];                                                      // fetch the order data
-        _order._secretKey = _secretKey;                                                                     //  update the secretKey value to be publicly available on the on-chain
-        ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, "");         // the htlc contract releases the token to the investor
-
+        require(_swapState[_swapID] == SwapState.OPEN);                                                             // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash);                                 // the hash of the provided secret by the investor must match the hash in this order ID 
+        OrderSwap memory _order = _orderSwap[_swapID];                                                              // fetch the order data
+        _order._secretKey = _secretKey;                                                                             //  update the secretKey value to be publicly available on the on-chain
+        ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, "");            // the htlc contract releases the token to the investor
+        emit ClosedOrder(_order._recipient, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
         
 
     }
