@@ -105,10 +105,10 @@ contract HTLC1400 {
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
         require(_orderSwap[_swapID]._expiration <= block.timestamp);
-        require(_swapState[_swapID] == SwapState.OPEN);                                 // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
-        require(sha256(abi.encode(_secretKey) == _orderSwap[_swapID]._secretHash);      // the hash of the provided secret by the investor must match the hash in this order ID 
-        OrderSwap memory _order = _orderSwap[_swapID];
-        _order._secretKey = _secretKey;                                                 //  update the secretKey value to be publicly available on the on-chain
+        require(_swapState[_swapID] == SwapState.OPEN);                                                     // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash);                          // the hash of the provided secret by the investor must match the hash in this order ID 
+        OrderSwap memory _order = _orderSwap[_swapID];                                                      // fetch the order data
+        _order._secretKey = _secretKey;                                                                     //  update the secretKey value to be publicly available on the on-chain
         ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._value, "");         // the htlc contract releases the token to the investor
 
         
@@ -117,4 +117,5 @@ contract HTLC1400 {
 
     
     event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
+    event ClosedOrder(address indexed _recipient, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
 }
