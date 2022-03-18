@@ -35,7 +35,7 @@ contract HTLC1400 {
     IERC1400 public ERC1400_TOKEN;
    
 
-    mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order to the secret phrase or word
+    mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
     
     struct OrderSwap {
@@ -88,8 +88,8 @@ contract HTLC1400 {
         require(_swapState[_swapID] == SwapState.INVALID);
         require( _secretHash == sha256(abi.encode(_secretKey)));
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
-        ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
-        _swapState[_swapID] = SwapState.OPEN;
+        ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
+        _swapState[_swapID] = SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
@@ -105,10 +105,10 @@ contract HTLC1400 {
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
         
-        require(_swapState[_swapID] == SwapState.OPEN);     // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
-        bytes32 _secretHash = sha256(abi.encode(_secretKey));
+        require(_swapState[_swapID] == SwapState.OPEN);                                 // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(sha256(abi.encode(_secretKey) == _orderSwap[_swapID]._secretHash);      // the hash of the provided secret by the investor must match the hash in this order ID 
+        OrderSwap memory _order = _orderSwap[_swapID];
         
-        OrderSwap memory _order = _orderSwap[_secretHash];
 
         //// continue from here by creating modifiers and conditions that checks the validity of a swap
 
