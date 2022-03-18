@@ -71,26 +71,30 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
         })
 
 
-        it("made the htlc contract an operator", async ()=>{
-
-            const isOperator = await erc1400.isOperator(htlc1400.address, deployer)
-            isOperator.should.be.equal(true, "the htlc for the security token is an operator")
+        describe("successful open orders", ()=>{
             
+            it("made the htlc contract an operator", async ()=>{
+
+                const isOperator = await erc1400.isOperator(htlc1400.address, deployer)
+                isOperator.should.be.equal(true, "the htlc for the security token is an operator")
+                
+            })
+
+            it("opens order", async()=>{
+                
+                createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
+
+            })
+
+            it("updates the balance of the balance of the htlc contract", async()=>{
+                const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
+                htlcBalance.toString().should.be.equal(tokens(5).toString(), "it has the correct balance")
+            })
         })
 
-        it("opens order", async()=>{
-            
-            createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
+        describe("failed open order", ()=>{
 
         })
-
-        it("updates the balance of the balance of the htlc contract", async()=>{
-            const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
-            htlcBalance.toString().should.be.equal(tokens(5).toString(), "it has the correct balance")
-        })
-
-       
-        
 
     })
 
