@@ -36,7 +36,7 @@ contract HTLC1400 {
    
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secret phrase or word
-    //  mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
+    mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
     mapping(bytes32 => SwapState) internal _swapState;      //  to keep track of the swap state of a particular secret
     
     struct OrderSwap {
@@ -84,7 +84,7 @@ contract HTLC1400 {
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
         require( _secretHash == sha256(abi.encode(_secretKey)));
-        _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretKey, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
+        _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, bytes32(0), _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_secretKey] = SwapState.OPEN;
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
