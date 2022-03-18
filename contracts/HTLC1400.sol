@@ -35,9 +35,9 @@ contract HTLC1400 {
     IERC1400 public ERC1400_TOKEN;
    
 
-    mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secret phrase or word
-    mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
-    mapping(bytes32 => SwapState) internal _swapState;      //  to keep track of the swap state of a particular secret
+    mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order to the secret phrase or word
+    mapping(bytes32 => bool) private _uniqueOrderID;            //  ensure that the ID is unique on the blockchain
+    mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of a particular secret
     
     struct OrderSwap {
 
