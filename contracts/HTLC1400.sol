@@ -93,7 +93,7 @@ contract HTLC1400 {
 
 
 
-    /// @param  _secret is the secret the recipient provides to withdraw the token from the htlc contract
+    /// @param  _secretKey is the secret the recipient provides to withdraw the token from the htlc contract
     /// @notice the existence of the hash of the secret is checked to be sure that it exist
     /// @notice the swap state of the secret is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. if INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
