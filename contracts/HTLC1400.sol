@@ -36,7 +36,7 @@ contract HTLC1400 {
    
 
     mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
-    mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
+    //  mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
     mapping(bytes32 => SwapState) internal _swapState;      //  to keep track of the swap state of a particular secret
     
     struct OrderSwap {
@@ -96,7 +96,7 @@ contract HTLC1400 {
     /// @notice the swap state of the secret is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. if INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
 
-    function recipientWithdrawal(string memory _secret) external {
+    function recipientWithdrawal(bytes32 _secretKey) external {
 
         bytes32 _secretHash = sha256(abi.encode(_secret));
         require(_uniqueSecret[_secretHash], "invalid secret");
