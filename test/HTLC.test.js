@@ -59,7 +59,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
         let secret2 = web3.utils.asciiToHex("avalanche")
         let createOrder
 
-        let dataHex1 = web3.eth.abi.encodeParameter("string", secret1)
+        let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
         let hash1 = ethers.utils.sha256(dataHex1)
 
         beforeEach(async()=>{
