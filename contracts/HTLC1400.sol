@@ -85,8 +85,8 @@ contract HTLC1400 {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
-        require(_swapState[_swapID] == SwapState.INVALID);
-        require( _secretHash == sha256(abi.encode(_secretKey)));
+        require(_swapState[_swapID] == SwapState.INVALID, "order ID exist already");
+        require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doen't match the hash");
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_swapID] = SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
@@ -102,6 +102,7 @@ contract HTLC1400 {
     /// @notice the swap state of the ID is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. When INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
 
+    
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
         require(_orderSwap[_swapID]._expiration <= block.timestamp);
