@@ -70,13 +70,14 @@ contract HTLC1400 {
     /// @param  _recipient is the target recipient/withdrawal of the deposited token
     /// @param  _tokenValue is the amount of token to be withdrawn by the investor
     /// @param  _expiration is the time the token withdrawal elasp. There will be a refund to the issuer's wallet if the token isn't withdrawn
+    /// @param  _secretKey is the secret word or phrase attached to an order
     /// @param  _secretHash is the hash of the secret that must be provided by the recipient for the recipient to withdraw the security token
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
     /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
     /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
     /// @notice ERC1400_TOKEN.operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
-    function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
+    function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
