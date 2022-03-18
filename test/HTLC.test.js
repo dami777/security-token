@@ -55,8 +55,8 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
     describe("open order", ()=>{
 
-        let secret1 = "anonymous"
-        let secret2 = "avalanche"
+        let secret1 = web3.utils.asciiToHex("anonymous")
+        let secret2 = web3.utils.asciiToHex("avalanche")
         let createOrder
 
         let dataHex1 = web3.eth.abi.encodeParameter("string", secret1)
@@ -66,7 +66,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             erc1400.issueByPartition(classA, deployer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(deployer, tokens(5), 10000, hash1, classA, data, {from: deployer})
+            createOrder = await htlc1400.openOrder(deployer, tokens(5), 10000, secret1, hash1, classA, data, {from: deployer})
             
         })
 

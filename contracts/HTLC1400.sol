@@ -35,16 +35,18 @@ contract HTLC1400 {
     IERC1400 public ERC1400_TOKEN;
    
 
-    mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secrete
+    mapping(bytes32 => OrderSwap) internal _orderSwap;      //  map the order to the secret phrase or word
     //  mapping(bytes32 => bool) internal _uniqueSecret;        //  ensure that the secret is unique on the blockchain
     mapping(bytes32 => SwapState) internal _swapState;      //  to keep track of the swap state of a particular secret
     
     struct OrderSwap {
 
+        
         address _recipient;
         uint256 _tokenValue;
         uint256 _expiration;
         bytes32 _secretHash;
+        bytes32 _secretKey;
         bytes32 _partition;
         
     }
@@ -84,7 +86,7 @@ contract HTLC1400 {
         require( _secretHash == sha256(abi.encode(_secretKey)));
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
-        _swapState[_secretHash] = SwapState.OPEN;
+        _swapState[_secretKey] = SwapState.OPEN;
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
@@ -100,7 +102,7 @@ contract HTLC1400 {
 
         bytes32 _secretHash = sha256(abi.encode(_secretKey));
         //  require(_uniqueSecret[_secretHash], "invalid secret");
-        require(_swapState[_secretHash] == SwapState.OPEN);
+        require(_swapState[_secretKey] == SwapState.OPEN);
         OrderSwap memory _order = _orderSwap[_secretHash];
 
         //// continue from here by creating modifiers and conditions that checks the validity of a swap
