@@ -36,8 +36,8 @@ contract HTLC1400 {
    
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order to the secret phrase or word
-    mapping(bytes32 => bool) private _uniqueOrderID;            //  ensure that the ID is unique on the blockchain
-    mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of a particular secret
+    mapping(bytes32 => bool) private _usedID;       //  ensure that the ID is unique on the blockchain
+    mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
     
     struct OrderSwap {
 
@@ -48,6 +48,7 @@ contract HTLC1400 {
         bytes32 _secretHash;
         bytes32 _secretKey;
         bytes32 _partition;
+        bytes32 _swapID;
         
     }
 
@@ -69,6 +70,7 @@ contract HTLC1400 {
 
 
     /// @dev    when an order is opened, the issuer funds the contract with the token
+    /// @param   _swapID is the ID of the swap order that keeps track of the state of the order. The withdrawee will make reference to this ID on this contract and their deposit contract as well
     /// @param  _recipient is the target recipient/withdrawal of the deposited token
     /// @param  _tokenValue is the amount of token to be withdrawn by the investor
     /// @param  _expiration is the time the token withdrawal elasp. There will be a refund to the issuer's wallet if the token isn't withdrawn
@@ -77,16 +79,19 @@ contract HTLC1400 {
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
     /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
     /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
+    /// @dev    with the uniqueness of the IDS, the secrets dont have to be unique accross the blockchain. The unique ID will keep track of each unique swap orders
     /// @notice ERC1400_TOKEN.operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
-    function openOrder(address _recipient, uint256 _tokenValue, uint256 _expiration, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, bytes memory _data) external {
+    function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _recipient, uint256 _tokenValue, uint256 _expiration, bytes memory _data) external {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
+        require (!_usedID[_swapID], "id has been used");
         require( _secretHash == sha256(abi.encode(_secretKey)));
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, bytes32(0), _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
-        _swapState[_secretKey] = SwapState.OPEN;
+        _swapState[_swapID] = SwapState.OPEN;
+        _usedID[_swapID] = true;
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
