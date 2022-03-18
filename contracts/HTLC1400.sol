@@ -108,9 +108,10 @@ contract HTLC1400 {
         require(_swapState[_swapID] == SwapState.OPEN);                                 // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
         require(sha256(abi.encode(_secretKey) == _orderSwap[_swapID]._secretHash);      // the hash of the provided secret by the investor must match the hash in this order ID 
         OrderSwap memory _order = _orderSwap[_swapID];
-        
+        _order._secretKey = _secretKey;                                                 //  update the secretKey value to be publicly available on the on-chain
+        ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._value, "");         // the htlc contract releases the token to the investor
 
-        //// continue from here by creating modifiers and conditions that checks the validity of a swap
+        
 
     }
 
