@@ -36,7 +36,6 @@ contract HTLC1400 {
    
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order to the secret phrase or word
-    mapping(bytes32 => bool) private _usedID;       //  ensure that the ID is unique on the blockchain
     mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
     
     struct OrderSwap {
@@ -70,7 +69,7 @@ contract HTLC1400 {
 
 
     /// @dev    when an order is opened, the issuer funds the contract with the token
-    /// @param   _swapID is the ID of the swap order that keeps track of the state of the order. The withdrawee will make reference to this ID on this contract and their deposit contract as well
+    /// @param   _swapID is the ID of the swap order that keeps track of the state of the order. The withdrawee will make reference to this ID on this contract and their deposit contract as well. The SwapState of that ID must be invalid which means it has not been used
     /// @param  _recipient is the target recipient/withdrawal of the deposited token
     /// @param  _tokenValue is the amount of token to be withdrawn by the investor
     /// @param  _expiration is the time the token withdrawal elasp. There will be a refund to the issuer's wallet if the token isn't withdrawn
@@ -86,28 +85,29 @@ contract HTLC1400 {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
-        require (!_usedID[_swapID], "id has been used");
+        require(_swapState[_swapID] == SwapState.INVALID);
         require( _secretHash == sha256(abi.encode(_secretKey)));
         _orderSwap[_secretHash] = OrderSwap(_recipient, _tokenValue, _expiration, bytes32(0), _secretHash, _partition);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);   // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_swapID] = SwapState.OPEN;
-        _usedID[_swapID] = true;
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
 
     }
 
 
 
-    /// @param  _secretKey is the secret the recipient provides to withdraw the token from the htlc contract
+    /// @param  _secretKey is the secret the recipient provides to withdraw the token from the htlc contract    
+    /// @param  _swapID is the ID of the order. The ID provided must be valid
     /// @notice the existence of the hash of the secret is checked to be sure that it exist
     /// @notice the swap state of the secret is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. if INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
 
-    function recipientWithdrawal(bytes32 _secretKey) external {
+    function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
+        
+        require(_swapState[_swapID] == SwapState.OPEN);     // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
         bytes32 _secretHash = sha256(abi.encode(_secretKey));
-        //  require(_uniqueSecret[_secretHash], "invalid secret");
-        require(_swapState[_secretKey] == SwapState.OPEN);
+        
         OrderSwap memory _order = _orderSwap[_secretHash];
 
         //// continue from here by creating modifiers and conditions that checks the validity of a swap
