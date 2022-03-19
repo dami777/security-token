@@ -1,4 +1,5 @@
 const date = new Date()
 
 
-console.log(date.get)
+const currentDate = date.getDate()
+const 2DaysLate = date.setDate()
