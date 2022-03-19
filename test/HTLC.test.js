@@ -100,7 +100,6 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
             it("emits the correct open order event data", ()=>{
                 createOrder.logs[0].args._recipient.should.be.equal(investor1, "it emits the correct recipient address of the security token")
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
-                createOrder.logs[0].args._partition.should.be.equal(classA, "it emits the partition of the deposited token")
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
             })
         })
