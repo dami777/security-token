@@ -88,7 +88,12 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             it("updates the balance of the balance of the htlc contract", async()=>{
                 const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
-                htlcBalance.toString().should.be.equal(tokens(5).toString(), "it has the correct balance")
+                htlcBalance.toString().should.be.equal(tokens(5).toString(), "the token was deposited to the htlc contract")
+            })
+
+            it("updates the balance of the issuer", async()=>{
+                const issuerBalance = await erc1400.balanceOfByPartition(classA, deployer)
+                issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's waller")
             })
         })
 
