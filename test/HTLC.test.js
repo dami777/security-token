@@ -94,7 +94,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
         describe("failed open order", ()=>{
 
-            it("fails to open order with an existing order ID", ()=>{
+            it("fails to open order with an existing order ID", async()=>{
                 await htlc1400.openOrder(orderID, secret1, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer}).should.be.rejected
             })
 
