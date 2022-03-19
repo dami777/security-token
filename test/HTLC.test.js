@@ -56,6 +56,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
     describe("open order", ()=>{
 
         let secret1 = web3.utils.asciiToHex("anonymous")
+        let secret2 = web3.utils.asciiToHex("avalanche")
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
         let createOrder
 
@@ -101,6 +102,12 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
             it("fails to open order with an existing order ID", async()=>{
                 await htlc1400.openOrder(orderID, secret1, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer}).should.be.rejected
+            })
+
+            it("fails to open an order if the secret expected from the investor doesn't match the hash", ()=>{
+
+                const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
+                await htlc1400.openOrder(orderID2, secret2, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer}).should.be.rejected
             })
 
         })
