@@ -53,7 +53,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     })*/
 
-    describe("open order", ()=>{
+    describe("Swap Order", ()=>{
 
         let secret1 = web3.utils.asciiToHex("anonymous")
         let secret2 = web3.utils.asciiToHex("avalanche")
@@ -118,11 +118,13 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
+        describe("successful withdrawal", ()=>{
+            
+        })
+
     })
 
-    describe("swap", ()=>{
-        
-    })
+    
 
 
 })
