@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait} = require("./helper.js")
 
 
 
@@ -119,7 +119,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         })
 
         describe("successful withdrawal", ()=>{
-            
+
         })
 
     })
