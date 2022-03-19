@@ -11,7 +11,7 @@ const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
 
-contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
+contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     let htlc20 
     let htlc1400
@@ -65,9 +65,9 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
 
         beforeEach(async()=>{
 
-            erc1400.issueByPartition(classA, deployer, 100, data)
+            erc1400.issueByPartition(classA, issuer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer})
+            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, recipient1, tokens(5), 10000, data, {from: issuer})
             
         })
 
@@ -76,7 +76,7 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
             
             it("made the htlc contract an operator", async ()=>{
 
-                const isOperator = await erc1400.isOperator(htlc1400.address, deployer)
+                const isOperator = await erc1400.isOperator(htlc1400.address, issuer)
                 isOperator.should.be.equal(true, "the htlc for the security token is an operator")
                 
             })
@@ -93,21 +93,25 @@ contract("HTLC", ([deployer, recipient1, recipient2, recipient3])=>{
             })
 
             it("updates the balance of the issuer", async()=>{
-                const issuerBalance = await erc1400.balanceOfByPartition(classA, deployer)
+                const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
                 issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's waller")
+            })
+
+            it("emits the correct open order event data", ()=>{
+                createOrder.logs[0].args._recipient.should.be.equal(investor1, "it emits the correct recipient address")
             })
         })
 
         describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secret1, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer}).should.be.rejected
+                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secret2, hash1, classA, deployer, tokens(5), 10000, data, {from: deployer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
         })
