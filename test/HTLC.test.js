@@ -128,7 +128,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
             let successfulWithDrawal
 
             beforeEach(async()=>{
-                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1)
+                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, {from: investor1})
             })
 
             it("emits the Closed Order event", ()=>{
