@@ -101,6 +101,8 @@ contract HTLC1400 {
     /// @notice the existence of the hash of the secret is checked to be sure that it exist
     /// @notice the swap state of the ID is checked to ensure that a recipient can only attempt a withdrawal when it's OPEN. When INVALID, CLOSED, or EXPIRED, withdrawal will not be possible
     /// @notice that OPEN is present tense
+    /// @notice `msg.sender` is equal the recipient of the token
+    /// @notice `block.timestamp` is less than `expiration value` for valid withdrawal
 
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
