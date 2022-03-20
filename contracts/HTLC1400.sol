@@ -116,9 +116,7 @@ contract HTLC1400 {
 
     }
 
-    function releaseDate() public view returns(uint256) {
-        return block.timestamp + 1 days;
-    }
+   
 
     
     event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
