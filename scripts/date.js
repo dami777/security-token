@@ -1,15 +1,11 @@
 const moment  = require("moment")
 
+const a = new Date(moment().add(1, 'days'))     //  convert the moment time format to Date format
+
+b = a.getTime()     // convert it to timestamp
 
 
-const date = new Date()
+const format = moment(b).format('h:mm:ss a M/D')        //  recover the date and time from the timestamp
 
+console.log(format)
 
-const currentDate = date.getTime()
-//const 2DaysLate = date.setDate()
-
-console.log(currentDate)
-
-const format = moment.unix(currentDate).format('h:mm:ss a M/D')
-
-console.log(moment().format())

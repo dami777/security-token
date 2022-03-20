@@ -7,6 +7,7 @@ const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait} = require
 const moment = require("moment");
 const { isTopic } = require("web3-utils");
 const { create } = require("domain");
+const { timeStamp } = require("console");
 
 
 const HTLC20 = artifacts.require("./HTLC20")
@@ -55,7 +56,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     })*/
 
-    describe("Swap Order", ()=>{
+    /*describe("Swap Order", ()=>{
 
         let secret1 = web3.utils.asciiToHex("anonymous")
         let secret2 = web3.utils.asciiToHex("avalanche")
@@ -64,7 +65,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
         let hash1 = ethers.utils.sha256(dataHex1)
-        let expiration = moment().add(1, 'days')    // expiration will be present time + 1 day
+        ///let expiration = moment().add(1, 'days')    // expiration will be present time + 1 day
 
         beforeEach(async()=>{
 
@@ -126,9 +127,9 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-    })
+    })*/
 
-    /*describe("time test", ()=>{
+    describe("time test", ()=>{
 
         let day1
 
@@ -143,7 +144,12 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             const format2 = moment().add(1, 'days').format('h:mm:ss a M/D')
             console.log(format2)
+
+            /*console.log(day1.toString())
+            const d = moment().add(1, 'days')
+            console.log(d.toDate())*/
+            
         })
 
-    })*/
+    })
 })
