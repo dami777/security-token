@@ -4,7 +4,9 @@ require("chai")
 
 const { ethers } = require("ethers")
 const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait} = require("./helper.js")
-
+const moment = require("moment");
+const { isTopic } = require("web3-utils");
+const { create } = require("domain");
 
 
 const HTLC20 = artifacts.require("./HTLC20")
@@ -62,12 +64,13 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
         let hash1 = ethers.utils.sha256(dataHex1)
+        let expiration = moment().add(1, 'days')    // expiration will be present time + 1 day
 
         beforeEach(async()=>{
 
             erc1400.issueByPartition(classA, issuer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), 10000, data, {from: issuer})
+            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -101,6 +104,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 createOrder.logs[0].args._recipient.should.be.equal(investor1, "it emits the correct recipient address of the security token")
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
+                createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
             })
         })
 
@@ -124,7 +128,22 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     })
 
-    
+    /*describe("time test", ()=>{
 
+        let day1
 
+        beforeEach(async()=>{
+            day1 = await htlc1400.releaseDate()
+        })
+
+        it("realeases date", async()=>{
+            const day = Number(day1.toString())
+            const format = moment.unix(day).format('h:mm:ss a M/D')
+            console.log(format)
+
+            const format2 = moment().add(1, 'days').format('h:mm:ss a M/D')
+            console.log(format2)
+        })
+
+    })*/
 })
