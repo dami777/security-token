@@ -120,12 +120,7 @@ contract HTLC1400 {
     }
 
 
-    function dateTest(uint256 _pastDays) public view returns (uint256, uint256) {
-
-            require(block.timestamp < _pastDays, "time expired");
-            return (block.timestamp, _pastDays);
-
-    }
+    
 
     
     

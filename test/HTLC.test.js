@@ -65,7 +65,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
         let hash1 = ethers.utils.sha256(dataHex1)
-        let expiration = new Date(moment().add(1, 'days')).getTime()    // expiration will be present time + 1 day
+        let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
 
         beforeEach(async()=>{
 
@@ -76,7 +76,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         })
 
 
-        /*describe("successful open orders", ()=>{
+        describe("successful open orders", ()=>{
             
             it("made the htlc contract an operator", async ()=>{
 
@@ -149,7 +149,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         describe("failed withdrawal", ()=>{
 
             let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
-            const expiration2 = new Date(moment().subtract(2, 'days')).getTime()       // set expiration to 2 days before
+            const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
             
             
             beforeEach(async()=>{
@@ -164,26 +164,8 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
 
             
-        })*/
-
-        describe("date test", ()=>{
-
-            const expiration2 = new Date(moment().subtract(2, 'days')).getTime()       // set expiration to 2 days before
-
-            it("is a past date", async()=>{
-                const pastDate = await htlc1400.dateTest(expiration2)
-                now = pastDate["0"].toString()
-                past = pastDate["1"].toString()
-
-                console.log(Number(past) > Number(now))
-                console.log(expiration2)
-                console.log(past)
-                console.log(now)
-                console.log(moment.unix(now).format('h:mm:ss a M/D'))
-                console.log(moment.unix(expiration2).format('h:mm:ss a M/D'))
-            })
-
         })
+
 
     })
 
