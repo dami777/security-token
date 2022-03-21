@@ -76,7 +76,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         })
 
 
-        describe("successful open orders", ()=>{
+        /*describe("successful open orders", ()=>{
             
             it("made the htlc contract an operator", async ()=>{
 
@@ -142,6 +142,45 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 investorBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
                 htlcBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
 
+            })
+
+        })
+
+        describe("failed withdrawal", ()=>{
+
+            let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
+            const expiration2 = new Date(moment().subtract(2, 'days')).getTime()       // set expiration to 2 days before
+            
+            
+            beforeEach(async()=>{
+                const createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})
+            })
+
+
+            it("fails to withdraw because the withdrawal date has expired", async()=>{
+                // await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2})
+                console.log(expiration2)
+            })
+
+
+            
+        })*/
+
+        describe("date test", ()=>{
+
+            const expiration2 = new Date(moment().subtract(2, 'days')).getTime()       // set expiration to 2 days before
+
+            it("is a past date", async()=>{
+                const pastDate = await htlc1400.dateTest(expiration2)
+                now = pastDate["0"].toString()
+                past = pastDate["1"].toString()
+
+                console.log(Number(past) > Number(now))
+                console.log(expiration2)
+                console.log(past)
+                console.log(now)
+                console.log(moment.unix(now).format('h:mm:ss a M/D'))
+                console.log(moment.unix(expiration2).format('h:mm:ss a M/D'))
             })
 
         })

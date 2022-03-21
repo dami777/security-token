@@ -426,10 +426,6 @@ contract ERC1400 is Certificate{
    }
 
 
-
-
-
-   
    // *********************    OPERATOR MANAGEMENT
 
 
@@ -548,8 +544,6 @@ contract ERC1400 is Certificate{
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
        }
 
-      
-
    }
 
 
@@ -626,7 +620,6 @@ contract ERC1400 is Certificate{
 
 
    }
-
 
 
    /*********************************************************************************/

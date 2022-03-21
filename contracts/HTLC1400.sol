@@ -119,11 +119,17 @@ contract HTLC1400 {
 
     }
 
+
+    function dateTest(uint256 _pastDays) public view returns (uint256, uint256) {
+
+            require(block.timestamp < _pastDays, "time expired");
+            return (block.timestamp, _pastDays);
+
+    }
+
     
-
-   
-
     
     event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
     event ClosedOrder(address indexed _recipient, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
+
 }
