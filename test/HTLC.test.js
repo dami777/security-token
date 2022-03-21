@@ -98,7 +98,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             it("updates the balance of the issuer", async()=>{
                 const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
-                issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's waller")
+                issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's wallet")
             })
 
             it("emits the correct open order event data", ()=>{
