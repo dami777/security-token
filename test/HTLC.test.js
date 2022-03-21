@@ -161,7 +161,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2}).should.be.rejected
             })
 
-            it("fails due to withdrawal by an invalid recipient", async()=>{
+            it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
                 await htlc1400.recipientWithdrawal(orderID, secret1, {from: investor2}).should.be.rejected
             })
             
