@@ -158,8 +158,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
 
             it("fails to withdraw because the withdrawal date has expired", async()=>{
-                // await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2})
-                console.log(expiration2)
+                await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2}).should.be.rejected
             })
 
 
