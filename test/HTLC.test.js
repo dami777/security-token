@@ -153,7 +153,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
             
             
             beforeEach(async()=>{
-                const createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})
+                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})
             })
 
 
@@ -161,7 +161,9 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2}).should.be.rejected
             })
 
-
+            it("fails due to withdrawal by an invalid recipient", async()=>{
+                await htlc1400.recipientWithdrawal(orderID, secret1, {from: investor2})
+            })
             
         })
 
