@@ -135,6 +135,15 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 successfulWithDrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
             })
 
+            it("updates the balance of the investor and the htlc contract", async()=>{
+                const investorBalance = await erc1400.balanceOfByPartition(classA, investor1)
+                const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
+
+                investorBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
+                htlcBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
+
+            })
+
         })
 
     })
