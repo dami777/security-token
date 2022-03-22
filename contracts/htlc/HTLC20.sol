@@ -3,7 +3,7 @@
 
 pragma solidity 0.8.10;
 
-import "./utils/IERC20.sol";
+import "../utils/IERC20.sol";
 
 contract HTLC20 {
 
