@@ -20,7 +20,7 @@ contract HTLC20 {
         
         address _recipient;
         address _investor;
-        uint256 _tokenValue;
+        uint256 _price;
         uint256 _expiration;
         bytes32 _secretHash;
         bytes32 _secretKey;
@@ -50,7 +50,7 @@ contract HTLC20 {
     /// @dev    The issuer uses the ID to withdraw USDT from this contract, while the investor uses the ID to withdraw from the htlc1400 contract
     /// @param  _swapID is the ID of the swap order. This ID must be valid on the htlc1400 contract for swap to occur
     /// @param _investor is the address that will fund this contract with the given _swapID
-    /// @param  _tokenValue is the amount to be funded by investor for this particular order
+    /// @param  _price is the price of the security token to be purchased. This contract is funded by investor for this particular order
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
@@ -63,7 +63,13 @@ contract HTLC20 {
 
     }
 
-    function fundOrder() {
+    function fundOrder(bytes32 _swapID) external {
+
+        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");
+        require(_orderSwap[_swapID]._funded == false, "this order has been funded");
+        require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
+        OrderSwap memory _order = _orderSwap[_swapID];
+        ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
 
     }
 
