@@ -54,24 +54,25 @@ contract HTLC20 {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function createOrder(bytes32 _swapID, address _investor, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash) {
+    function createOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _expiration, bytes32 _secretHash) {
 
         require(msg.sender == _owner, "invalid caller");
-        _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _tokenValue, _expiration, _secretHash, bytes(0), _swapID, false);
+        _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _expiration, _secretHash, bytes(0), _swapID, false);
         _swapState[_swapID] = SwapState.OPEN;
+        emit OpenedOrder(_investor, _swapID, _price, expiration, _secretHash);
 
     }
 
-    /*function fundOrder() {
+    function fundOrder() {
 
     }
 
-    function issuerWithdrawal() {
+    /*function issuerWithdrawal() {
 
     }*/
 
-    event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
-    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
-    event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
+    event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
+    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash);
+    event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration);
 
 }
