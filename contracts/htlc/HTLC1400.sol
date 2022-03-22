@@ -37,7 +37,9 @@ contract HTLC1400 {
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
-    
+    address _owner;
+
+
     struct OrderSwap {
 
         
@@ -64,6 +66,7 @@ contract HTLC1400 {
     constructor(address _securityToken) {
 
         ERC1400_TOKEN = IERC1400(_securityToken);
+        _owner = msg.sender;
         
     }
 
@@ -86,6 +89,7 @@ contract HTLC1400 {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
+        require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
         _orderSwap[_swapID] = OrderSwap(_recipient, msg.sender, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
