@@ -83,16 +83,20 @@ contract HTLC20 {
 
 
     /// @param _swapID is the id of the order to withdrawn the usdt from
+    /// @notice the caller is the owner of the contract
     /// @notice the order must be OPEN
-
-
+    /// @notice the order must not be an expired order
 
     function issuerWithdrawal(bytes32 _swapID) {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
         OrderSwap memory _order = _orderSwap[_swapID];
-        require(block.timestamp < order._expiration);
+        require(block.timestamp < _order._expiration, "order has expired");
+        ERC20_TOKEN.transfer(_order._recipient, _order._price);
+        _swapState[_swapID] = SwapState.CLOSED;
+        emit ClosedOrder(_order._investor, _swapID, _order._price, _order._expiration, _order._secretHash);
+
 
 
     }
