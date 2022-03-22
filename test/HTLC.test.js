@@ -227,7 +227,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                     refund = await htlc1400.refund(orderID3)
                 })
 
-                it("refunds the issuer and updates the htlc and issuer's balance", ()=>{
+                it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
                     const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
                     const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
                     htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
@@ -249,6 +249,19 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
            
 
             
+
+        })
+
+        describe("order checking", ()=>{
+
+            it("checks valid orders", async()=>{
+                const validOrder = await htlc1400.checkOrder(orderID)
+                validOrder._orderState.should.be.equal(swapState.OPEN)
+            })
+
+            it("fails to check invalid orders", async()=>{
+                await htlc1400.checkOrder(web3.utils.asciiToHex("x23dfdbvsdgdp")).should.be.rejected
+            })
 
         })
 
