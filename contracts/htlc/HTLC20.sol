@@ -94,6 +94,7 @@ contract HTLC20 {
         require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
         OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
+        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret");
         ERC20_TOKEN.transfer(_order._recipient, _order._price);
         _swapState[_swapID] = SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._price, _order._expiration, _order._secretHash);
