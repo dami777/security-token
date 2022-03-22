@@ -42,6 +42,7 @@ contract HTLC1400 {
 
         
         address _recipient;
+        address _issuer;
         uint256 _tokenValue;
         uint256 _expiration;
         bytes32 _secretHash;
@@ -87,7 +88,7 @@ contract HTLC1400 {
 
         require(_swapState[_swapID] == SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderSwap(_recipient, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
+        _orderSwap[_swapID] = OrderSwap(_recipient, msg.sender, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_swapID] = SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
         emit OpenedOrder(_recipient, _tokenValue, _expiration, _secretHash, _partition);
@@ -107,15 +108,18 @@ contract HTLC1400 {
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
-        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");          // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");                                      // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
         require(block.timestamp < _orderSwap[_swapID]._expiration, "withdrawal expired");
         require(msg.sender == _orderSwap[_swapID]._recipient, "invalid recipient");                       
-        require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash, "invalid secret");                                 // the hash of the provided secret by the investor must match the hash in this order ID 
-        OrderSwap memory _order = _orderSwap[_swapID];                                                              // fetch the order data
-        _order._secretKey = _secretKey;                                                                             //  update the secretKey value to be publicly available on the on-chain
-        ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, hex"00");            // the htlc contract releases the token to the investor
+        require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash, "invalid secret");                   // the hash of the provided secret by the investor must match the hash in this order ID 
+        OrderSwap memory _order = _orderSwap[_swapID];                                                                  // fetch the order data
+        _order._secretKey = _secretKey;                                                                                 //  update the secretKey value to be publicly available on the on-chain
+        ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, hex"00");           // the htlc contract releases the token to the investor
         emit ClosedOrder(_order._recipient, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
         
+    }
+
+    function refund(bytes32 _swapID) external {
 
     }
 
