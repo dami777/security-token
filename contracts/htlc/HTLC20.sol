@@ -83,11 +83,12 @@ contract HTLC20 {
 
 
     /// @param _swapID is the id of the order to withdrawn the usdt from
+    /// @param _secretKey is the secret the issuer must provide and reveal to the investor. The investor will in turn use this secret to withdraw the security token from the htlc1400 contract
     /// @notice the caller is the owner of the contract
     /// @notice the order must be OPEN
     /// @notice the order must not be an expired order
 
-    function issuerWithdrawal(bytes32 _swapID) {
+    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
