@@ -132,7 +132,8 @@ contract HTLC1400 {
 
         OrderSwap memory _order = _orderSwap[_swapID];
         require(_order._issuer == msg.sender, "invalid caller");
-        require(block.timestamp > _order._expiration, "the order is yet to expire");  
+        require(block.timestamp > _order._expiration, "the order is yet to expire");
+        require(_swapState[_swapID] == SwapState.OPEN); 
         ERC1400_TOKEN.transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
         _swapState[_swapID] = SwapState.EXPIRED;
         emit RefundOrder(msg.sender, _swapID, _order._tokenValue, _order._expiration, _order._partition);
