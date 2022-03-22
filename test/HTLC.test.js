@@ -46,7 +46,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
     })
 
 
-   /* describe("Contract deployment", ()=>{
+    describe("Contract deployment", ()=>{
 
         it("has a contract address", ()=>{
 
@@ -63,7 +63,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
             token.should.be.equal(erc1400.address, "the interface detects the token address")
         })
 
-    })*/
+    })
 
     describe("Swap Order", ()=>{
 
@@ -85,7 +85,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         })
 
 
-        /*describe("successful open orders", ()=>{
+        describe("successful open orders", ()=>{
             
             it("made the htlc contract an operator", async ()=>{
 
@@ -189,7 +189,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, {from: investor1}).should.be.rejected
             })
             
-        })*/
+        })
         
 
         describe("refund", ()=>{
