@@ -48,7 +48,11 @@ contract HTLC20 {
 
     /// @dev    Issuer initializes the order with the same orderID in the htlc1400 contract
     /// @dev    The issuer uses the ID to withdraw USDT from this contract, while the investor uses the ID to withdraw from the htlc1400 contract
-
+    /// @param  _swapID is the ID of the swap order. This ID must be valid on the htlc1400 contract for swap to occur
+    /// @param _investor is the address that will fund this contract with the given _swapID
+    /// @param  _tokenValue is the amount to be funded by investor for this particular order
+    /// @param _expiration is the time expected for this order to expire before a refund can enabled
+    /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
     function createOrder(bytes32 _swapID, address _investor, uint256 _tokenValue, uint256 _expiration, bytes32 _secretHash) {
 
@@ -65,5 +69,9 @@ contract HTLC20 {
     function issuerWithdrawal() {
 
     }*/
+
+    event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
+    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
+    event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
 
 }
