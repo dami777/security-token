@@ -127,6 +127,7 @@ contract HTLC1400 {
         require(_order._issuer == msg.sender, "invalid caller");
         require(block.timestamp > _order.expiration, "the order is yet to expire");  
         ERC1400_TOKEN.transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
+        _swapState[_swapID] = SwapState.EXPIRED;
         emit RefundOrder(msg.sender, _order._tokenValue, _order._expiration, _order._partition);
 
 
