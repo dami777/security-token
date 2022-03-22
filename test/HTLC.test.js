@@ -14,6 +14,15 @@ const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
 
+const swapState = {
+
+    INVALID: "0",
+    OPEN: "1",
+    CLOSED: "2",
+    EXPIRED:  "3"
+
+}
+
 contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     let htlc20 
@@ -76,7 +85,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
         })
 
 
-        describe("successful open orders", ()=>{
+        /*describe("successful open orders", ()=>{
             
             it("made the htlc contract an operator", async ()=>{
 
@@ -151,7 +160,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
                 order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of of the order")
-                order._orderState.toString().should.be.equal("2", "it fetched the updated order state which is closed")
+                order._orderState.toString().should.be.equal(swapState.CLOSED, "it fetched the updated order state which is closed")
                 
             })
 
@@ -180,11 +189,46 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, {from: investor1}).should.be.rejected
             })
             
-        })
+        })*/
         
 
         describe("refund", ()=>{
+
+            let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
+            const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let refund
+
+            beforeEach(async()=>{
+                await htlc1400.openOrder(orderID3, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
+                refund = await htlc1400.refund(orderID3)
+            })
+
+            describe("before refund", ()=>{
+
+                it("updates the htlc's and issuer's balance after order was placed", async()=>{
+
+                    const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
+                    const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
+                    htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
+                    issuerBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
+                
+                })
+
+                it("checks that order state is 'OPEN' ", async()=>{
+                    const order = await htlc1400.checkOrder(orderID3)
+                    order._state.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
+                })
+
+            })
+
+            /*it("emits the refund order event", ()=>{
+                refund.logs[0].event.should.be.equal("RefundOrder", "it emits the RefundOrder event")
+            })
+
+            it("refund")*/
+
             
+
         })
 
 
