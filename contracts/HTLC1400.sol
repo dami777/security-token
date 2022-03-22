@@ -115,14 +115,19 @@ contract HTLC1400 {
         OrderSwap memory _order = _orderSwap[_swapID];                                                                  // fetch the order data
         _order._secretKey = _secretKey;                                                                                 //  update the secretKey value to be publicly available on the on-chain
         ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, hex"00");           // the htlc contract releases the token to the investor
+        _swapState[_swapID] = SwapState.CLOSED;                                                                         //  close the order
         emit ClosedOrder(_order._recipient, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
         
     }
 
     function refund(bytes32 _swapID) external {
+
         OrderSwap memory _order = _orderSwap[_swapID];
         require(_order._issuer == msg.sender, "invalid caller");
         require(block.timestamp > _order.expiration, "the order is yet to expire");  
+        ERC1400_TOKEN.transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
+
+
     }
 
 
