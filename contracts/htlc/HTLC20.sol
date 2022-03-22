@@ -5,6 +5,7 @@ pragma solidity 0.8.10;
 
 import "../utils/IERC20.sol";
 
+
 contract HTLC20 {
 
 
@@ -18,12 +19,11 @@ contract HTLC20 {
 
         
         address _recipient;
-        address _issuer;
+        address _investor;
         uint256 _tokenValue;
         uint256 _expiration;
         bytes32 _secretHash;
         bytes32 _secretKey;
-        bytes32 _partition;
         bytes32 _swapID;
         
     }
@@ -35,6 +35,14 @@ contract HTLC20 {
         OPEN,
         CLOSED,
         EXPIRED
+
+    }
+
+    constructor(address _usdtAddress) {
+        ERC20_TOKEN = IERC20(_usdtAddress);
+    }
+
+    function createOrder() {
 
     }
 
