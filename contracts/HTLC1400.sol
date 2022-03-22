@@ -104,6 +104,7 @@ contract HTLC1400 {
     /// @notice that OPEN is present tense
     /// @notice `msg.sender` is equal the recipient of the token
     /// @notice `block.timestamp` is less than `expiration value` for valid withdrawal
+    /// @notice `_swapState[_swapID] = SwapState.CLOSED`    closes the order after successful withdrawal
 
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
@@ -126,6 +127,7 @@ contract HTLC1400 {
         require(_order._issuer == msg.sender, "invalid caller");
         require(block.timestamp > _order.expiration, "the order is yet to expire");  
         ERC1400_TOKEN.transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
+        emit RefundOrder(msg.sender, _order._tokenValue, _order._expiration, _order._partition);
 
 
     }
@@ -137,5 +139,6 @@ contract HTLC1400 {
     
     event OpenedOrder(address indexed _recipient, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
     event ClosedOrder(address indexed _recipient, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
+    event RefundOrder(address indexed _to, uint256 _amount, uint256 _expiration, bytes32 _partition);
 
 }
