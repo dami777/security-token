@@ -190,7 +190,6 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
             })
             
         })
-        
 
         describe("refund", ()=>{
 
