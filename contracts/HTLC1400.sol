@@ -105,7 +105,7 @@ contract HTLC1400 {
     /// @notice `msg.sender` is equal the recipient of the token
     /// @notice `block.timestamp` is less than `expiration value` for valid withdrawal
     /// @notice `_swapState[_swapID] = SwapState.CLOSED`    closes the order after successful withdrawal
-
+    /// @notice `_orderSwap[_swapID]._secretKey = _secretKey;` to update the secretKey value of the OrderSwap data for that ID
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
@@ -114,7 +114,7 @@ contract HTLC1400 {
         require(msg.sender == _orderSwap[_swapID]._recipient, "invalid recipient");                       
         require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash, "invalid secret");                   // the hash of the provided secret by the investor must match the hash in this order ID 
         OrderSwap memory _order = _orderSwap[_swapID];                                                                  // fetch the order data
-        _order._secretKey = _secretKey;                                                                                 //  update the secretKey value to be publicly available on the on-chain
+        _orderSwap[_swapID]._secretKey = _secretKey;                                                                                 //  update the secretKey value to be publicly available on the on-chain
         ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, hex"00");           // the htlc contract releases the token to the investor
         _swapState[_swapID] = SwapState.CLOSED;                                                                         //  close the order
         emit ClosedOrder(_order._recipient, _swapID, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
@@ -140,14 +140,16 @@ contract HTLC1400 {
     }
 
 
-    
 
+    /// @param _swapID is the id of the order to be fetched
+    /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
 
-    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _issuer, uint256 _amount, uint256 _expiration, bytes32 _partition, bytes32 _swapID, uint8 _orderState) {
+    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _issuer, uint256 _amount, uint256 _expiration, bytes32 _partition, bytes32 _orderID, SwapState _orderState, bytes32 _secretKey) {
 
         require(_swapState[_swapID] != SwapState.INVALID, "invalid order");
         OrderSwap memory _order = _orderSwap[_swapID];
-        return (_order._recipient, _order._issuer, _order._tokenValue, _order._expiration, _order._partition, _swapID, _swapState[_swapID]);
+        SwapState _state = _swapState[_swapID];
+        return (_order._recipient, _order._issuer, _order._tokenValue, _order._expiration, _order._partition, _swapID, _state, _order._secretKey);
 
     }
 

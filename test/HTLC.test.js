@@ -144,9 +144,21 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             })
 
+            it("fetches the order details", async()=>{
+
+                const order = await htlc1400.checkOrder(orderID)
+                order._recipient.should.be.equal(investor1, "it fetched the recipient of the order")
+                order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
+                order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
+                order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of of the order")
+                order._orderState.toString().should.be.equal("2", "it fetched the updated order state which is closed")
+                console.log(order._secretKey)
+                console.log(secret1)
+            })
+
         })
 
-        describe("failed withdrawal", ()=>{
+        /*describe("failed withdrawal", ()=>{
 
             let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
             const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
@@ -169,7 +181,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, {from: investor1}).should.be.rejected
             })
             
-        })
+        })*/
 
 
     })
