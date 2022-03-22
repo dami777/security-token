@@ -63,6 +63,12 @@ contract HTLC20 {
 
     }
 
+
+    /// @param _swapID is the id of the order to be funded
+    /// @notice `_orderSwap[_swapID]._funded == false`, i.e the order must not be funded yet
+    /// @notice `_swapState[_swapID] == SwapState.OPEN` ,  i.e the order state must be opened
+    /// @dev this contract must be approved by the caller before calling this function
+
     function fundOrder(bytes32 _swapID) external {
 
         require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");
