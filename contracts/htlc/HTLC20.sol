@@ -87,6 +87,7 @@ contract HTLC20 {
     /// @notice the caller is the owner of the contract
     /// @notice the order must be OPEN
     /// @notice the order must not be an expired order
+    /// @notice the hash of the secretKey must equal the hash in the order
 
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) {
 
