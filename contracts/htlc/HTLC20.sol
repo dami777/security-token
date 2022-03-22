@@ -70,6 +70,7 @@ contract HTLC20 {
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
         OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
+        emit Funded(_order._investor, _order._price);
 
     }
 
@@ -80,5 +81,6 @@ contract HTLC20 {
     event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
     event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash);
     event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration);
+    event Funded(address indexed _investor, uint256 _price);
 
 }
