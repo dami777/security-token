@@ -120,7 +120,9 @@ contract HTLC1400 {
     }
 
     function refund(bytes32 _swapID) external {
-
+        OrderSwap memory _order = _orderSwap[_swapID];
+        require(_order._issuer == msg.sender, "invalid caller");
+        require(block.timestamp > _order.expiration, "the order is yet to expire");  
     }
 
 
