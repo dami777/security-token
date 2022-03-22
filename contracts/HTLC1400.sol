@@ -107,9 +107,9 @@ contract HTLC1400 {
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
+        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");          // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
         require(block.timestamp < _orderSwap[_swapID]._expiration, "withdrawal expired");
-        require(msg.sender == _orderSwap[_swapID]._recipient, "invalid recipient");
-        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");                                                             // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(msg.sender == _orderSwap[_swapID]._recipient, "invalid recipient");                       
         require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash, "invalid secret");                                 // the hash of the provided secret by the investor must match the hash in this order ID 
         OrderSwap memory _order = _orderSwap[_swapID];                                                              // fetch the order data
         _order._secretKey = _secretKey;                                                                             //  update the secretKey value to be publicly available on the on-chain
