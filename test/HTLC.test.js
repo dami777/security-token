@@ -159,7 +159,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
                 order._recipient.should.be.equal(investor1, "it fetched the recipient of the order")
                 order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
-                order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of of the order")
+                order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of the order")
                 order._orderState.toString().should.be.equal(swapState.CLOSED, "it fetched the updated order state which is closed")
                 
             })

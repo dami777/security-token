@@ -57,6 +57,7 @@ contract HTLC20 {
     function createOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _expiration, bytes32 _secretHash) {
 
         require(msg.sender == _owner, "invalid caller");
+        require(_swapState[_swapID] == SwapState.INVALID, "this order id exist already");
         _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _expiration, _secretHash, bytes(0), _swapID, false);
         _swapState[_swapID] = SwapState.OPEN;
         emit OpenedOrder(_investor, _swapID, _price, expiration, _secretHash);
@@ -80,9 +81,21 @@ contract HTLC20 {
 
     }
 
-    /*function issuerWithdrawal() {
 
-    }*/
+    /// @param _swapID is the id of the order to withdrawn the usdt from
+    /// @notice the order must be OPEN
+
+
+
+    function issuerWithdrawal(bytes32 _swapID) {
+
+        require(msg.sender == _owner, "invalid caller");
+        require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
+        OrderSwap memory _order = _orderSwap[_swapID];
+        require(block.timestamp < order._expiration);
+
+
+    }
 
     event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
     event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash);
