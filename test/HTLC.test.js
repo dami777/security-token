@@ -200,7 +200,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             beforeEach(async()=>{
                 await htlc1400.openOrder(orderID3, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
-                refund = await htlc1400.refund(orderID3)
+                
             })
 
             describe("before refund", ()=>{
@@ -209,23 +209,44 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
                     const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
                     const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
-                    htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
-                    issuerBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
+                    htlcBalance.toString().should.be.equal(tokens(10).toString(), "the htlc balance was incremented")
+                    issuerBalance.toString().should.be.equal(tokens(90).toString(), "the htlc balance was incremented")
                 
                 })
 
                 it("checks that order state is 'OPEN' ", async()=>{
                     const order = await htlc1400.checkOrder(orderID3)
-                    order._state.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
+                    order._orderState.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
                 })
 
             })
 
-            /*it("emits the refund order event", ()=>{
-                refund.logs[0].event.should.be.equal("RefundOrder", "it emits the RefundOrder event")
+            describe("after refund", ()=>{
+
+                beforeEach(async()=>{
+                    refund = await htlc1400.refund(orderID3)
+                })
+
+                it("refunds the issuer and updates the htlc and issuer's balance", ()=>{
+                    const htlcBalance = await erc1400.balanceOfByPartition(classA, htlc1400.address)
+                    const issuerBalance = await erc1400.balanceOfByPartition(classA, issuer)
+                    htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
+                    issuerBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
+                })
+
+                it("checks that order state has been set to 'EXPIRED' ", async()=>{
+
+                    const expiredOrder = await htlc1400.checkOrder(orderID3)
+                    expiredOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state has 'EXPIRED' ")
+                
+                })
+
+                it("emits the refund order event", ()=>{
+                    refund.logs[0].event.should.be.equal("RefundOrder", "it emits the RefundOrder event")
+                })
             })
 
-            it("refund")*/
+           
 
             
 
