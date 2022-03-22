@@ -256,7 +256,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             it("checks valid orders", async()=>{
                 const validOrder = await htlc1400.checkOrder(orderID)
-                validOrder._orderState.should.be.equal(swapState.OPEN)
+                validOrder._orderState.toString().should.be.equal(swapState.OPEN)
             })
 
             it("fails to check invalid orders", async()=>{
