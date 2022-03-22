@@ -1,6 +1,6 @@
 pragma solidity 0.8.10;
 
-import "./utils/IERC1400.sol";
+import "../utils/IERC1400.sol";
 
 
 
