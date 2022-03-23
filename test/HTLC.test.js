@@ -5,9 +5,7 @@ require("chai")
 const { ethers } = require("ethers")
 const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait} = require("./helper.js")
 const moment = require("moment");
-const { isTopic } = require("web3-utils");
-const { create } = require("domain");
-const { timeStamp } = require("console");
+
 
 
 const HTLC20 = artifacts.require("./HTLC20")
@@ -55,6 +53,9 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
             htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
+            erc20.address.should.not.be.equal("", "the erc20_usdt has a contract address")
+            erc1400.address.should.not.be.equal("", "the security token contract has an address")
+
         })
 
     })
@@ -68,7 +69,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
     })
 
-    describe("Swap Order", ()=>{
+    describe("htlc1400", ()=>{
 
         let secret1 = web3.utils.asciiToHex("anonymous")
         let secret2 = web3.utils.asciiToHex("avalanche")
@@ -267,6 +268,10 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
+
+    })
+
+    decribe("htlc20", ()=>{
 
     })
 
