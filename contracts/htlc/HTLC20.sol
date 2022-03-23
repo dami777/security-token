@@ -77,6 +77,7 @@ contract HTLC20 {
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
         OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
+        _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._price);
 
     }
@@ -93,6 +94,7 @@ contract HTLC20 {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
+        require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
         require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret");
@@ -100,9 +102,11 @@ contract HTLC20 {
         _swapState[_swapID] = SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._price, _order._expiration, _order._secretHash);
 
-
-
     }
+
+
+    /// continue with the refund function after expiration
+    /// continue with the check order function
 
     event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
     event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash);
