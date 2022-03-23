@@ -54,7 +54,7 @@ contract HTLC20 {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function createOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _expiration, bytes32 _secretHash) {
+    function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _expiration, bytes32 _secretHash) external {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.INVALID, "this order id exist already");
