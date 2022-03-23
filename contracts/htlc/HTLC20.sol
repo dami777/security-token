@@ -105,6 +105,19 @@ contract HTLC20 {
     }
 
 
+    function refund(bytes32 _swapID) external {
+
+        require(_swapState[_swapID] == SwapState.OPEN, "order is not opened");
+        require(block.timestamp > _order._expiration, "order has not expired");
+        require(_orderSwap[_swapID]._funded == true, "this order was not funded");
+        OrderSwap memory _order = _orderSwap[_swapID];
+        ERC20_TOKEN.transfer(_order._investor, _order._price);
+        _swapState[_swapID] = SwapState.EXPIRED;
+        emit RefundOrder(_order._investor, _swapID, _order._price, _order._expiration);
+
+    }
+
+
     /// continue with the refund function after expiration
     /// continue with the check order function
 
