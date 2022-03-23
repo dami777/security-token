@@ -13,7 +13,7 @@ const { timeStamp } = require("console");
 const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
-const ERC20_USDT = artifacts.require("./ERC20.sol")     // this erc20 token will be represented as usdt
+const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
 const swapState = {
 
