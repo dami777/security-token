@@ -97,8 +97,9 @@ contract HTLC20 {
         require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
-        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret");
+        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         ERC20_TOKEN.transfer(_order._recipient, _order._price);
+        _orderSwap[_swapID]._secretKey = _secretKey;
         _swapState[_swapID] = SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._price, _order._expiration, _order._secretHash);
 
@@ -116,6 +117,21 @@ contract HTLC20 {
         emit RefundOrder(_order._investor, _swapID, _order._price, _order._expiration);
 
     }
+
+
+    /// @param _swapID is the id of the order to be fetched
+    /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
+
+    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _investor, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, SwapState _orderState, bytes32 _secretKey) {
+
+        require(_swapState[_swapID] != SwapState.INVALID, "invalid order");
+        OrderSwap memory _order = _orderSwap[_swapID];
+        SwapState _state = _swapState[_swapID];
+        return (_order._recipient, _order._investor, _order._price, _order._expiration, _order._funded, _swapID, _state, _order._secretKey);
+
+    }
+
+
 
 
     /// continue with the refund function after expiration
