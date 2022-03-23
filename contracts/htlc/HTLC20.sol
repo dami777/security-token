@@ -101,7 +101,7 @@ contract HTLC20 {
         ERC20_TOKEN.transfer(_order._recipient, _order._price);
         _orderSwap[_swapID]._secretKey = _secretKey;
         _swapState[_swapID] = SwapState.CLOSED;
-        emit ClosedOrder(_order._investor, _swapID, _order._price, _order._expiration, _order._secretHash);
+        emit ClosedOrder(_order._investor, _swapID, _order._price, _order._secretKey, _order._secretHash);
 
     }
 
@@ -138,7 +138,7 @@ contract HTLC20 {
     /// continue with the check order function
 
     event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
-    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash);
+    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, bytes32 _secretKey, bytes32 _secretHash);
     event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration);
     event Funded(address indexed _investor, uint256 _price);
 
