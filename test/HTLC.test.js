@@ -13,6 +13,7 @@ const { timeStamp } = require("console");
 const HTLC20 = artifacts.require("./HTLC20")
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
+const ERC20_USDT = artifacts.require("./ERC20.sol")     // this erc20 token will be represented as usdt
 
 const swapState = {
 
@@ -28,6 +29,7 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
     let htlc20 
     let htlc1400
     let erc1400
+    let erc20
 
     let name = "Tangl"
     let symbol = "TAN"
@@ -39,7 +41,8 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
     beforeEach(async()=>{
 
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
-        htlc20 = await HTLC20.new()
+        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
+        htlc20 = await HTLC20.new(erc20.address)
         htlc1400 = await HTLC1400.new(erc1400.address)
 
         await erc1400.setController(signer)
