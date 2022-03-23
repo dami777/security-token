@@ -60,7 +60,7 @@ contract HTLC20 {
         require(_swapState[_swapID] == SwapState.INVALID, "this order id exist already");
         _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _expiration, _secretHash, bytes(0), _swapID, false);
         _swapState[_swapID] = SwapState.OPEN;
-        emit OpenedOrder(_investor, _swapID, _price, expiration, _secretHash);
+        emit OpenedOrder(_investor, _swapID, _price, _expiration, _secretHash);
 
     }
 
