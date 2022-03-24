@@ -158,9 +158,9 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             describe("successful withdrawal", ()=>{
 
-                it("transfers the token to the payment token to the issuer", async()=>{
-                    const issuerBalance = erc20.balanceOf(issuer)
-                    const htlcBalance = erc20.balanceOf(htlc20.address)
+                it("transfers the payment token to the issuer", async()=>{
+                    const issuerBalance = await erc20.balanceOf(issuer)
+                    const htlcBalance = await erc20.balanceOf(htlc20.address)
                     issuerBalance.toString().should.be.equal(checkOrder._amount.toString(), "the htlc contract releases the token to the issuer after providing the secret")
                     htlcBalance.toString().should.be.equal("0", "htlc released the token")
                 })
