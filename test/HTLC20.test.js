@@ -12,7 +12,7 @@ const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
 
-contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
+contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     let htlc20 
     let erc20
@@ -85,7 +85,7 @@ contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
                 await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret1).should.be.rejected
             })
 
-            it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", ()=>{
+            it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", async()=>{
                 
                 const orderID2 = web3.utils.asciiToHex("x23dlsdgd")
                 await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
@@ -94,10 +94,14 @@ contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
         })
 
         describe("funding order", ()=>{
-            let funded
+            /*let funded
 
             beforeEach(async()=>{
-                
+                funded = await htlc20.fundOrder(orderID, {from: investor1})
+            })*/
+
+            beforeEach(async()=>{
+                await erc20.transfer(investor1, tokens(2000))   // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             })
         })
 
