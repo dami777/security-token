@@ -17,10 +17,10 @@ const ERC1400 = artifacts.require("./ERC1400")
 
 contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
-    let htlc20 
+    
     let htlc1400
     let erc1400
-    let erc20
+    
 
     let name = "Tangl"
     let symbol = "TAN"
