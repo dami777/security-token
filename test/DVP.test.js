@@ -117,7 +117,7 @@ contract ("DVP", ([issuer, investor])=>{
 
                 })
 
-                describe("investor withdrawal after getting to know the secret", ()=>{
+                describe("investor's withdrawal after getting to know the secret", ()=>{
 
                     let checkOrder
                     let revealedSecret
@@ -134,7 +134,7 @@ contract ("DVP", ([issuer, investor])=>{
 
                     it("releases the security token to the investor as he provides the secret to withdraw from the htlc1400 contract", async()=>{
 
-                        investorWithdraws = htlc1400.recipientWithdrawal(orderID, revealedSecret)
+                        investorWithdraws = htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})
 
                     })
 
