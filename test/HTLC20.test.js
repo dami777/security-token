@@ -52,16 +52,53 @@ contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash)
+            openOrder = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret1)
 
         })
 
         describe("successful open order", ()=>{
 
+            let checkOrder
+
+            beforeEach(async()=>{
+                checkOrder = await htlc20.checkOrder(orderID)
+            })
+
+            it("emits the open order event", ()=>{
+                openOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the open order event")
+            })
+
+            it("changes the swap state from INVALID to OPEN", ()=>{
+                checkOrder._orderState.toString().should.be.equal(swapState.OPEN, "it is an open order")
+            })
+
+            it("registers the correct order information", ()=>{
+                checkOrder._amount.toString().should.be.equal(tokens(1000).toString(), "it registers the correct price")
+                checkOrder._investor.should.be.equal(investor1, "it registers the investor needed to fund this order")
+            })
+
         })
 
         describe("failed open order", ()=>{
 
+            it("fails to open order for an existing order ID", async()=>{
+                await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret1).should.be.rejected
+            })
+
+            it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", ()=>{
+                
+                const orderID2 = web3.utils.asciiToHex("x23dlsdgd")
+                await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
+            })
+
+        })
+
+        describe("funding order", ()=>{
+            let funded
+
+            beforeEach(async()=>{
+                
+            })
         })
 
         
