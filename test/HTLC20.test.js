@@ -4,7 +4,7 @@ require("chai")
 
 const { ethers, Contract } = require("ethers")
 const moment = require("moment");
-
+const { ETHER_ADDRESS, tokens, swapState} = require("./helper.js")
 
 //  connect to the smart contract
 
@@ -12,17 +12,11 @@ const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
 
-Contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
+contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
 
     let htlc20 
     let erc20
 
-    let name = "Tangl"
-    let symbol = "TAN"
-    let decimal = 18
-    let totalSupply = 0
-    let classA = web3.utils.asciiToHex("CLASS A")
-    let classB = web3.utils.asciiToHex("CLASS B")
 
     beforeEach(async()=>{
 
@@ -31,7 +25,6 @@ Contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
         htlc20 = await HTLC20.new(erc20.address)
         
 
-        await erc1400.setController(signer)
     })    
 
 
@@ -44,6 +37,34 @@ Contract("HTLC20", ([USDT_DEPLOYER, investor1, investor2])=>{
             
 
         })
+
+    })
+
+    describe("open order", ()=>{
+
+        let openOrder
+        let secret1 = web3.utils.asciiToHex("anonymous")
+        let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
+        let secretHash = ethers.utils.sha256(dataHex1)
+        let orderID = web3.utils.asciiToHex("x23dvsdgd")
+        let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
+
+
+        beforeEach(async()=>{
+
+            openOrder = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash)
+
+        })
+
+        describe("successful open order", ()=>{
+
+        })
+
+        describe("failed open order", ()=>{
+
+        })
+
+        
 
     })
 

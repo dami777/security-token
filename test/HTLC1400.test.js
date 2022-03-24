@@ -261,9 +261,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     })
 
-    decribe("htlc20", ()=>{
-
-    })
+    
 
    
 })

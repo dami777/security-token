@@ -2,6 +2,7 @@ pragma solidity 0.8.10;
 // SPDX-License-Identifier: MIT
 
 contract ERC20{
+    
     string public name;
     string public symbol;
     uint256 public decimals = 18;
