@@ -56,7 +56,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         })
 
-        describe("successful open order", ()=>{
+        /*describe("successful open order", ()=>{
 
             let checkOrder
 
@@ -92,21 +92,31 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
             })
 
-        })
+        })*/
 
         describe("funding order", ()=>{
 
             let funded
+            let checkOrder
 
             beforeEach(async()=>{
                 await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 funded = await htlc20.fundOrder(orderID, {from: investor1})
+                checkOrder = await htlc20.checkOrder(orderID)                       // check the order after funding
             })
 
             it("emits the funded event", ()=>{
                 funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
             })
+
+            it("changes the order fund status to true after funding", ()=>{
+                checkOrder._funded.should.be.equal(true, "the order fund status was changed to true")
+                const usdtBalance = erc20.balance(htlc.address)
+                usdtBalance.toString().should.be.equal(checkOrder._price.toString(), "the contract was funded")
+            })
+
+            
         })
 
         
