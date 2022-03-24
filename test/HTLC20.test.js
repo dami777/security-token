@@ -140,6 +140,41 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                  
         })
 
+        describe("withdrawal by issuer", ()=>{
+
+            let withdrawal 
+            let checkOrder
+
+            beforeEach(async()=>{
+
+                withdrawal = await htlc20.issuerWithdrawal(orderID, secret1)
+                checkOrder = await htlc20.checkOrder(orderID)
+
+            })
+            
+
+            describe("successful withdrawal", ()=>{
+
+                it("transfers the token to the payment token to the issuer", ()=>{
+                    const issuerBalance = erc20.balanceOf(issuer)
+                    const htlcBalance = erc20.balanceOf(htlc20.address)
+                    issuerBalance.toString().should.be.equal(checkOrder._amount.toString(), "the htlc contract releases the token to the issuer after providing the secret")
+                    htlcBalance.toString().should.be.equal("0", "htlc released the token")
+                })
+
+                it("emits the closed order event after successful withdrawal by the issuer of the security token", async()=>{
+                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "issuer withdraws and closes the order")
+                })
+
+               
+
+            })
+
+        })
+
+
+        /// will continue testing after the DVP testing and after creating a UI demo for the exchange
+
     })
 
 })
