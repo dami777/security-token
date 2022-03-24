@@ -75,6 +75,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             it("registers the correct order information", ()=>{
                 checkOrder._amount.toString().should.be.equal(tokens(1000).toString(), "it registers the correct price")
                 checkOrder._investor.should.be.equal(investor1, "it registers the investor needed to fund this order")
+                checkOrder._recipient.should.be.equal(issuer, "the issuer is the recipient of the order")
             })
 
         })
@@ -94,14 +95,17 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         })
 
         describe("funding order", ()=>{
-            /*let funded
 
-            beforeEach(async()=>{
-                funded = await htlc20.fundOrder(orderID, {from: investor1})
-            })*/
+            let funded
 
+        
             beforeEach(async()=>{
                 await erc20.transfer(investor1, tokens(2000))   // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                funded = await htlc20.fundOrder(orderID, {from: investor1})
+            })
+
+            it("emits the funded event", ()=>{
+                funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
             })
         })
 
