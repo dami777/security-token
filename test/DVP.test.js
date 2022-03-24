@@ -77,8 +77,8 @@ contract ("DVP", ([issuer, investor])=>{
         describe("success", ()=>{
 
             it("emits the open order event for both ordres", ()=>{
-                openOrderHtlc20.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 20 contract")
-                openOrderHtlc1400.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 1400 contract")
+                openOrderHtlc20.logs[0].event.should.be.equal("OpenedOrder", "issuer opens order on the htlc 20 contract")
+                openOrderHtlc1400.logs[0].event.should.be.equal("OpenedOrder", "issuer opens order on the htlc 1400 contract")
             })
             
         })
@@ -86,6 +86,7 @@ contract ("DVP", ([issuer, investor])=>{
         describe("fill order", async()=>{
 
             beforeEach(async()=>{
+
                 //  investor purchases USDT from p2p/escrow, exchanges
                 await erc20.transfer(investor, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
 
@@ -110,12 +111,13 @@ contract ("DVP", ([issuer, investor])=>{
                 describe("issuer's withdrawal", async()=>{
 
                     it("emits the closed order when issuer withdraws the payment", async()=>{
+
                         issuerWithdraws.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event as the issuer withdraws the payment")
                     })
 
                 })
 
-                describe("investor withdrawal", ()=>{
+                describe("investor withdrawal after getting to know the secret", ()=>{
 
                     let checkOrder
                     let revealedSecret
@@ -124,14 +126,28 @@ contract ("DVP", ([issuer, investor])=>{
                         checkOrder = await htlc20.checkOrder(orderID)
                     })
 
-                    it("reveals the secret as the investor checks the order after withdrawal by the issuer", ()=>{
+                    it("reveals the secret to the investor after withdrawal was made by the issuer", ()=>{
 
                         revealedSecret = checkOrder._secretKey
 
                     })
 
                     it("releases the security token to the investor as he provides the secret to withdraw from the htlc1400 contract", async()=>{
+
                         investorWithdraws = htlc1400.recipientWithdrawal(orderID, revealedSecret)
+
+                    })
+
+
+                    it("updates the balance of the issuer and the investor", async()=>{
+
+                        const issuerPaymentBalance = erc20.balanceOf(issuer)
+                        const investorSecurityTokenBalance = htlc1400.balanceOfByPartition(classA, investor)
+
+                        issuerPaymentBalance.toString().should.be.equal(tokens(1000).toString(), "payment token was released to the issuer")
+                        investorSecurityTokenBalance.toString().should.be.equal(tokens(5).toString(), "security token was released to the investor")
+
+
                     })
 
                 })
