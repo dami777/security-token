@@ -106,20 +106,39 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 checkOrder = await htlc20.checkOrder(orderID)                       // check the order after funding
             })
 
-            it("emits the funded event", ()=>{
-                funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
+            describe("successful funding", ()=>{
+
+                it("emits the funded event", ()=>{
+                    funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
+                })
+    
+                it("changes the order fund status to true after funding", async()=>{
+                    checkOrder._funded.should.be.equal(true, "the order fund status was changed to true")
+                    const usdtBalance = await erc20.balanceOf(htlc20.address)
+                    usdtBalance.toString().should.be.equal(checkOrder._amount.toString(), "the contract was funded")
+                })
+
             })
 
-            it("changes the order fund status to true after funding", ()=>{
-                checkOrder._funded.should.be.equal(true, "the order fund status was changed to true")
-                const usdtBalance = erc20.balance(htlc20.address)
-                usdtBalance.toString().should.be.equal(checkOrder._price.toString(), "the contract was funded")
+            describe("failed funding", ()=>{
+
+                it("fails to fund any order that isn't OPEN", async()=>{
+                    const orderID3 = web3.utils.asciiToHex("xg23dlsdgd")
+                    await htlc20.fundOrder(orderID3, {from: investor1}).should.be.rejected
+                })
+
+                it("fails to fund any order if attempted by the wrong investor of the order", async()=>{
+                    await htlc20.fundOrder(orderID, {from: investor2}).should.be.rejected
+                })
+
+                it("fails to fund any funded order", async()=>{
+                    await htlc20.fundOrder(orderID, {from: investor1}).should.be.rejected
+                })
+
             })
 
-            
+                 
         })
-
-        
 
     })
 
