@@ -104,7 +104,8 @@ contract ("DVP", ([issuer, investor])=>{
                 let investorWithdraws
 
                 beforeEach(async()=>{
-                    issuerWithdraws = await htlc20.issuerWithdrawal(orderID, secret)
+
+                    issuerWithdraws = await htlc20.issuerWithdrawal(orderID, secret)            // issuer withdraws the payment token and reveals the secret
                 })
 
 
