@@ -10,6 +10,7 @@ const moment = require("moment");
 
 //  Security token and it's htlc
 
+
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -55,13 +56,13 @@ contract ("DVP", ([issuer, investor])=>{
         let openOrderHtlc1400
 
         let expirationHTLC20 = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
-        let expirationHTLC11400 = new Date(moment().add(2, 'days').unix()).getTime()    // expiration will be present time + 2 day
+        let expirationHTLC1400 = new Date(moment().add(2, 'days').unix()).getTime()    // expiration will be present time + 2 day
 
         let secret = web3.utils.asciiToHex("anonymous")
-        let dataHex = web3.eth.abi.encodeParameter("bytes32", secret1)
-        let secretHash = ethers.utils.sha256(dataHex1)
+        let dataHex = web3.eth.abi.encodeParameter("bytes32", secret)
+        let secretHash = ethers.utils.sha256(dataHex)
 
-        beforeEach(()=>{
+        beforeEach(async()=>{
 
             // issuer mints tokens to his wallet
             await erc1400.issueByPartition(classA, issuer, 100, data)
@@ -69,26 +70,30 @@ contract ("DVP", ([issuer, investor])=>{
             //  issuer approves htlc1400 to move the tokens and fund the order
             await erc1400.authorizeOperator(htlc1400.address, {from: issuer})       //set the htlc contract to be an operator
 
-            openOrderHtlc20 = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret, {from: issuer})
-            openOrderHtlc1400 = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor, tokens(5), expiration, data, {from: issuer})
+            openOrderHtlc20 = await htlc20.openOrder(orderID, investor, tokens(1000), expirationHTLC20, secretHash, secret, {from: issuer})
+            openOrderHtlc1400 = await htlc1400.openOrder(orderID, secret, secretHash, classA, investor, tokens(5), expirationHTLC1400, data, {from: issuer})
         })
 
         describe("success", ()=>{
-            openOrderHtlc20.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 20 contract")
-            openOrderHtlc1400.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 1400 contract")
+
+            it("emits the open order event for both ordres", ()=>{
+                openOrderHtlc20.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 20 contract")
+                openOrderHtlc1400.logs[0].event.should.be.equal("OpenOrder", "issuer opens order on the htlc 1400 contract")
+            })
+            
         })
 
         describe("fill order", async()=>{
 
-            beforeEach(()=>{
+            beforeEach(async()=>{
                 //  investor purchases USDT from p2p/escrow, exchanges
-                await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.transfer(investor, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
 
                 // investor approves the htlc20 contract to move tokens from his wallet to fund the order
-                await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
+                await erc20.approve(htlc20.address, tokens(1000), {from: investor})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
 
                 //  investor funds the order
-                await htlc20.fundOrder(orderID, {from: investor1})
+                await htlc20.fundOrder(orderID, {from: investor})
             })
 
 
@@ -97,7 +102,7 @@ contract ("DVP", ([issuer, investor])=>{
                 let issuerWithdraws
                 let investorWithdraws
 
-                beforeEach(()=>{
+                beforeEach(async()=>{
                     issuerWithdraws = await htlc20.issuerWithdrawal(orderID, secret)
                 })
 
