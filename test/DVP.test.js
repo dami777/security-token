@@ -85,6 +85,48 @@ contract ("DVP", ([issuer, investor])=>{
                 await htlc20.fundOrder(orderID, {from: investor1})
             })
 
+
+            describe("Token swap", ()=>{
+
+                let issuerWithdraws
+                let investorWithdraws
+
+                beforeEach(()=>{
+                    issuerWithdraws = await htlc20.issuerWithdrawal(orderID, secret)
+                })
+
+
+                describe("issuer's withdrawal", async()=>{
+
+                    it("emits the closed order when issuer withdraws the payment", async()=>{
+                        issuerWithdraws.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event as the issuer withdraws the payment")
+                    })
+
+                })
+
+                describe("investor withdrawal", ()=>{
+
+                    let checkOrder
+                    let revealedSecret
+                    
+                    beforeEach(async()=>{
+                        checkOrder = await htlc20.checkOrder(orderID)
+                    })
+
+                    it("reveals the secret as the investor checks the order after withdrawal by the issuer", ()=>{
+
+                        revealedSecret = checkOrder._secretKey
+
+                    })
+
+                    it("releases the security token to the investor as he provides the secret to withdraw from the htlc1400 contract", async()=>{
+                        investorWithdraws = htlc1400.recipientWithdrawal(orderID, revealedSecret)
+                    })
+
+                })
+
+            })
+
         })
 
     })
