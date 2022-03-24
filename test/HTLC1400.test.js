@@ -72,7 +72,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         beforeEach(async()=>{
 
-            erc1400.issueByPartition(classA, issuer, 100, data)
+            await erc1400.issueByPartition(classA, issuer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
             createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), expiration, data, {from: issuer})
             

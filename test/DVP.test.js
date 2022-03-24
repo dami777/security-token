@@ -63,6 +63,12 @@ contract ("DVP", ([issuer, investor])=>{
 
         beforeEach(()=>{
 
+            // issuer mints tokens to his wallet
+            await erc1400.issueByPartition(classA, issuer, 100, data)
+
+            //  issuer approves htlc1400 to move the tokens and fund the order
+            await erc1400.authorizeOperator(htlc1400.address, {from: issuer})       //set the htlc contract to be an operator
+
             openOrderHtlc20 = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret, {from: issuer})
             openOrderHtlc1400 = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor, tokens(5), expiration, data, {from: issuer})
         })
