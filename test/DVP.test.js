@@ -135,9 +135,12 @@ contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
 
                     it("releases the security token to the investor as he provides the secret to withdraw from the htlc1400 contract", async()=>{
 
-                        investorWithdraws = htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})
+                        investorWithdraws = await htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})
 
-                        // check the investor and Issuer's balance
+                    })
+
+
+                    it("updates the balance of the issuer and the investor", async()=>{
 
                         const issuerPaymentBalance = await erc20.balanceOf(issuer)
                         const investorSecurityTokenBalance = await erc1400.balanceOfByPartition(classA, investor)
@@ -145,9 +148,8 @@ contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
                         issuerPaymentBalance.toString().should.be.equal(tokens(1000).toString(), "payment token was released to the issuer")
                         investorSecurityTokenBalance.toString().should.be.equal(tokens(5).toString(), "security token was released to the investor")
 
+
                     })
-
-
 
                 })
 
