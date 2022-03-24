@@ -122,24 +122,22 @@ contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
 
                     let checkOrder
                     let revealedSecret
+                
                     
                     beforeEach(async()=>{
+
                         checkOrder = await htlc20.checkOrder(orderID)
+                        revealedSecret = checkOrder._secretKey                                                              // reveals the secret to the investor
+                        investorWithdraws = await htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})   // investor proceeds with withdrawing the security token after getting to know the secret
                     })
 
-                    it("reveals the secret to the investor after withdrawal was made by the issuer", ()=>{
+                    it("emits the closed order event ", ()=>{
 
-                        revealedSecret = checkOrder._secretKey
-
-                    })
-
-                    it("releases the security token to the investor as he provides the secret to withdraw from the htlc1400 contract", async()=>{
-
-                        investorWithdraws = await htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})
+                        investorWithdraws.logs[0].event.should.be.equal("ClosedOrder", "emitted the closed order event")                        
 
                     })
 
-
+    
                     it("updates the balance of the issuer and the investor", async()=>{
 
                         const issuerPaymentBalance = await erc20.balanceOf(issuer)
