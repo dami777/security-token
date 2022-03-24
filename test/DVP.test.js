@@ -128,26 +128,42 @@ contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
 
                         checkOrder = await htlc20.checkOrder(orderID)
                         revealedSecret = checkOrder._secretKey                                                              // reveals the secret to the investor
-                        investorWithdraws = await htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})   // investor proceeds with withdrawing the security token after getting to know the secret
+                        
                     })
 
-                    it("emits the closed order event ", ()=>{
+                    describe("successful withdrawal", ()=>{
 
-                        investorWithdraws.logs[0].event.should.be.equal("ClosedOrder", "emitted the closed order event")                        
+                        beforeEach(async()=>{
+                            investorWithdraws = await htlc1400.recipientWithdrawal(orderID, revealedSecret, {from: investor})   // investor proceeds with withdrawing the security token after getting to know the secret
+                        })
 
-                    })
+                        it("emits the closed order event ", ()=>{
 
+                            investorWithdraws.logs[0].event.should.be.equal("ClosedOrder", "emitted the closed order event")                        
     
-                    it("updates the balance of the issuer and the investor", async()=>{
+                        })
+    
+        
+                        it("updates the balance of the issuer and the investor", async()=>{
+    
+                            const issuerPaymentBalance = await erc20.balanceOf(issuer)
+                            const investorSecurityTokenBalance = await erc1400.balanceOfByPartition(classA, investor)
+    
+                            issuerPaymentBalance.toString().should.be.equal(tokens(1000).toString(), "payment token was released to the issuer")
+                            investorSecurityTokenBalance.toString().should.be.equal(tokens(5).toString(), "security token was released to the investor")
+    
+    
+                        })
+                    })
 
-                        const issuerPaymentBalance = await erc20.balanceOf(issuer)
-                        const investorSecurityTokenBalance = await erc1400.balanceOfByPartition(classA, investor)
+                    describe("failed withdrawal", ()=>{
 
-                        issuerPaymentBalance.toString().should.be.equal(tokens(1000).toString(), "payment token was released to the issuer")
-                        investorSecurityTokenBalance.toString().should.be.equal(tokens(5).toString(), "security token was released to the investor")
-
+                        it("fails to withdraw if the investor attempts withdrawal with the wrong secret", async()=>{
+                            await htlc1400.recipientWithdrawal(orderID, web3.utils.asciiToHex("anonymouss"), {from: investor}).should.be.rejected
+                        })
 
                     })
+                    
 
                 })
 
