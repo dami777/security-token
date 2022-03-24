@@ -56,7 +56,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         })
 
-        /*describe("successful open order", ()=>{
+        describe("successful open order", ()=>{
 
             let checkOrder
 
@@ -92,7 +92,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
             })
 
-        })*/
+        })
 
         describe("funding order", ()=>{
 
