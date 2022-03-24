@@ -98,9 +98,9 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             let funded
 
-        
             beforeEach(async()=>{
-                await erc20.transfer(investor1, tokens(2000))   // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.approve(htlc20.address, {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 funded = await htlc20.fundOrder(orderID, {from: investor1})
             })
 
