@@ -3,26 +3,19 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState} = require("./helper.js")
 const moment = require("moment");
 
 
 
-const HTLC20 = artifacts.require("./HTLC20")
+
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
-const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
-const swapState = {
 
-    INVALID: "0",
-    OPEN: "1",
-    CLOSED: "2",
-    EXPIRED:  "3"
 
-}
 
-contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
+contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     let htlc20 
     let htlc1400
@@ -39,8 +32,6 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
     beforeEach(async()=>{
 
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
-        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
-        htlc20 = await HTLC20.new(erc20.address)
         htlc1400 = await HTLC1400.new(erc1400.address)
 
         await erc1400.setController(signer)
@@ -51,9 +42,8 @@ contract("HTLC", ([issuer, investor1, investor2, investor3])=>{
 
         it("has a contract address", ()=>{
 
-            htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
+           
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
-            erc20.address.should.not.be.equal("", "the erc20_usdt has a contract address")
             erc1400.address.should.not.be.equal("", "the security token contract has an address")
 
         })
