@@ -112,7 +112,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             it("changes the order fund status to true after funding", ()=>{
                 checkOrder._funded.should.be.equal(true, "the order fund status was changed to true")
-                const usdtBalance = erc20.balance(htlc.address)
+                const usdtBalance = erc20.balance(htlc20.address)
                 usdtBalance.toString().should.be.equal(checkOrder._price.toString(), "the contract was funded")
             })
 
