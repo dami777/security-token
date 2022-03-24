@@ -20,7 +20,7 @@ const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
 
-contract ("DVP", ([issuer, investor])=>{
+contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
 
     let htlc20 
     let htlc1400
@@ -40,7 +40,7 @@ contract ("DVP", ([issuer, investor])=>{
 
     beforeEach(async()=>{
 
-        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
+        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT", {from: USDT_MARKET})
         htlc20 = await HTLC20.new(erc20.address)
 
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
@@ -88,7 +88,7 @@ contract ("DVP", ([issuer, investor])=>{
             beforeEach(async()=>{
 
                 //  investor purchases USDT from p2p/escrow, exchanges
-                await erc20.transfer(investor, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.transfer(investor, tokens(2000), {from: USDT_MARKET})           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
 
                 // investor approves the htlc20 contract to move tokens from his wallet to fund the order
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
