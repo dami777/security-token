@@ -110,7 +110,7 @@ contract ("DVP", ([issuer, investor])=>{
 
                 describe("issuer's withdrawal", async()=>{
 
-                    it("emits the closed order when issuer withdraws the payment", async()=>{
+                    it("emits the closed order after issuer withdraws the payment", async()=>{
 
                         issuerWithdraws.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event as the issuer withdraws the payment")
                     })
@@ -142,7 +142,7 @@ contract ("DVP", ([issuer, investor])=>{
                     it("updates the balance of the issuer and the investor", async()=>{
 
                         const issuerPaymentBalance = erc20.balanceOf(issuer)
-                        const investorSecurityTokenBalance = htlc1400.balanceOfByPartition(classA, investor)
+                        const investorSecurityTokenBalance = erc1400.balanceOfByPartition(classA, investor)
 
                         issuerPaymentBalance.toString().should.be.equal(tokens(1000).toString(), "payment token was released to the issuer")
                         investorSecurityTokenBalance.toString().should.be.equal(tokens(5).toString(), "security token was released to the investor")
