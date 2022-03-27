@@ -81,7 +81,7 @@ contract HTLC20 {
         OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_swapID]._funded = true;
-        emit Funded(_order._investor, _order._partition, _order.amount, _order._price);
+        emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
 
     }
 
