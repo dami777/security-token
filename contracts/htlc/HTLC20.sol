@@ -21,10 +21,12 @@ contract HTLC20 {
         address _recipient;
         address _investor;
         uint256 _price;
+        uint256 _amount;
         uint256 _expiration;
         bytes32 _secretHash;
         bytes32 _secretKey;
         bytes32 _swapID;
+        bytes32 _partition;
         bool _funded;
         
     }
@@ -54,14 +56,14 @@ contract HTLC20 {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey) external {
+    function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == SwapState.INVALID, "this order id exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _expiration, _secretHash, bytes32(0), _swapID, false);
+        _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_swapID] = SwapState.OPEN;
-        emit OpenedOrder(_investor, _swapID, _price, _expiration, _secretHash);
+        emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
 
     }
 
@@ -79,7 +81,7 @@ contract HTLC20 {
         OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_swapID]._funded = true;
-        emit Funded(_order._investor, _order._price);
+        emit Funded(_order._investor, _order._partition, _order.amount, _order._price);
 
     }
 
@@ -102,7 +104,7 @@ contract HTLC20 {
         ERC20_TOKEN.transfer(_order._recipient, _order._price);
         _orderSwap[_swapID]._secretKey = _secretKey;
         _swapState[_swapID] = SwapState.CLOSED;
-        emit ClosedOrder(_order._investor, _swapID, _order._price, _order._secretKey, _order._secretHash);
+        emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
 
     }
 
@@ -138,9 +140,9 @@ contract HTLC20 {
     /// continue with the refund function after expiration
     /// continue with the check order function
 
-    event OpenedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash);
-    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount, bytes32 _secretKey, bytes32 _secretHash);
+    event OpenedOrder(address indexed _investor, bytes32 _swapID, bytes32 _partition, uint256 _amount, uint256 _price, uint256 _expiration, bytes32 _secretHash);
+    event ClosedOrder(address indexed _investor, bytes32 _swapID, bytes32 _partition, uint256 _amount, uint256 _price, bytes32 _secretKey, bytes32 _secretHash);
     event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration);
-    event Funded(address indexed _investor, uint256 _price);
+    event Funded(address indexed _investor, bytes32 _partition, uint256 _amount, uint256 _price);
 
 }
