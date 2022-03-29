@@ -48,11 +48,13 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         let secretHash = ethers.utils.sha256(dataHex1)
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
         let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
-
+        let classA = web3.utils.asciiToHex("CLASS A")
+        let price = tokens(1000)        // price of the asset
+        let amount = tokens(10)         // quantity of asset to be issued
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret1)
+            openOrder = await htlc20.openOrder(orderID, investor1, price, amount, expiration, secretHash, secret1, classA)
 
         })
 
