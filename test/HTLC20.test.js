@@ -43,8 +43,9 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     describe("open order", ()=>{
 
         let openOrder
-        let secret1 = web3.utils.asciiToHex("anonymous")
-        let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
+        let secret_phrase = "anonymous"
+        let secretBytes32 = web3.utils.asciiToHex(secret_phrase)
+        let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secretBytes32)
         let secretHash = ethers.utils.sha256(dataHex1)
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
         let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
@@ -54,7 +55,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, price, amount, expiration, secretHash, secret1, classA)
+            openOrder = await htlc20.openOrder(orderID, investor1, price, amount, expiration, secretHash, secretBytes32, classA)
 
         })
 
@@ -85,7 +86,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         describe("failed open order", ()=>{
 
             it("fails to open order for an existing order ID", async()=>{
-                await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secret1).should.be.rejected
+                await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secretBytes32).should.be.rejected
             })
 
             it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", async()=>{
@@ -152,7 +153,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 await htlc20.fundOrder(orderID, {from: investor1})
-                withdrawal = await htlc20.issuerWithdrawal(orderID, secret1)
+                withdrawal = await htlc20.issuerWithdrawal(orderID, secretBytes32)
                 checkOrder = await htlc20.checkOrder(orderID)
 
             })
@@ -171,7 +172,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 })
 
                 it("made the secret visible to the investor, hence the investor can withdraw the security token with the secret", ()=>{
-                    secret1.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "it reveals the correct secret to the investor")   
+                    secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "it reveals the correct secret to the investor")   
                 })
 
                
