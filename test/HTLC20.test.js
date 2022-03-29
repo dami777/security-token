@@ -171,7 +171,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 })
 
                 it("made the secret visible to the investor, hence the investor can withdraw the security token with the secret", ()=>{
-                    console.log(checkOrder._secretKey)
+                    secret1.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "it reveals the correct secret to the investor")   
                 })
 
                
