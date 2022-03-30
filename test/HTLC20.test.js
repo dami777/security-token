@@ -40,7 +40,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     })
 
-    describe("open order", ()=>{
+    /*describe("open order", ()=>{
 
         let openOrder
         let secret_phrase = "anonymous"
@@ -184,6 +184,30 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         /// will continue testing after the DVP testing and after creating a UI demo for the exchange
 
+    })*/
+
+    describe("refund expired order", ()=>{
+
+        let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
+        const expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+        let refund
+
+        beforeEach(async()=>{
+
+            await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretBytes32, classA)
+            await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+            await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
+            funded = await htlc20.fundOrder(orderID, {from: investor1})
+        })
+
+        describe("the order is opened", ()=>{
+
+            it("check the order to be opened", async()=>{
+                const checkOrder = await htlc20.checkOrder(orderID2)
+                checkOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
+            })
+
+        })
     })
 
 })
