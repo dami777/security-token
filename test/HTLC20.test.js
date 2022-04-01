@@ -198,7 +198,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretBytes32, classA)
             await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
-            funded = await htlc20.fundOrder(orderID, {from: investor1})
+            funded = await htlc20.fundOrder(orderID2, {from: investor1})
         })
 
         describe("the order is opened", ()=>{
