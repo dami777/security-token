@@ -2,7 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ethers, Contract } = require("ethers")
+const { ethers, Contract } = require("ethers");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState} = require("./helper.js")
 
@@ -198,7 +198,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretBytes32, classA)
             await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
-            funded = await htlc20.fundOrder(orderID2, {from: investor1})
+            funded = await htlc20.fundOrder(orderID2, {from: investor1})            // investor funds the order
         })
 
         describe("the order is opened", ()=>{
@@ -206,6 +206,20 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             it("check the order to be opened", async()=>{
                 const checkOrder = await htlc20.checkOrder(orderID2)
                 checkOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
+            })
+
+        })
+
+        describe("refund", ()=>{
+
+            beforeEach(async()=>{
+                refund = await htlc20.refund(orderID2)
+            })
+
+            it("refunds the investor's payment to the investor's waller", ()=>{
+
+                refund.logs[1].event.should.be.equal("RefundOrder", "it emits the refund event")
+
             })
 
         })
