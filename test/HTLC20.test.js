@@ -216,9 +216,12 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 refund = await htlc20.refund(orderID2)
             })
 
-            it("refunds the investor's payment to the investor's waller", ()=>{
+            it("refunds the investor's payment to the investor's waller", async()=>{
 
-                refund.logs[1].event.should.be.equal("RefundOrder", "it emits the refund event")
+                const balance = await erc20.balanceOf(investor1)
+                balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
+                refund.logs[0].event.should.be.equal("RefundOrder", "it emits the refund event")
+
 
             })
 
