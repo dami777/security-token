@@ -7,6 +7,8 @@ const tokens=(n)=>{
     
 }
 
+const ether = (n) => tokens(n)
+
 
 const signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
 const fromIsWhiteListedOrIssuer = true
@@ -29,5 +31,5 @@ const swapState = {
 
 }
 
-module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState }
+module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether }
 
