@@ -121,9 +121,6 @@ contract HTLC20 {
 
 
 
-    /// continue with the refund function after expiration
-    /// continue with the check order function
-
     event OpenedOrder(address indexed _investor, bytes32 _swapID, bytes32 _partition, uint256 _amount, uint256 _price, uint256 _expiration, bytes32 _secretHash);
     event ClosedOrder(address indexed _investor, bytes32 _swapID, bytes32 _partition, uint256 _amount, uint256 _price, bytes32 _secretKey, bytes32 _secretHash);
     event RefundedOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration);
