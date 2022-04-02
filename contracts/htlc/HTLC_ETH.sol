@@ -12,8 +12,14 @@ contract HTLC_ETH {
 
     }
 
+    address private _owner;
 
-    
+    constructor () {
+
+        _owner = msg.sender
+
+    }
+
 
 
 }
