@@ -2,7 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ethers, Contract } = require("ethers");
+const { ethers } = require("ethers");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState} = require("./helper.js")
 
@@ -21,10 +21,10 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secretBytes32)
     let secretHash = ethers.utils.sha256(dataHex1)
     let orderID = web3.utils.asciiToHex("x23dvsdgd")
-    let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
+    let expiration = new Date(moment().add(1, 'days').unix()).getTime()     // expiration will be present time + 1 day
     let classA = web3.utils.asciiToHex("CLASS A")
-    let price = tokens(1000)        // price of the asset
-    let amount = tokens(10)         // quantity of asset to be issued
+    let price = tokens(1000)                                                // price of the asset
+    let amount = tokens(10)                                                 // quantity of asset to be issued
 
 
     beforeEach(async()=>{
@@ -210,6 +210,14 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         })
 
+        describe("withdrawal fails for expired order", ()=>{
+
+            it("should revert if the issuer tries to withdraw an opened order that is expired", async()=>{
+                await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
+            })
+
+        })
+
         describe("refund", ()=>{
 
             beforeEach(async()=>{
@@ -222,6 +230,14 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
                 refund.logs[0].event.should.be.equal("RefundOrder", "it emits the refund event")
 
+
+            })
+
+        })
+
+        describe("issuer can't withdraw from an expired order", ()=>{
+
+            it("should fail for every attempted withdrawal from issuer on any refunded order", async()=>{
 
             })
 
