@@ -224,7 +224,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 refund = await htlc20.refund(orderID2)
             })
 
-            it("refunds the investor's payment to the investor's waller", async()=>{
+            it("refunds the investor's payment to the investor's wallet", async()=>{
 
                 const balance = await erc20.balanceOf(investor1)
                 balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
