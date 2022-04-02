@@ -108,6 +108,10 @@ contract HTLC20 {
 
     }
 
+    /// @param _swapID is the order ID of the order to be refunded
+    /// @notice `block.timestamp ` > `expiration time`
+    /// @notice swapt state becomes `expired`
+
 
     function refund(bytes32 _swapID) external {
 
