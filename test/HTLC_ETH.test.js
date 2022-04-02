@@ -58,7 +58,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
         })
 
         it("emits the open order event", ()=>{
-            order.logs[0].should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+            order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
         })
 
     })
