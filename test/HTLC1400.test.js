@@ -50,15 +50,6 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     })
 
-    describe("htlc connection to the security token",  ()=>{
-
-        it("detects the security token contract", async()=>{
-            const token = await htlc1400.ERC1400_TOKEN()
-            token.should.be.equal(erc1400.address, "the interface detects the token address")
-        })
-
-    })
-
     describe("htlc1400", ()=>{
 
         let secret1 = web3.utils.asciiToHex("anonymous")
