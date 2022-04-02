@@ -10,14 +10,17 @@ import "../utils/OrderLibrary.sol";
 contract HTLC20 {
 
 
-    mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
-    mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
+    //using OrderLibrary for OrderLibrary.SwapState;
+    //using OrderLibrary for OrderLibrary.OrderSwap;
+
+    mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
+    mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
     
     address _owner;
 
     IERC20 ERC20_TOKEN;
 
-    struct OrderSwap {
+    /*struct OrderSwap {
 
         
         address _recipient;
@@ -31,8 +34,7 @@ contract HTLC20 {
         bytes32 _partition;
         bool _funded;
         
-    }
-
+    }*/
 
     /*enum SwapState {
 
@@ -61,10 +63,10 @@ contract HTLC20 {
     function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == SwapState.INVALID, "this order id exist already");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
-        _swapState[_swapID] = SwapState.OPEN;
+        _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
+        _swapState[_swapID] = OrderLibrary.SwapState.OPEN;
         emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
 
     }
@@ -72,15 +74,15 @@ contract HTLC20 {
 
     /// @param _swapID is the id of the order to be funded
     /// @notice `_orderSwap[_swapID]._funded == false`, i.e the order must not be funded yet
-    /// @notice `_swapState[_swapID] == SwapState.OPEN` ,  i.e the order state must be opened
+    /// @notice `_swapState[_swapID] == OrderLibrary.SwapState.OPEN` ,  i.e the order state must be opened
     /// @dev this contract must be approved by the caller before calling this function
 
     function fundOrder(bytes32 _swapID) external {
 
-        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
-        OrderSwap memory _order = _orderSwap[_swapID];
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
@@ -98,14 +100,14 @@ contract HTLC20 {
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == SwapState.OPEN, "this order is not opened");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
         require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
-        OrderSwap memory _order = _orderSwap[_swapID];
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
         require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         ERC20_TOKEN.transfer(_order._recipient, _order._price);
         _orderSwap[_swapID]._secretKey = _secretKey;
-        _swapState[_swapID] = SwapState.CLOSED;
+        _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
 
     }
@@ -117,12 +119,12 @@ contract HTLC20 {
 
     function refund(bytes32 _swapID) external {
 
-        require(_swapState[_swapID] == SwapState.OPEN, "order is not opened");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
         require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
         require(_orderSwap[_swapID]._funded == true, "this order was not funded");
-        OrderSwap memory _order = _orderSwap[_swapID];
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         ERC20_TOKEN.transfer(_order._investor, _order._price);
-        _swapState[_swapID] = SwapState.EXPIRED;
+        _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundedOrder(_order._investor, _swapID, _order._price, _order._expiration);
 
     }
@@ -131,11 +133,11 @@ contract HTLC20 {
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
 
-    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _investor, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, SwapState _orderState, bytes32 _secretKey) {
+    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _investor, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
 
-        require(_swapState[_swapID] != SwapState.INVALID, "invalid order");
-        OrderSwap memory _order = _orderSwap[_swapID];
-        SwapState _state = _swapState[_swapID];
+        require(_swapState[_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
+        OrderLibrary.SwapState _state = _swapState[_swapID];
         return (_order._recipient, _order._investor, _order._price, _order._expiration, _order._funded, _swapID, _state, _order._secretKey);
 
     }

@@ -3,7 +3,7 @@ pragma solidity 0.8.10;
 
 library OrderLibrary {
 
-    /*struct OrderSwap {
+    struct OrderSwap {
 
         
         address _recipient;
@@ -17,7 +17,7 @@ library OrderLibrary {
         bytes32 _partition;
         bool _funded;
         
-    }*/
+    }
 
 
     enum SwapState {
