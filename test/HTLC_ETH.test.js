@@ -3,7 +3,6 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers");
-const { before } = require("lodash");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
@@ -63,6 +62,23 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
                 order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
             })
     
+        })
+
+        describe("funding order", ()=>{
+
+            let fund 
+
+            before(async()=>{
+                fund = await htlcEth.fundOrder(orderID, {from: investor, value: ether(0.5)})
+            })
+
+            it("should increase the ether balance of the contract", async()=>{
+                const ethBalance = await web3.eth.balance(htlcEth.address)
+                console.log(ethBalance.toString())
+            })
+
+            
+
         })
 
         

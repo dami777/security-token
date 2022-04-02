@@ -48,7 +48,7 @@ contract HTLC_ETH {
     /// @notice `_swapState[_swapID] == OrderLibrary.SwapState.OPEN` ,  i.e the order state must be opened
     /// @dev this contract must be approved by the caller before calling this function
 
-    function fundOrder(bytes32 _swapID) external {
+    function fundOrder(bytes32 _swapID) payable external {
 
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
