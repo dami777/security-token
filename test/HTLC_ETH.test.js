@@ -6,6 +6,7 @@ const { ethers } = require("ethers");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
+const ReEntrancy = artifacts.require("./ReEntrancy")
 
 
 contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
@@ -15,12 +16,14 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
 
     beforeEach(async()=>{
         htlcEth = await HTLC_ETH.new()
+        reEntrancy = await ReEntrancy.new()
     })
 
     describe("contract address", ()=>{
 
         it("should have a contract address", ()=>{
             htlcEth.address.should.not.be.equal("", "it has a contract address")
+            reEntrancy.address.should.not.be.equal("", "it has a contract address")
         })
 
     })
