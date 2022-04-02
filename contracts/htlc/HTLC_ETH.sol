@@ -54,7 +54,7 @@ contract HTLC_ETH {
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        address(this).transfer(msg.value);
+        payable(address(this)).transfer(_order._price);
         _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
 
