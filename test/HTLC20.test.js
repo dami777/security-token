@@ -49,7 +49,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     })
 
-    /*describe("open order", ()=>{
+    describe("open order", ()=>{
 
         let openOrder
         
@@ -182,10 +182,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         })
 
-
-        /// will continue testing after the DVP testing and after creating a UI demo for the exchange
-
-    })*/
+    })
 
     describe("refund expired order", ()=>{
 
