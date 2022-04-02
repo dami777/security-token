@@ -144,6 +144,15 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                  
         })
 
+        describe("failed refund before expiration", ()=>{
+            
+            it("should revert if refund is attempted before the expiration period", async()=>{
+                await htlc20.refund(orderID, {from: investor1}).should.be.rejected
+            })
+
+        })
+
+
         describe("withdrawal by issuer", ()=>{
 
             let withdrawal 
@@ -218,7 +227,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         describe("refund", ()=>{
 
             beforeEach(async()=>{
-                refund = await htlc20.refund(orderID2)
+                refund = await htlc20.refund(orderID2, {from: investor1})
             })
 
             it("refunds the investor's payment to the investor's wallet", async()=>{
@@ -236,6 +245,8 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
 
             })
+
+            
 
         })
 
