@@ -34,11 +34,6 @@ contract HTLC1400 {
 
 
     IERC1400 ERC1400_TOKEN;
-
-
-    
-
-    OrderLibrary.
    
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
