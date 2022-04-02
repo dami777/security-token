@@ -116,7 +116,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                     funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
                 })
     
-                it("changes the order fund status to true after funding", async()=>{
+                it("changes the order's fund status to true after funding", async()=>{
                     checkOrder._funded.should.be.equal(true, "the order fund status was changed to true")
                     const usdtBalance = await erc20.balanceOf(htlc20.address)
                     usdtBalance.toString().should.be.equal(checkOrder._amount.toString(), "the contract was funded")
@@ -135,7 +135,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                     await htlc20.fundOrder(orderID, {from: investor2}).should.be.rejected
                 })
 
-                it("fails to fund any funded order", async()=>{
+                it("fails to fund an already funded order", async()=>{
                     await htlc20.fundOrder(orderID, {from: investor1}).should.be.rejected
                 })
 
@@ -163,7 +163,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 await htlc20.fundOrder(orderID, {from: investor1})
-                withdrawal = await htlc20.issuerWithdrawal(orderID, secretBytes32)
+                withdrawal = await htlc20.issuerWithdrawal(orderID, secretBytes32, {from:issuer})
                 checkOrder = await htlc20.checkOrder(orderID)
 
             })
@@ -183,6 +183,10 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
                 it("made the secret visible to the investor, hence the investor can withdraw the security token with the secret", ()=>{
                     secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "it reveals the correct secret to the investor")   
+                })
+
+                it("should have a closed order state", ()=>{
+                    checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order is closed after withdrawal by the issuer")
                 })
 
                
@@ -245,6 +249,8 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
 
             })
+
+            
 
             
 
