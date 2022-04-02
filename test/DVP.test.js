@@ -80,6 +80,16 @@ contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
                 openOrderHtlc20.logs[0].event.should.be.equal("OpenedOrder", "issuer opens order on the htlc 20 contract")
                 openOrderHtlc1400.logs[0].event.should.be.equal("OpenedOrder", "issuer opens order on the htlc 1400 contract")
             })
+
+            it("should return the correct recipient of the security token and payment", async()=>{
+
+                const htlc1400Order = await htlc1400.checkOrder(orderID)
+                const htlc20Order = await htlc20.checkOrder(orderID)
+
+                htlc1400Order._recipient.should.be.equal(investor, "it returns the correct recipient of this order")
+                htlc120Order._recipient.should.be.equal(issuer, "it returns the correct recipient of this order")
+
+            })
             
         })
 
