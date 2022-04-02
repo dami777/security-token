@@ -1,6 +1,7 @@
 pragma solidity 0.8.10;
 
 import "../utils/IERC1400.sol";
+import "../utils/OrderLibrary.sol";
 
 
 
@@ -32,11 +33,16 @@ contract HTLC1400 {
 
 
 
-    IERC1400 public ERC1400_TOKEN;
+    IERC1400 ERC1400_TOKEN;
+
+
+    
+
+    OrderLibrary.
    
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
-    mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
+    mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
     address _owner;
 
 
@@ -55,13 +61,13 @@ contract HTLC1400 {
     }
 
 
-    enum SwapState {
+    /*enum SwapState {
 
         INVALID,
         OPEN,
         CLOSED,
         EXPIRED
-    }
+    }*/
 
     constructor(address _securityToken) {
 
@@ -90,11 +96,11 @@ contract HTLC1400 {
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == SwapState.INVALID, "order ID exist already");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
         _orderSwap[_swapID] = OrderSwap(_recipient, msg.sender, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
-        _swapState[_swapID] = SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
+        _swapState[_swapID] = OrderLibrary.SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
         emit OpenedOrder(_recipient, _swapID, _tokenValue, _expiration, _secretHash, _partition);
 
     }
@@ -108,19 +114,19 @@ contract HTLC1400 {
     /// @notice that OPEN is present tense
     /// @notice `msg.sender` is equal the recipient of the token
     /// @notice `block.timestamp` is less than `expiration value` for valid withdrawal
-    /// @notice `_swapState[_swapID] = SwapState.CLOSED`    closes the order after successful withdrawal
+    /// @notice `_swapState[_swapID] = OrderLibrary.SwapState.CLOSED`    closes the order after successful withdrawal
     /// @notice `_orderSwap[_swapID]._secretKey = _secretKey;` to update the secretKey value of the OrderSwap data for that ID
     
     function recipientWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
-        require(_swapState[_swapID] == SwapState.OPEN, "this order isn't opened");                                      // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");                                      // this order must not be CLOSED, INVALID or EXPIRED. it must be opened
         require(block.timestamp < _orderSwap[_swapID]._expiration, "withdrawal expired");
         require(msg.sender == _orderSwap[_swapID]._recipient, "invalid recipient");                       
         require(sha256(abi.encode(_secretKey)) == _orderSwap[_swapID]._secretHash, "invalid secret");                   // the hash of the provided secret by the investor must match the hash in this order ID 
         OrderSwap memory _order = _orderSwap[_swapID];                                                                  // fetch the order data
         ERC1400_TOKEN.transferByPartition(_order._partition, _order._recipient, _order._tokenValue, hex"00");           // the htlc contract releases the token to the investor
         _orderSwap[_swapID]._secretKey = _secretKey;                                                                    //  update the secretKey value to be publicly available on the on-chain
-        _swapState[_swapID] = SwapState.CLOSED;                                                                         //  close the order
+        _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;                                                                         //  close the order
         emit ClosedOrder(_order._recipient, _swapID, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
         
     }
@@ -130,16 +136,16 @@ contract HTLC1400 {
     /// @notice `_order._issuer` should be msg.sender
     /// @notice `_order._expiration` should be lesser than the current time.  In order words, the order has expired
     /// @notice `ERC1400_TOKEN.transferByPartition` refunds the issuer
-    /// @notice `_swapState[_swapID] = SwapState.EXPIRED` sets the order's state to EXPIRED
+    /// @notice `_swapState[_swapID] = OrderLibrary.SwapState.EXPIRED` sets the order's state to EXPIRED
 
     function refund(bytes32 _swapID) external {
 
         OrderSwap memory _order = _orderSwap[_swapID];
         require(_order._issuer == msg.sender, "invalid caller");
-        require(_swapState[_swapID] == SwapState.OPEN, "order is not opened");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
         require(block.timestamp > _order._expiration, "the order is yet to expire"); 
         ERC1400_TOKEN.transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
-        _swapState[_swapID] = SwapState.EXPIRED;
+        _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundOrder(msg.sender, _swapID, _order._tokenValue, _order._expiration, _order._partition);
 
     }
@@ -151,9 +157,9 @@ contract HTLC1400 {
 
     function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _issuer, uint256 _amount, uint256 _expiration, bytes32 _partition, bytes32 _orderID, SwapState _orderState, bytes32 _secretKey) {
 
-        require(_swapState[_swapID] != SwapState.INVALID, "invalid order");
+        require(_swapState[_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
         OrderSwap memory _order = _orderSwap[_swapID];
-        SwapState _state = _swapState[_swapID];
+        OrderLibrary.SwapState _state = _swapState[_swapID];
         return (_order._recipient, _order._issuer, _order._tokenValue, _order._expiration, _order._partition, _swapID, _state, _order._secretKey);
 
     }
