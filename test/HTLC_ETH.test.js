@@ -53,8 +53,8 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
         let order
         
         
-        beforeEach(()=>{
-            order = htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA)
+        beforeEach(async()=>{
+            order = await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA)
         })
 
         it("emits the open order event", ()=>{
