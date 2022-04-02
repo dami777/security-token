@@ -233,15 +233,15 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             })
 
-        })
-
-        describe("issuer can't withdraw from an expired order", ()=>{
 
             it("should fail for every attempted withdrawal from issuer on any refunded order", async()=>{
+
+                await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
 
             })
 
         })
+
     })
 
 })
