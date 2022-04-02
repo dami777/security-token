@@ -16,7 +16,7 @@ contract HTLC_ETH {
 
     constructor () {
 
-        _owner = msg.sender
+        _owner = msg.sender;
 
     }
 
