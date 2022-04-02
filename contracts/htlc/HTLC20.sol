@@ -11,6 +11,7 @@ contract HTLC20 {
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => SwapState) private _swapState;      //  to keep track of the swap state of an id
+    
     address _owner;
 
     IERC20 ERC20_TOKEN;
@@ -32,14 +33,14 @@ contract HTLC20 {
     }
 
 
-    enum SwapState {
+    /*enum SwapState {
 
         INVALID,
         OPEN,
         CLOSED,
         EXPIRED
 
-    }
+    }*/
 
     constructor(address _usdtAddress) {
 
