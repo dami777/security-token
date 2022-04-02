@@ -225,7 +225,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
                 const balance = await erc20.balanceOf(investor1)
                 balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
-                refund.logs[0].event.should.be.equal("RefundOrder", "it emits the refund event")
+                refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refund event")
 
 
             })
