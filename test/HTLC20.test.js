@@ -230,8 +230,16 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         describe("refund", ()=>{
 
+            let checkOrder
+
             beforeEach(async()=>{
                 refund = await htlc20.refund(orderID2, {from: investor1})
+                checkOrder = await htlc20.checkOrder(orderID2)
+
+            })
+
+            it("should have an expired order state after refund", ()=>{
+                checkOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state changes to EXPIRED after refund")
             })
 
             it("refunds the investor's payment to the investor's wallet", async()=>{
