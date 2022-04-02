@@ -13,7 +13,7 @@ contract HTLC_ETH {
     }
 
     address private _owner;
-    
+
     mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
 
@@ -39,6 +39,24 @@ contract HTLC_ETH {
         _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_swapID] = OrderLibrary.SwapState.OPEN;
         emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
+
+    }
+
+
+    /// @param _swapID is the id of the order to be funded
+    /// @notice `_orderSwap[_swapID]._funded == false`, i.e the order must not be funded yet
+    /// @notice `_swapState[_swapID] == OrderLibrary.SwapState.OPEN` ,  i.e the order state must be opened
+    /// @dev this contract must be approved by the caller before calling this function
+
+    function fundOrder(bytes32 _swapID) external {
+
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
+        require(_orderSwap[_swapID]._funded == false, "this order has been funded");
+        require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
+        address(this).transfer(msg.value);
+        _orderSwap[_swapID]._funded = true;
+        emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
 
     }
 

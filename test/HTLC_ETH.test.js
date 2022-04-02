@@ -39,7 +39,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
     })
 
 
-    describe("open order", ()=>{
+    describe("order", ()=>{
 
         let secret_phrase = "anonymous"
         let secretBytes32 = web3.utils.asciiToHex(secret_phrase)
@@ -57,10 +57,15 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
             order = await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA)
         })
 
-        it("emits the open order event", ()=>{
-            order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+        describe("opening order", ()=>{
+
+            it("emits the open order event", ()=>{
+                order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+            })
+    
         })
 
+        
     })
 
 
