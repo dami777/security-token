@@ -3,6 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers");
+const { before } = require("lodash");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
@@ -47,8 +48,18 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
         let expiration = new Date(moment().add(1, 'days').unix()).getTime()     // expiration will be present time + 1 day
         let classA = web3.utils.asciiToHex("CLASS A")
-        let price = ether(1000)                                                // price of the asset
-        let amount = tokens(10) 
+        let price = ether(1)                                                // price of the asset
+        let amount = tokens(10)
+        let order
+        
+        
+        beforeEach(()=>{
+            order = htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA)
+        })
+
+        it("emits the open order event", ()=>{
+            order.logs[0].should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+        })
 
     })
 
