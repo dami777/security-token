@@ -120,11 +120,13 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
 
                 it("releases the ether to the issuer", async()=>{
                     const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
-                    const issuerEthBalance = await web3.eth.getBalance(issuer)
+                    const issuerEthBalanceAfterWithdrawal = await web3.eth.getBalance(issuer)
 
                     htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
-                    issuerBalanceIncreased = Number(issuerEthBalance.toString()) > Number(issuerEthBalanceBeforeWithDrawal)
+                    issuerBalanceIncreased = Number(issuerEthBalanceAfterWithdrawal.toString()) > Number(issuerEthBalanceBeforeWithDrawal.toString())
                     issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
+
+
                 })
 
             })
