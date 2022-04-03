@@ -115,7 +115,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
 
                 it("closes the order", ()=>{
                     withdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
-                    orderID._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                    checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
                 })
 
                 it("releases the ether to the issuer", async()=>{
