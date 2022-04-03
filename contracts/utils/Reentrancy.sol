@@ -12,7 +12,7 @@ contract ReEntrancy {
     }
 
     function attack(bytes32 _swapID, bytes32 _secretKey) external {
-        _htlcEth.issuerWithdrawal(_swapID, _secretKey);
+        htlcEth.issuerWithdrawal(_swapID, _secretKey);
     }
  
 }
