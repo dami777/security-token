@@ -73,12 +73,12 @@ contract HTLC_ETH {
         //require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
         //require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        require(block.timestamp < _order._expiration, "order has expired");
-        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
+        //require(block.timestamp < _order._expiration, "order has expired");
+        //require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         payable(msg.sender).transfer(_order._price);
-        _orderSwap[_swapID]._secretKey = _secretKey;
-        _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
-        emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
+        //_orderSwap[_swapID]._secretKey = _secretKey;
+        //_swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
+        //emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
 
     }
 
