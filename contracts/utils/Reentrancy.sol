@@ -11,7 +11,7 @@ contract ReEntrancy {
         htlcEth = HTLC_ETH(_htlcEth);
     }
 
-    function attack(bytes32 _swapID, bytes32 _secretKey) external {
+    function attack(bytes32 _swapID, bytes32 _secretKey) external payable {
         htlcEth.issuerWithdrawal(_swapID, _secretKey);
     }
  
