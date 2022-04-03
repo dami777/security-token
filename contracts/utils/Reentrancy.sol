@@ -11,9 +11,17 @@ contract ReEntrancy {
         htlcEth = HTLC_ETH(_htlcEthAddress);
     }
 
-    function attack(bytes32 _swapID, bytes32 _secretKey) external view returns (string memory) {
+    fallback() external payable {
+        
+    }
+
+    
+
+    function attack(bytes32 _swapID, bytes32 _secretKey) external {
+        
         //htlcEth.issuerWithdrawal(_swapID, _secretKey);
-        return "okay";
+        htlcEth.issuerWithdrawal(_swapID, _secretKey);
+
     }
  
 }
