@@ -101,7 +101,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
                 })
             })
 
-            describe("issuer withdrawal", ()=>{
+            /*describe("issuer withdrawal", ()=>{
 
                 let withdrawal
                 let checkOrder
@@ -127,6 +127,21 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
                     issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
 
 
+                })
+
+            })*/
+
+            describe("reentrancy attack", ()=>{
+
+                let reEntrancyAttack
+
+                beforeEach(async()=>{
+                    reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
+                })
+
+                it("updates the balance of the contract carry out the attack", async()=>{
+                    const attackContractBalance = await web3.eth.getBalance(reEntrancy.address)
+                    attackContractBalance.toString().should.be.greater("0", "it is greater than 0")
                 })
 
             })
