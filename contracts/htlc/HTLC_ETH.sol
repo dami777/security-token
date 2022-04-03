@@ -60,6 +60,29 @@ contract HTLC_ETH {
     }
 
 
+    /// @param _swapID is the id of the order to withdrawn the usdt from
+    /// @param _secretKey is the secret the issuer must provide and reveal to the investor. The investor will in turn use this secret to withdraw the security token from the htlc1400 contract
+    /// @notice the caller is the owner of the contract
+    /// @notice the order must be OPEN
+    /// @notice the order must not be an expired order
+    /// @notice the hash of the secretKey must equal the hash in the order
+
+    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
+
+        require(msg.sender == _owner, "invalid caller");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
+        require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
+        require(block.timestamp < _order._expiration, "order has expired");
+        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
+        payable(msg.sender).transfer(_order._recipient, _order._price);
+        _orderSwap[_swapID]._secretKey = _secretKey;
+        _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
+        emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
+
+    }
+
+
 
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 

@@ -4,7 +4,6 @@ require("chai")
 
 const { ethers } = require("ethers");
 const moment = require("moment");
-const { describe } = require("yargs");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
@@ -30,13 +29,13 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
     })
 
 
-    /*describe("fallback", ()=>{
+    describe("fallback", ()=>{
 
         it("should revert if a call is made to any non existing function", async()=>{
             await htlcEth.sendTransaction({value: 1, from: issuer}).should.be.rejected
         })
 
-    })*/
+    })
 
 
     describe("order", ()=>{
@@ -85,7 +84,20 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
             })
 
             describe("check order", ()=>{
-                
+
+                let checkOrder
+
+                beforeEach(async()=>{
+                    checkOrder = await htlcEth.checkOrder(orderID)
+                })
+
+                it("should be funded", ()=>{
+                    checkOrder._funded.should.be.equal(true, "the order has been funded")
+                })
+
+                it("shouldn't have the secret yet", ()=>{
+                    web3.utils.hexToUtf8(checkOrder._secretKey).should.not.be.equal(secretHash, "secret hasn't been revealed yet") 
+                })
             })
 
         })
