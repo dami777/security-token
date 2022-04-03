@@ -3,6 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers");
+const { without } = require("lodash");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
@@ -98,6 +99,34 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
                 it("shouldn't have the secret yet", ()=>{
                     web3.utils.hexToUtf8(checkOrder._secretKey).should.not.be.equal(secretHash, "secret hasn't been revealed yet") 
                 })
+            })
+
+            describe("issuer withdrawal", ()=>{
+
+                let withdrawal
+                let checkOrder
+                let issuerEthBalanceBeforeWithDrawal
+
+                beforeEach(async()=>{
+                    issuerEthBalanceBeforeWithDrawal = await web3.eth.getBalance(issuer)
+                    withdrawal = await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer})
+                    checkOrder = await htlcEth.checkOrder(orderID)
+                })
+
+                it("closes the order", ()=>{
+                    without.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                    orderID._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                })
+
+                it("releases the ether to the issuer", async()=>{
+                    const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
+                    const issuerEthBalance = await web3.eth.getBalance(issuer)
+
+                    htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
+                    issuerBalanceIncreased = Number(issuerEthBalance.toString()) > Number(issuerEthBalanceBeforeWithDrawal)
+                    issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
+                })
+
             })
 
         })
