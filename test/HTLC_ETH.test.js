@@ -17,7 +17,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
 
     beforeEach(async()=>{
         htlcEth = await HTLC_ETH.new()
-        reEntrancy = await ReEntrancy.new()
+        reEntrancy = await ReEntrancy.new(htlcEth.address)
     })
 
     describe("contract address", ()=>{
