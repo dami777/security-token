@@ -9,7 +9,7 @@ const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
 
 
-contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
+contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
 
     let htlcEth
 
@@ -29,13 +29,13 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
     })
 
 
-    describe("fallback", ()=>{
+    /*describe("fallback", ()=>{
 
         it("should revert if a call is made to any non existing function", async()=>{
             await htlcEth.sendTransaction({value: 1, from: issuer}).should.be.rejected
         })
 
-    })
+    })*/
 
 
     describe("order", ()=>{
@@ -47,7 +47,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
         let expiration = new Date(moment().add(1, 'days').unix()).getTime()     // expiration will be present time + 1 day
         let classA = web3.utils.asciiToHex("CLASS A")
-        let price = ether(1)                                                // price of the asset
+        let price = ether(0.5)                                                // price of the asset
         let amount = tokens(10)
         let order
         
@@ -68,16 +68,20 @@ contract ("HTLC for ETH Deposit", ([issuer, investor])=>{
 
             let fund 
 
-            before(async()=>{
-                fund = await htlcEth.fundOrder(orderID, {from: investor, value: ether(0.5)})
+            beforeEach(async()=>{
+                fund = await htlcEth.fundOrder(orderID, {from: investor, value: price})
             })
 
-            it("should increase the ether balance of the contract", async()=>{
-                const ethBalance = await web3.eth.balance(htlcEth.address)
-                console.log(ethBalance.toString())
-            })
+            describe("contract ehter balance", ()=>{
 
-            
+                it("should increase the ether balance of the contract", async()=>{
+                    
+                    const ethBalance = await web3.eth.getBalance(htlcEth.address)
+                    ethBalance.toString().should.be.equal(price.toString(), "ether was successfully deposited")
+     
+                })
+
+            })
 
         })
 

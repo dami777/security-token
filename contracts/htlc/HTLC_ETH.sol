@@ -8,7 +8,7 @@ import "../utils/OrderLibrary.sol";
 contract HTLC_ETH {
 
 
-    fallback () external {
+   fallback () external {
 
     }
 
@@ -16,7 +16,6 @@ contract HTLC_ETH {
 
     mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
-
     constructor () {
 
         _owner = msg.sender;
@@ -53,12 +52,15 @@ contract HTLC_ETH {
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
+        require(_orderSwap[_swapID]._price == msg.value, "invalid amount");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        payable(address(this)).transfer(_order._price);
         _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
 
     }
+
+
+    
 
 
     event OpenedOrder(address indexed _investor, bytes32 _swapID, bytes32 _partition, uint256 _amount, uint256 _price, uint256 _expiration, bytes32 _secretHash);
