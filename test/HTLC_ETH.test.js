@@ -272,9 +272,14 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 })
 
                 it("should declare the order as expired", async()=>{
+
                     const checkOrder = await htlcEth.checkOrder(orderID3)
                     checkOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "order state is updated to EXPIRED after refund")
                     
+                })
+
+                it("should emit the RefundedOrder event", ()=>{
+                    refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refunded order event after refund")
                 })
 
             })
