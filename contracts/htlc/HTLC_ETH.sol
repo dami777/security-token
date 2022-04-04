@@ -91,7 +91,7 @@ contract HTLC_ETH {
         require(block.timestamp < _order._expiration, "order has expired");
         require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         (bool sent, ) = payable(msg.sender).call{value: _order._price}("");
-        require(sent, "Failed to send Ether");
+        require(sent, "Failed to release Ether");
         _orderSwap[_swapID]._secretKey = _secretKey;
         _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
@@ -110,7 +110,8 @@ contract HTLC_ETH {
         require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
         require(_orderSwap[_swapID]._funded == true, "this order was not funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        ERC20_TOKEN.transfer(_order._investor, _order._price);
+        (bool sent, ) = payable(msg.sender).call{value: _order._price}("");
+        require(sent, "Failed to release Ether");
         _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundedOrder(_order._investor, _swapID, _order._price, _order._expiration);
 
