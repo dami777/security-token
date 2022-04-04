@@ -300,9 +300,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
     
                     })
 
-                    it("should fail to refund any unfunded open order", async()=>{
+                    it("should fail to refund any unfunded / unexpired open order", async()=>{
     
-                        await htlcEth.refund(order).should.be.rejected
+                        await htlcEth.refund(orderID).should.be.rejected
     
                     })
     
