@@ -144,7 +144,7 @@ contract ("HTLC for ETH Deposit", ([issuer, investor, tester])=>{
                     const attackContractBalance = await web3.eth.getBalance(reEntrancy.address)
                     const attackContractBalanceIncreased = Number(attackContractBalance.toString()) > 0
                     attackContractBalanceIncreased.should.be.equal(true, "the contract balance was incremented")
-                    console.log(attackContractBalance.toString())
+                    
                 })
 
             })
