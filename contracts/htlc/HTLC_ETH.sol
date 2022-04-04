@@ -99,6 +99,24 @@ contract HTLC_ETH {
     }
 
 
+    /// @param _swapID is the order ID of the order to be refunded
+    /// @notice `block.timestamp ` > `expiration time`
+    /// @notice swapt state becomes `expired`
+
+
+    function refund(bytes32 _swapID) external {
+
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
+        require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
+        require(_orderSwap[_swapID]._funded == true, "this order was not funded");
+        OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
+        ERC20_TOKEN.transfer(_order._investor, _order._price);
+        _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
+        emit RefundedOrder(_order._investor, _swapID, _order._price, _order._expiration);
+
+    }
+
+
 
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
