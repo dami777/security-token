@@ -133,24 +133,31 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
             describe("reentrancy attack", ()=>{
 
-                let reEntrancyAttack
+                /*let reEntrancyAttack
 
                 beforeEach(async()=>{
                     reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
                 })
 
-                it("updates the balance of the contract after carrying out the attack", async()=>{
+                describe("successful attack", ()=>{
+
+                    it("updates the balance of the contract after carrying out the attack", async()=>{
                     
-                    const attackContractBalance = await web3.eth.getBalance(reEntrancy.address)
-                    const attackContractBalanceIncreased = Number(attackContractBalance.toString()) > 0
-                    attackContractBalanceIncreased.should.be.equal(true, "the contract balance was incremented")
-                    console.log(attackContractBalance.toString())
+                        const attackContractBalance = await web3.eth.getBalance(reEntrancy.address)
+                        const attackContractBalanceIncreased = Number(attackContractBalance.toString()) > 0
+                        attackContractBalanceIncreased.should.be.equal(true, "the contract balance was incremented")
+                        
+                    })
+                })*/
+
+                describe("failed attack", ()=>{
+
+                    it("fails to execute re-entrancy attack", async()=>{
+                        await reEntrancy.attack(orderID, secretBytes32).should.be.rejected
+                    })
                 })
 
-                it("tests", async()=>{
-                    c = await reEntrancy.re()
-                    console.log(c.toString())
-                })
+
 
             })
 

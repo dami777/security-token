@@ -82,7 +82,7 @@ contract HTLC_ETH {
     /// @notice the order must not be an expired order
     /// @notice the hash of the secretKey must equal the hash in the order
 
-    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
+    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external noReEntrancy {
 
         //require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
