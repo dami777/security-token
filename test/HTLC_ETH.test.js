@@ -139,7 +139,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
                 })
 
-                it("updates the balance of the contract carry out the attack", async()=>{
+                it("updates the balance of the contract after carrying out the attack", async()=>{
                     
                     const attackContractBalance = await web3.eth.getBalance(reEntrancy.address)
                     const attackContractBalanceIncreased = Number(attackContractBalance.toString()) > 0
