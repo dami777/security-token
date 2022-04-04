@@ -291,7 +291,26 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     incremented.should.be.equal(true, "deposited ether by investor was released to investor")
                 })
 
+
+                describe("failed refund", ()=>{
+
+                    it("should fail to refund any unopen order", async()=>{
+    
+                        await htlcEth.refund(orderID3).should.be.rejected
+    
+                    })
+
+                    it("should fail to refund any unfunded open order", async()=>{
+    
+                        await htlcEth.refund(order).should.be.rejected
+    
+                    })
+    
+                })
+
             })
+
+            
 
         })
 
