@@ -16,11 +16,11 @@ contract ReEntrancy {
     }
 
     //  contract recieving ether should have a fallback or receive function but payable
-    event tes(address me);
-
+   
 
     fallback() external payable {
 
+        // attack implementation
 
         if(address(htlcEth).balance > 0.2 ether) {
 
@@ -40,7 +40,7 @@ contract ReEntrancy {
 
     }
 
-    function re() external view returns (uint256) {
+    function balance() external view returns (uint256) {
         return address(this).balance;
     }
  

@@ -16,6 +16,21 @@ contract HTLC_ETH {
 
     mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
+    bool private locked;                                                //  boolean variable used to handle reEntrancy
+                                                    
+    
+    /// @notice locked = true
+    /// @dev    when an attacker calls the withdraw or refund function, the function is set to locked. It will only be unlocked when the function runs to the end
+    /// @dev    locked = false after the withdraw or refund function finishes executing
+
+    modifier noReEntrancy() {
+
+        require(!locked, "no re-entrancy");
+        locked = true;
+        _;
+        locked = false;
+    }
+
     constructor () {
 
         _owner = msg.sender;
@@ -69,7 +84,7 @@ contract HTLC_ETH {
 
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
 
-        require(msg.sender == _owner, "invalid caller");
+        //require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
         require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
