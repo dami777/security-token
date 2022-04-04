@@ -262,16 +262,19 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
             beforeEach(async()=>{
 
                 await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretBytes32, classA)
-                await htlcEth.fundOrder(orderID3, {from: investor, value: price})
-                balanceBeforeRefund = await web3.eth.getBalance(investor)
+               
 
             })
 
             describe("successful refund", ()=>{
 
+
                 beforeEach(async()=>{
-                    
+
+                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
+                    balanceBeforeRefund = await web3.eth.getBalance(investor)
                     refund = await htlcEth.refund(orderID3, {from: investor})
+
                 })
 
                 it("should declare the order as expired", async()=>{
@@ -292,20 +295,22 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 })
 
 
-                describe("failed refund", ()=>{
+              
 
-                    it("should fail to refund any unopen order", async()=>{
-    
-                        await htlcEth.refund(orderID3).should.be.rejected
-    
-                    })
+            })
 
-                    it("should fail to refund any unfunded / unexpired open order", async()=>{
-    
-                        await htlcEth.refund(orderID).should.be.rejected
-    
-                    })
-    
+            describe("failed refund", ()=>{
+
+                it("should fail to refund any unfunded order", async()=>{
+
+                    await htlcEth.refund(orderID3).should.be.rejected
+
+                })
+
+                it("should fail to refund any unexpired open order", async()=>{
+
+                    await htlcEth.refund(orderID).should.be.rejected
+
                 })
 
             })
