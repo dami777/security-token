@@ -3,6 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers");
+const { before } = require("lodash");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
@@ -46,15 +47,18 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
         let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secretBytes32)
         let secretHash = ethers.utils.sha256(dataHex1)
         let orderID = web3.utils.asciiToHex("x23dvsdgd")
+        let orderID2 = web3.utils.asciiToHex("x23dvsdgdu")
         let expiration = new Date(moment().add(1, 'days').unix()).getTime()     // expiration will be present time + 1 day
         let classA = web3.utils.asciiToHex("CLASS A")
         let price = ether(0.2)                                                // price of the asset
         let amount = tokens(10)
         let order
+        let order2
         
         
         beforeEach(async()=>{
             order = await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA)
+            order2 = await htlcEth.openOrder(orderID2, investor, price, amount, expiration, secretHash, secretBytes32, classA)
         })
 
         describe("opening order", ()=>{
@@ -102,14 +106,13 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
             })
 
             describe("failed funding", ()=>{
-
+                
                 it("should fail to fund if attempted again by the investor", async()=>{
                     await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
                 })
 
                 it("should fail to fund if attempted by the wrong investor", async()=>{
-                    let orderID2 = web3.utils.asciiToHex("x23dvsdgdu")
-                    await htlcEth.openOrder(orderID2, investor, price, amount, expiration, secretHash, secretBytes32, classA)
+                    
                     await htlcEth.fundOrder(orderID2, {from: investor2, value: price}).should.be.rejected
                 })
 
@@ -152,6 +155,14 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("fails to withdraw if the order has been closed", async()=>{
                         await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer}).should.be.rejected
+                    })
+
+                    it("fails to release payment if withdrawal is attempted by the wrong recipient", async()=>{
+                        await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:investor}).should.be.rejected
+                    })
+
+                    it("fails to withdraw from an order that has not been funded by the investor", async()=>{
+                        await htlcEth.issuerWithdrawal(orderID2, secretBytes32, {from:issuer}).should.be.rejected
                     })
 
                 })
