@@ -5,6 +5,7 @@ require("chai")
 const { ethers } = require("ethers");
 const { before } = require("lodash");
 const moment = require("moment");
+const { describe } = require("yargs");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
@@ -63,9 +64,23 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
         describe("opening order", ()=>{
 
-            it("emits the open order event", ()=>{
-                order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+            describe("successful opened order", ()=>{
+
+                it("emits the open order event", ()=>{
+                    order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                })
+
             })
+
+            describe("failed opened order", ()=>{
+
+                it("fails to reopen an opened order", async()=>{
+
+                    await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA).should.be.rejected
+                })
+            })
+
+            
     
         })
 
@@ -163,6 +178,20 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("fails to withdraw from an order that has not been funded by the investor", async()=>{
                         await htlcEth.issuerWithdrawal(orderID2, secretBytes32, {from:issuer}).should.be.rejected
+                    })
+
+                })
+
+                describe("failed activities on withdrawn orders", ()=>{
+
+                    it("fails to open a closed order", async()=>{
+                        await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretBytes32, classA).should.be.rejected
+                    })
+
+                    it("fails to fund an order that has been closed", async()=>{
+
+                        await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
+
                     })
 
                 })
