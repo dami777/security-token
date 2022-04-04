@@ -256,11 +256,14 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
             let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
             let expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
             let refund
+            let balanceBeforeRefund
+            let balanceAfterRefund
 
             beforeEach(async()=>{
 
                 await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretBytes32, classA)
                 await htlcEth.fundOrder(orderID3, {from: investor, value: price})
+                balanceBeforeRefund = await web3.eth.getBalance(investor)
 
             })
 
@@ -280,6 +283,12 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 it("should emit the RefundedOrder event", ()=>{
                     refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refunded order event after refund")
+                })
+
+                it("should increment the investor's balance after refund", async()=>{
+                    balanceAfterRefund = await web3.eth.getBalance(investor)
+                    incremented = Number(balanceAfterRefund.toString()) > Number(balanceBeforeRefund.toString())
+                    incremented.should.be.equal(true, "deposited ether by investor was released to investor")
                 })
 
             })
