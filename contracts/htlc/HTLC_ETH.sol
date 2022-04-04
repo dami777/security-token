@@ -85,7 +85,7 @@ contract HTLC_ETH {
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external noReEntrancy {
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
+        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "must be an opened order");
         require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
