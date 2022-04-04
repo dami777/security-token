@@ -4,6 +4,7 @@ require("chai")
 
 const { ethers } = require("ethers");
 const moment = require("moment");
+const { describe } = require("yargs");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
@@ -137,6 +138,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 let withdrawal
                 let checkOrder
                 let issuerEthBalanceBeforeWithDrawal
+                
 
                 beforeEach(async()=>{
                     issuerEthBalanceBeforeWithDrawal = await web3.eth.getBalance(issuer)
@@ -189,6 +191,23 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     it("fails to fund an order that has been closed", async()=>{
 
                         await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
+
+                    })
+
+                })
+
+                describe("updated order status", ()=>{
+
+                    let checkOrder
+                    beforeEach(async()=>{
+
+                        checkOrder = await htlcEth.checkOrder(orderID)
+
+                    })
+
+                    it("should make the secret public", ()=>{
+
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "issuer made the secret public after withdrawl")   
 
                     })
 
