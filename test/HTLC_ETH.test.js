@@ -128,21 +128,31 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     checkOrder = await htlcEth.checkOrder(orderID)
                 })
 
-                
+                describe("successful withdrawal", ()=>{
 
-                it("closes the order", ()=>{
-                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
-                    checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                    it("closes the order", ()=>{
+                        withdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                        checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                    })
+    
+                    it("releases the ether to the issuer", async()=>{
+                        const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
+                        const issuerEthBalanceAfterWithdrawal = await web3.eth.getBalance(issuer)
+    
+                        htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
+                        issuerBalanceIncreased = Number(issuerEthBalanceAfterWithdrawal.toString()) > Number(issuerEthBalanceBeforeWithDrawal.toString())
+                        issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
+    
+    
+                    })
+
                 })
 
-                it("releases the ether to the issuer", async()=>{
-                    const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
-                    const issuerEthBalanceAfterWithdrawal = await web3.eth.getBalance(issuer)
+                describe("failed withdrawal", ()=>{
 
-                    htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
-                    issuerBalanceIncreased = Number(issuerEthBalanceAfterWithdrawal.toString()) > Number(issuerEthBalanceBeforeWithDrawal.toString())
-                    issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
-
+                    it("fails to withdraw if the order has been closed", async()=>{
+                        await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer}).should.be.rejected
+                    })
 
                 })
 
