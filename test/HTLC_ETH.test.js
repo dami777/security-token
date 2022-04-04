@@ -312,8 +312,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     await htlcEth.refund(orderID).should.be.rejected
 
                 })
-
             })
+
+            /// continue by adding checking for rentrancy during refund
 
             
 
