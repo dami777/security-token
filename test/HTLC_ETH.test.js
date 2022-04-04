@@ -4,13 +4,12 @@ require("chai")
 
 const { ethers } = require("ethers");
 const moment = require("moment");
-const { describe } = require("yargs");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
 
 
-contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, investor, investor2])=>{
+contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, exhautedAccount3, investor, investor2])=>{
 
     let htlcEth
     let reEntrancy
@@ -178,6 +177,13 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("fails to withdraw from an order that has not been funded by the investor", async()=>{
                         await htlcEth.issuerWithdrawal(orderID2, secretBytes32, {from:issuer}).should.be.rejected
+                    })
+
+                    it("should fail if withrawal is attempted with the wrong secret", async()=>{
+
+                        const wrongSecret = web3.utils.asciiToHex("ava")
+                        await htlcEth.fundOrder(orderID2, {from: investor, value: price})
+                        await htlcEth.issuerWithdrawal(orderID2, wrongSecret, {from:issuer}).should.be.rejected
                     })
 
                 })
