@@ -67,7 +67,7 @@ contract HTLC_ETH {
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
-        //require(_orderSwap[_swapID]._price == msg.value, "invalid amount");
+        require(_orderSwap[_swapID]._price == msg.value, "invalid amount");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
@@ -84,7 +84,7 @@ contract HTLC_ETH {
 
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external noReEntrancy {
 
-        //require(msg.sender == _owner, "invalid caller");
+        require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
         require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];

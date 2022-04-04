@@ -9,7 +9,7 @@ const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ReEntrancy = artifacts.require("./ReEntrancy")
 
 
-contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, investor, tester])=>{
+contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, investor, investor2])=>{
 
     let htlcEth
     let reEntrancy
@@ -70,7 +70,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
             let fund 
 
             beforeEach(async()=>{
-                fund = await htlcEth.fundOrder(orderID, {from: investor, value: ether(1)})
+                fund = await htlcEth.fundOrder(orderID, {from: investor, value: price})
             })
 
             describe("contract ether balance", ()=>{
@@ -78,7 +78,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 it("should increase the ether balance of the contract", async()=>{
                     
                     const ethBalance = await web3.eth.getBalance(htlcEth.address)
-                    //ethBalance.toString().should.be.equal(price.toString(), "ether was successfully deposited")
+                    ethBalance.toString().should.be.equal(price.toString(), "ether was successfully deposited")
      
                 })
 
@@ -101,7 +101,22 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 })
             })
 
-            /*describe("issuer withdrawal", ()=>{
+            describe("failed funding", ()=>{
+
+                it("should fail to fund if attempted again by the investor", async()=>{
+                    await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
+                })
+
+                it("should fail to fund if attempted by the wrong investor", async()=>{
+                    let orderID2 = web3.utils.asciiToHex("x23dvsdgdu")
+                    await htlcEth.openOrder(orderID2, investor, price, amount, expiration, secretHash, secretBytes32, classA)
+                    await htlcEth.fundOrder(orderID2, {from: investor2, value: price}).should.be.rejected
+                })
+
+
+            })
+
+            describe("issuer withdrawal", ()=>{
 
                 let withdrawal
                 let checkOrder
@@ -112,6 +127,8 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     withdrawal = await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer})
                     checkOrder = await htlcEth.checkOrder(orderID)
                 })
+
+                
 
                 it("closes the order", ()=>{
                     withdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
@@ -129,11 +146,11 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 })
 
-            })*/
+            })
 
-            describe("reentrancy attack", ()=>{
+            /*describe("reentrancy attack", ()=>{
 
-                /*let reEntrancyAttack
+                let reEntrancyAttack
 
                 beforeEach(async()=>{
                     reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
@@ -148,7 +165,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                         attackContractBalanceIncreased.should.be.equal(true, "the contract balance was incremented")
                         
                     })
-                })*/
+                })
 
                 describe("failed attack", ()=>{
 
@@ -157,9 +174,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     })
                 })
 
-
-
-            })
+            })*/
 
         })
 
