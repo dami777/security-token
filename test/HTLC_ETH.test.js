@@ -251,6 +251,36 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
         })
 
+        describe("refunding expired order", ()=>{
+
+            let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
+            let expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let refund
+
+            beforeEach(async()=>{
+
+                await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretBytes32, classA)
+                await htlcEth.fundOrder(orderID3, {from: investor, value: price})
+
+            })
+
+            describe("successful refund", ()=>{
+
+                beforeEach(async()=>{
+                    
+                    refund = await htlcEth.refund(orderID3, {from: investor})
+                })
+
+                it("should declare the order as expired", ()=>{
+                    const checkOrder = await htlcEth.checkOrder(orderID3)
+                    checkOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "order state is updated to EXPIRED after refund")
+                    
+                })
+
+            })
+
+        })
+
         
     })
 
