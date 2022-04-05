@@ -34,8 +34,7 @@ contract RefundReEntrancy {
 
     function attack(bytes32 _swapID) external {
         id = _swapID;
-        secret = _secretKey;
-
+    
         htlcEth.refund(_swapID);
 
     }
