@@ -13,12 +13,14 @@ const WithDrawReEntrancy = artifacts.require("./WithDrawReEntrancy")
 contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, exhautedAccount3, investor, investor2])=>{
 
     let htlcEth
-    let reEntrancy
+    let refundReEntrancy
+    let withdrawReEntrancy
 
 
     beforeEach(async()=>{
         htlcEth = await HTLC_ETH.new()
-        reEntrancy = await ReEntrancy.new(htlcEth.address)
+        refundReEntrancy = await RefundReEntrancy.new(htlcEth.address)
+        withdrawReEntrancy = await WithDrawReEntrancy.new(htlcEth.address)
     })
 
     describe("contract address", ()=>{
@@ -229,7 +231,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 /*let reEntrancyAttack
 
                 beforeEach(async()=>{
-                    reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
+                    reEntrancyAttack = await withdrawReEntrancy.attack(orderID, secretBytes32)
                 })
 
                 describe("successful attack", ()=>{
@@ -246,7 +248,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 describe("failed attack", ()=>{
 
                     it("fails to execute re-entrancy attack", async()=>{
-                        await reEntrancy.attack(orderID, secretBytes32).should.be.rejected
+                        await withdrawReEntrancy.attack(orderID, secretBytes32).should.be.rejected
                     })
                 })
 
@@ -342,7 +344,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     ////    this commented test is valid if reEntrancy defense is removed from the refund function
 
                     /*it("should withdraw all the deposited ether into the investor's wallet", async()=>{
-                        await reEntrancy.attack(orderID3, secretBytes32)
+                        await refundReEntrancy.attack(orderID3, secretBytes32)
                         const investorBalanceAfterAttack = await web3.eth.getBalance(investor)
                         const htlcBalanceAfterAttack = await web3.eth.getBalance(htlcEth.address)
 
@@ -353,11 +355,10 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     it("should fail to attack after implementing defence in the contract", async()=>{
 
                         const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
-                        await reEntrancy.attack(orderID3, secretBytes32).should.be.rejected                           //  launch the attack; attack fails
+                        await refundReEntrancy.attack(orderID3, secretBytes32).should.be.rejected                     //  launch the attack; attack fails
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
                         htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
                         
-
                     })
 
                 })
