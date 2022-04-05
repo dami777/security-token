@@ -248,8 +248,14 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 describe("failed attack", ()=>{
 
+                    beforeEach(async()=>{
+                        await htlcEth.fundOrder(orderID2, {from: investor, value: price})
+                    })
+
                     it("fails to execute re-entrancy attack", async()=>{
                         await withdrawReEntrancy.attack(orderID, secretBytes32).should.be.rejected
+                        const balanceAfterFailedAttack = await withdrawReEntrancy.balance()
+                        balanceAfterFailedAttack.toString().should.be.equal("0", "could not withdraw any ether")
                     })
                 })
 
