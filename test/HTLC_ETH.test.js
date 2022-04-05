@@ -6,7 +6,8 @@ const { ethers } = require("ethers");
 const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
-const ReEntrancy = artifacts.require("./ReEntrancy")
+const RefundReEntrancy = artifacts.require("./RefundReEntrancy")
+const WithDrawReEntrancy = artifacts.require("./WithDrawReEntrancy")
 
 
 contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, exhautedAccount3, investor, investor2])=>{
