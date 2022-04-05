@@ -104,7 +104,7 @@ contract HTLC_ETH {
     /// @notice swapt state becomes `expired`
 
 
-    function refund(bytes32 _swapID) external {
+    function refund(bytes32 _swapID) external noReEntrancy {
 
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
         require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
