@@ -27,7 +27,8 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
         it("should have a contract address", ()=>{
             htlcEth.address.should.not.be.equal("", "it has a contract address")
-            reEntrancy.address.should.not.be.equal("", "it has a contract address")
+            refundReEntrancy.address.should.not.be.equal("", "it has a contract address")
+            withdrawReEntrancy.address.should.not.be.equal("", "it has a contract address")
         })
 
     })
