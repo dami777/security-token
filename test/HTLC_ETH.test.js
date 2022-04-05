@@ -82,7 +82,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
     
         })
 
-        /*describe("funding order", ()=>{
+        describe("funding order", ()=>{
 
             let fund 
 
@@ -219,11 +219,13 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 })
 
-            })*/
+            })
 
-            /*describe("reentrancy attack", ()=>{
+            describe("reentrancy attack", ()=>{
 
-                let reEntrancyAttack
+                /// this commented test case is only valid is reEntrancy defence is removed from the withdraw function
+
+                /*let reEntrancyAttack
 
                 beforeEach(async()=>{
                     reEntrancyAttack = await reEntrancy.attack(orderID, secretBytes32)
@@ -238,7 +240,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                         attackContractBalanceIncreased.should.be.equal(true, "the contract balance was incremented")
                         
                     })
-                })
+                })*/
 
                 describe("failed attack", ()=>{
 
@@ -247,9 +249,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     })
                 })
 
-            })*/
+            })
 
-        //})
+        })
 
         describe("refunding expired order", ()=>{
 
