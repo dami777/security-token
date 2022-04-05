@@ -346,10 +346,12 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                     })*/
 
                     it("should fail to attack after implementing defence in the contract", async()=>{
+
+                        htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)
                         await reEntrancy.attack(orderID3, secretBytes32).should.be.rejected
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)
-                        htlcBalanceAfterFailedAttack.toString().should.be.equal((price * 2).toString(), "the ether in the htlc contract remain intact")
-                        console.log(htlcBalanceAfterFailedAttack.toString())
+                        htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
+                        
 
                     })
 
