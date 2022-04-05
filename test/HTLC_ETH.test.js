@@ -82,7 +82,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
     
         })
 
-        describe("funding order", ()=>{
+        /*describe("funding order", ()=>{
 
             let fund 
 
@@ -219,7 +219,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 })
 
-            })
+            })*/
 
             /*describe("reentrancy attack", ()=>{
 
@@ -249,11 +249,12 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
             })*/
 
-        })
+        //})
 
         describe("refunding expired order", ()=>{
 
             let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
+            let orderID4 = web3.utils.asciiToHex("x23d33sdgdb")
             let expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
             let refund
             let balanceBeforeRefund
@@ -262,6 +263,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
             beforeEach(async()=>{
 
                 await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretBytes32, classA)
+                await htlcEth.openOrder(orderID4, investor, price, amount, expired, secretHash, secretBytes32, classA)
                
 
             })
@@ -314,7 +316,39 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                 })
             })
 
-            /// continue by adding checking for rentrancy during refund
+            describe("reEntrancy attack at refund", ()=>{
+
+                // investor funds the orders
+
+                beforeEach(async()=>{
+                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
+                    await htlcEth.fundOrder(orderID4, {from: investor, value: price})
+                })
+
+                describe("htlc ether balance", ()=>{
+
+                    it("returns the ether balance of the htlc", async()=>{
+                        const balance = await web3.eth.getBalance(htlcEth.address)
+                        balance.toString().should.be.equal((price * 2).toString(), "it returns the balanc of the htlc contract")
+                    })
+
+                })
+
+                describe("reEntrancy", ()=>{
+
+                    it("should withdraw all the deposited ether into the investor's wallet", async()=>{
+                        await reEntrancy.attack(orderID2)
+                        const investorBalanceAfterAttack = await web3.eth.getBalance(investor)
+                        const htlcBalanceAfterAttack = await web3.eth.getBalance(htlcEth.address)
+
+                        investorBalanceAfterAttack.toString().should.be.equal((price * 2).toString(), "it returns the balanc of the htlc contract")
+                        htlcBalanceAfterAttack.toString().should.be.equal("0", "investor withdrew all the ether from the htlc via reEntrancy")
+                    })
+
+                })
+
+            })
+
 
             
 
