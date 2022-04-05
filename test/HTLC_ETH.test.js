@@ -334,7 +334,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                 })
 
-                describe("reEntrancy", ()=>{
+                describe("reEntrancy during refund", ()=>{
+
+                    ////    this commented test is valid if reEntrancy defense is removed from the refund function
 
                     /*it("should withdraw all the deposited ether into the investor's wallet", async()=>{
                         await reEntrancy.attack(orderID3, secretBytes32)
@@ -347,9 +349,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("should fail to attack after implementing defence in the contract", async()=>{
 
-                        htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)
-                        await reEntrancy.attack(orderID3, secretBytes32).should.be.rejected
-                        const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)
+                        const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
+                        await reEntrancy.attack(orderID3, secretBytes32).should.be.rejected                           //  launch the attack; attack fails
+                        const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
                         htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
                         
 
