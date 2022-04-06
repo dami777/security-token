@@ -223,9 +223,9 @@ contract ERC1400 {
     //  Default Partitions
 
 
-    /*function setDefaultPartitions(bytes32[] calldata defaultPartitions) external  {
-        _defaultPartitions = defaultPartitions;
-    }*/
+    function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+        _defaultPartitions = newDefaultPartitions;
+    }
      
     // *********************    DOCUMENT MANAGEMENT  ---------- ERC 1643
 
@@ -629,7 +629,9 @@ contract ERC1400 {
        return _totalPartitions;
     }
 
-    
+    function setTotalPartitions(bytes32[] memory _newTotalPartitions) external () {
+        _totalPartitions = _newTotalPartitions;
+    }
 
 
 }
