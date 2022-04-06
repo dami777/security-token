@@ -28,7 +28,7 @@ library Certificate {
         address verifyingContract;
         string version;
         string companyName;
-        uint256 chainiID;
+        uint256 chainID;
         bytes32 salt;
 
     }
