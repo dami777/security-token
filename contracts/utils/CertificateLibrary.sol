@@ -32,11 +32,6 @@ library Certificate {
         bytes32 salt;
 
     }
-
-    
-
-    
-    
    
     /// @notice this function generates hashes the domain separator for the signature
     /// @dev Enclose the strings in bytes during encoding
