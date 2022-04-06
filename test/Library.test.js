@@ -41,11 +41,11 @@ contract("Library Test", ([account1])=>{
         })
 
         it("returns struct data", async()=>{
-            const data = await lib.testStruct(signature)
+            const data = await callLib.testStruc(me)
             console.log(data)
         })
 
-        it("returns signer", async()=>{
+        /*it("returns signer", async()=>{
             const add = await lib.verifySignature(signature, ethHash)
             console.log(add)
         })
@@ -58,7 +58,7 @@ contract("Library Test", ([account1])=>{
         it("decodes data", async()=>{
             const d = await lib.decodeData(data)
             console.log(d)
-        })
+        })*/
     })
 
 })

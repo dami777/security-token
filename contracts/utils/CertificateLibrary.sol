@@ -50,7 +50,7 @@ library Certificate {
     }
 
 
-    function hashHolder(Holder memory _holder) public pure returns (bytes32) {
+    function hashHolder(Holder memory _holder) internal pure returns (bytes32) {
 
         bytes32 HOLDER_TYPED_HASH = keccak256("Holder(string firstName,string lastName,string location,address walletAddress)");
         return keccak256(abi.encode(HOLDER_TYPED_HASH, keccak256(bytes(_holder.firstName)),  keccak256(bytes(_holder.lastName)), keccak256(bytes(_holder.location)), _holder.walletAddress));
