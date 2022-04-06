@@ -62,17 +62,23 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         beforeEach(async()=>{
 
+            // issuer classA and classB to investor1
             await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
             await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
             
-            await erc1400.issueByPartition(classB, investor1, 5, web3.utils.toHex(""))
+            // issue classB to investor2
+            await erc1400.issueByPartition(classB, investor2, 5, web3.utils.toHex(""))
 
+        })
 
+        it("outputs the partitions being held by an investor", async()=>{
+            const partitionsOfinvestor1 = await erc1400.partitionsOf(investor1)
+            console.log(partitionsOfinvestor1)
         })
 
     })
 
-    describe ("issuance of token by partition", ()=>{
+    /*describe ("issuance of token by partition", ()=>{
 
         let issueClassA
 
@@ -232,7 +238,7 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         })
 
-        /*describe("authorize operator for a specific partition", ()=>{
+        describe("authorize operator for a specific partition", ()=>{
 
             let authorizeForPartition
             
@@ -340,7 +346,7 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
             
 
-        })*/
+        })
 
     })
 
@@ -630,7 +636,7 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         })
 
-    })
+    })*/
 
     
 

@@ -625,9 +625,11 @@ contract ERC1400 {
 
    //function to return partitioned token balance
 
-    function totalPartitions () external view returns (bytes32[] memory) {
+    function totalPartitions() external view returns (bytes32[] memory) {
        return _totalPartitions;
     }
+
+    
 
 
 }
