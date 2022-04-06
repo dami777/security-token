@@ -49,7 +49,7 @@ library Certificate {
             EIP712_DOMAIN_HASH_TYPE,
             keccak256(bytes(_domainData.companyName)),
             keccak256(bytes(_domainData.version)),
-            _domainData.chainId,
+            _domainData.chainID,
             _domainData.verifyingContract,
             _domainData.salt
         ));
