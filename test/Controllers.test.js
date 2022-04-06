@@ -1,6 +1,7 @@
-const { red } = require("bn.js")
 
+const Certificate = artifacts.require("./Certificate")
 const ERC1400 = artifacts.require('./ERC1400')
+
 const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const tokens=(n)=>{
@@ -32,6 +33,8 @@ contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, con
 
 
     beforeEach( async()=>{
+        
+        cert = await Certificate.new()
         token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
     })
     

@@ -1,7 +1,7 @@
 pragma solidity 0.8.10;
 
 
-contract Certificate {
+contract Certificatee {
 
 
     struct Holder {

@@ -13,6 +13,7 @@ contract ERC1400 {
 
     //Certificate certificate;
 
+
      // *************************************** Strings ********************************************************* //
 
     string public name;   // token name

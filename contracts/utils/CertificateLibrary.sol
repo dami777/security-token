@@ -65,7 +65,7 @@ library Certificate {
     /// @dev    the hashHolder function hashes the _from and _to separately as they are different Holders entirely
     /// @return the prefixed hash
 
-    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) public pure returns (bytes32) {
+    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) external pure returns (bytes32) {
         
         bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
         return keccak256(
