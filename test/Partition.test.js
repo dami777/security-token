@@ -74,7 +74,10 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         it("outputs the partitions being held by an investor", async()=>{
             const partitionsOfinvestor1 = await erc1400.partitionsOf(investor1)
-            console.log(partitionsOfinvestor1)
+            partitionsOfinvestor1.length.toString.should.be.equal("2", "it returns the partitions in the investor's wallet")
+
+            const partitionsOfinvestor2 = await erc1400.partitionsOf(investor2)
+            partitionsOfinvestor2.length.toString.should.be.equal("1", "it returns the partitions in the investor's wallet")
         })
 
     })
