@@ -2,16 +2,16 @@
 pragma solidity 0.8.10;
 
 import "./utils/Certificate.sol";
-import "./utils/CertificateLibrary.sol";
+//import "./utils/CertificateLibrary.sol";
 
 
-contract ERC1400 is Certificate{
+contract ERC1400 {
 
 
     /************************************************ Variable Declarations and Initaalizations ************************************/
 
 
-    Certificate certificate;
+    //Certificate certificate;
 
      // *************************************** Strings ********************************************************* //
 
@@ -210,7 +210,7 @@ contract ERC1400 is Certificate{
     function _verifySigner(bytes memory _data) internal view returns (bool) {
         (bytes memory _signature, bytes32 _signatureHash, bool _fromIsWhiteListedOrIssuer, bool _toIsWhiteListed) = decodeData(_data);
         require(_fromIsWhiteListedOrIssuer && _toIsWhiteListed, "0x5b");    // require that the from and to accounts are whitelisted
-        address _signer = verifySignature(_signature, _signatureHash);
+        address _signer = Certificate.verifySignature(_signature, _signatureHash);
         require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
         return true;
     }
