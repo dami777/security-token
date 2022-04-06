@@ -629,7 +629,7 @@ contract ERC1400 {
        return _totalPartitions;
     }
 
-    function setTotalPartitions(bytes32[] memory _newTotalPartitions) external () {
+    function setTotalPartitions(bytes32[] memory _newTotalPartitions) external {
         _totalPartitions = _newTotalPartitions;
     }
 

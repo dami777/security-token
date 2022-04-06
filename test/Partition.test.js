@@ -32,6 +32,7 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
         
     beforeEach( async()=>{
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
+        await erc1400.setTotalPartitions([classA, classB])
     })
 
     describe("contract deployment", ()=>{
