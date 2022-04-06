@@ -35,13 +35,13 @@ library Certificate {
     /// @param chainId The chain Id where the data will be signed
     /// @param salt An hardcoded byte32. One of the security measures for the signature
 
-    function generateDomainSepartor (address verifyingContract, string memory version, uint256 chainId, bytes32 salt) internal pure returns (bytes32) {
+    function generateDomainSepartor (address verifyingContract, string memory version, string memory companyName, uint256 chainId, bytes32 salt) internal pure returns (bytes32) {
 
         bytes32 EIP712_DOMAIN_HASH_TYPE = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)");
 
         return keccak256(abi.encode(
             EIP712_DOMAIN_HASH_TYPE,
-            keccak256(bytes("TANGL CAPITAL PARTNERS")),
+            keccak256(bytes(companyName)),
             keccak256(bytes(version)),
             chainId,
             verifyingContract,
@@ -65,13 +65,14 @@ library Certificate {
     /// @dev    the hashHolder function hashes the _from and _to separately as they are different Holders entirely
     /// @return the prefixed hash
 
-    function hashTransfer(Holder memory _from, Holder memory _to, uint256 _amount) external view returns (bytes32) {
+    function hashTransfer(address verifyingContract, string memory version, string memory companyName, uint256 chainId, bytes32 salt, Holder memory _from, Holder memory _to, uint256 _amount) external view returns (bytes32) {
         
         bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
+        
         return keccak256(
             abi.encodePacked(
             "\x19\x01", 
-                generateDomainSepartor(0x549f71200b5Ee3F3C04EF5A29e7c70d40E42ed83, "1", 1337, 0x54132a91a1bafcf3d90beaad0c0d5f0bda635715da5017e515739dbb823f282d),
+                generateDomainSepartor(verifyingContract, version, companyName, chainId, salt),
                 keccak256(abi.encode(
                     TRANSFER_TYPED_HASH,
                     hashHolder(_from),
