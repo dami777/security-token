@@ -23,6 +23,16 @@ library Certificate {
 
     }
 
+    struct DomainData {
+
+        address verifyingContract;
+        string version;
+        string companyName;
+        uint256 chainiID;
+        bytes32 salt;
+        
+    }
+
     
 
     
