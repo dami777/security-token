@@ -35,11 +35,7 @@ library Certificate {
    
     /// @notice this function generates hashes the domain separator for the signature
     /// @dev Enclose the strings in bytes during encoding
-    /// @param verifyingContract The contract that will be used to verify the signatue
-    /// @param version The version of the Dapp
-    /// @param chainId The chain Id where the data will be signed
-    /// @param salt An hardcoded byte32. One of the security measures for the signature
-
+    
 
     function generateDomainSepartor(DomainData memory _domainData) internal pure returns (bytes32) {
 
@@ -68,9 +64,7 @@ library Certificate {
     /// @notice this function generates the signed signature prefixed with \x19\x01. The result will be used to verify the signer
     /// @param  _from The struct of the account to be debited
     /// @param  _to The struct of the account to be credited
-    /// @dev    the hashHolder function hashes the _from and _to separately as they are different Holders entirely
-    /// @return the prefixed hash
-
+   
 
     function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount) external view returns (bytes32) {
         
