@@ -269,10 +269,10 @@ contract ERC1400 {
 
     function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
-        bytes32[] _partitions = new bytes32[](_totalPartitions.length);
+        bytes32[] memory _partitions = new bytes32[](_totalPartitions.length);
         for (uint256 index = 0; index < _totalPartitions.length; index++) {
             if (_balanceOfByPartition[_tokenHolder][_totalPartitions[index]] > 0) {
-                _partitions[index] = [_totalPartitions[index];
+                _partitions[index] = _totalPartitions[index];
             }
         }
 
