@@ -6,7 +6,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-contract("Certificate Data Test", ()=>{
+contract("Certificate Data Test", ([issuer])=>{
 
     let generateSig
 
@@ -20,7 +20,7 @@ contract("Certificate Data Test", ()=>{
 
         it("has a contract address", async()=>{
             generateSig.address.should.not.be.equal("", "it has a contract address")
-            //console.log(generateSig.address)
+            
         })
 
     })
@@ -44,11 +44,10 @@ contract("Certificate Data Test", ()=>{
         }
 
         let domainData = {
-
-            verifyingContract: address,
-            version: "1",
             name: "Tangle Capital Partners",
-            chainID: 1337,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: address,
             salt: "0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
 
         }
@@ -132,12 +131,12 @@ contract("Certificate Data Test", ()=>{
 
         it("generate signature", async()=>{
             const digest = TypedDataUtils.encodeDigest(typedData)
-            //const digestHex = ethers.utils.hexlify(digest)
+            const digestHex = ethers.utils.hexlify(digest)
             
-            //const wallet = ethers.Wallet.createRandom()
-            //const signature = wallet.signMessage(digest)
-
-            console.log(digest)
+            const wallet = new ethers.Wallet("177cd11440560b48c69ee286cea70bc6a5baa6ece8ef317efb739dafc25b6d53")        // get the address using private key
+            const signature = wallet.signMessage(digest)
+            console.log(signature)
+           
         })
 
     })

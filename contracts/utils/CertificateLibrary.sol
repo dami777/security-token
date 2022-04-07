@@ -28,7 +28,7 @@ library Certificate {
         address verifyingContract;
         string version;
         string name;
-        uint256 chainID;
+        uint256 chainId;
         bytes32 salt;
 
     }
@@ -45,7 +45,7 @@ library Certificate {
             EIP712_DOMAIN_HASH_TYPE,
             keccak256(bytes(_domainData.name)),
             keccak256(bytes(_domainData.version)),
-            _domainData.chainID,
+            _domainData.chainId,
             _domainData.verifyingContract,
             _domainData.salt
         ));
