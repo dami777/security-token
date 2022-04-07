@@ -1,6 +1,5 @@
 
 const ERC1400 = artifacts.require("./ERC1400")
-//const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 const { ETHER_ADDRESS } = require("./helper")
 
 require("chai")

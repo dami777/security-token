@@ -51,6 +51,67 @@ contract("Certificate Data Test", ()=>{
 
         }
 
+        let domain = [
+            {name: "name", type: "string"},
+            {name: "version", type: "string"},
+            {name: "chainId", type: "uint256"},
+            {name: "verifyingContract", type: "address"},
+            {name: "salt", type: "bytes32"}
+        ]
+        
+    
+    
+        let holder = [
+    
+            {name: "firstName", type: "string"},
+            {name: "lastName", type: "string"},
+            {name: "location", type: "string"},
+            {name: "walletAddress", type: "address"}
+        ]
+    
+        let transfer = [
+    
+            {name: "from", type: "Holder"},
+            {name: "to", type: "Holder"},
+            {name: "amount", type: "uint256"},
+    
+        ]
+        
+        
+    
+        let message = {
+            
+            from:  {
+                firstName: "Israel",
+                lastName: "Komolehin",
+                location: "University Of Ibadan, Nigeria",
+                walletAddress: "0x292072a24aa02b6b0248C9191d46175E11C86270"
+            },
+            
+            to: {
+                firstName: "Tommy",
+                lastName: "Shelby",
+                location: "Ireland",
+                walletAddress: "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+            },
+    
+            amount: 100
+        }
+    
+    
+        let data = JSON.stringify({
+            types : {
+                EIP712Domain: domain,
+                Transfer: transfer,
+                Holder: holder
+            },
+        
+            domain: domainData,
+            primaryType: "Transfer",
+            message: message
+        
+        })
+
 
         let prefixed
         let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
