@@ -1,4 +1,5 @@
 const GenerateSig = artifacts.require("./GenerateEthSignature")
+const CertLib = artifacts.require("./Certificate")
 const { ethers } = require('ethers')
 const { TypedDataUtils } = require('ethers-eip712')
 
@@ -9,10 +10,12 @@ require("chai")
 contract("Certificate Data Test", ([issuer])=>{
 
     let generateSig
+    let certLib
 
     beforeEach(async()=>{
 
-        generateSig = await GenerateSig.new()
+        generateSig = await GenerateSig.new()       // instantiate the deployed instance of the GenerateEthSignature Contract
+        certLib = await CertLib.new()               // instantiate the deployed instance of the Certificate Library
 
     })
 
@@ -115,8 +118,10 @@ contract("Certificate Data Test", ([issuer])=>{
 
 
         let prefixed
-        let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
-        let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+        let signature
+        let wallet
+        //let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
+        //let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
 
         /*const _signature = signature.substring(2)
         const r = "0x" + _signature.substring(0, 64)
@@ -125,18 +130,24 @@ contract("Certificate Data Test", ([issuer])=>{
 
 
         it("returns the prefixed signed hash", async()=>{
-            prefixed = await generateSig.generateEthSignature(domainData, from, to, 10)
+            prefixed = await generateSig.hashTransfer(domainData, from, to, 10)
             prefixed.should.not.be.equal("", "it returns a prefixed hash")
         })
 
         it("generate signature", async()=>{
+
             const digest = TypedDataUtils.encodeDigest(typedData)
             const digestHex = ethers.utils.hexlify(digest)
             
-            const wallet = new ethers.Wallet("177cd11440560b48c69ee286cea70bc6a5baa6ece8ef317efb739dafc25b6d53")        // get the address using private key
-            const signature = await wallet.signMessage(digest)
+            wallet = new ethers.Wallet("177cd11440560b48c69ee286cea70bc6a5baa6ece8ef317efb739dafc25b6d53")        // get the address using private key
+            signature = await wallet.signMessage(digest)
             signature.should.not.be.equal("", "it returns the signature")
            
+        })
+
+        it("verifies the signer of the data", async()=>{
+            const returnedSigner = await certLib.verifySignature(signature, prefixed)
+            console.log(returnedSigner)
         })
 
     })
