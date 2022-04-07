@@ -116,17 +116,6 @@ library Certificate {
 
         (bytes32 r, bytes32 s, uint8 v) = _split(_signature);
 
-        require(_signature.length == 65, "0x5f"); // invalid signature length
-
-        assembly {
-
-            r := mload(add(_signature, 32))
-            s := mload(add(_signature, 64))
-            v := byte(0, mload(add(_signature, 96)))
-           
-
-        }
-
         require (ecrecover(_ethHash, v, r, s) != address(0), "0x59"); // invalid signer
         return ecrecover(_ethHash, v, r, s);
 
