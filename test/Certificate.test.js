@@ -1,4 +1,6 @@
 const GenerateSig = artifacts.require("./GenerateEthSignature")
+const { ethers } = require('ethers')
+const { TypedDataUtils } = require('ethers-eip712')
 
 require("chai")
     .use(require("chai-as-promised"))
@@ -45,7 +47,7 @@ contract("Certificate Data Test", ()=>{
 
             verifyingContract: address,
             version: "1",
-            companyName: "Tangle Capital Partners",
+            name: "Tangle Capital Partners",
             chainID: 1337,
             salt: "0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
 
@@ -80,7 +82,7 @@ contract("Certificate Data Test", ()=>{
         
     
         let message = {
-            
+
             from:  {
                 firstName: "Israel",
                 lastName: "Komolehin",
@@ -99,18 +101,18 @@ contract("Certificate Data Test", ()=>{
         }
     
     
-        let data = JSON.stringify({
+        let typedData = {
             types : {
                 EIP712Domain: domain,
                 Transfer: transfer,
                 Holder: holder
             },
-        
-            domain: domainData,
+
             primaryType: "Transfer",
+            domain: domainData,   
             message: message
         
-        })
+        }
 
 
         let prefixed
@@ -126,6 +128,16 @@ contract("Certificate Data Test", ()=>{
         it("returns the prefixed signed hash", async()=>{
             prefixed = await generateSig.generateEthSignature(domainData, from, to, 10)
             prefixed.should.not.be.equal("", "it returns a prefixed hash")
+        })
+
+        it("generate signature", async()=>{
+            const digest = TypedDataUtils.encodeDigest(typedData)
+            //const digestHex = ethers.utils.hexlify(digest)
+            
+            //const wallet = ethers.Wallet.createRandom()
+            //const signature = wallet.signMessage(digest)
+
+            console.log(digest)
         })
 
     })

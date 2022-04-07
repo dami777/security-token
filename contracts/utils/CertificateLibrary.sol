@@ -27,7 +27,7 @@ library Certificate {
 
         address verifyingContract;
         string version;
-        string companyName;
+        string name;
         uint256 chainID;
         bytes32 salt;
 
@@ -43,7 +43,7 @@ library Certificate {
 
         return keccak256(abi.encode(
             EIP712_DOMAIN_HASH_TYPE,
-            keccak256(bytes(_domainData.companyName)),
+            keccak256(bytes(_domainData.name)),
             keccak256(bytes(_domainData.version)),
             _domainData.chainID,
             _domainData.verifyingContract,
