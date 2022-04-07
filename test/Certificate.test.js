@@ -134,8 +134,8 @@ contract("Certificate Data Test", ([issuer])=>{
             const digestHex = ethers.utils.hexlify(digest)
             
             const wallet = new ethers.Wallet("177cd11440560b48c69ee286cea70bc6a5baa6ece8ef317efb739dafc25b6d53")        // get the address using private key
-            const signature = wallet.signMessage(digest)
-            console.log(signature)
+            const signature = await wallet.signMessage(digest)
+            signature.should.not.be.equal("", "it returns the signature")
            
         })
 
