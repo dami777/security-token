@@ -130,7 +130,7 @@ contract("Certificate Data Test", ([issuer])=>{
             const returnedEthersSigner = await certLib.verifySignature(signature, prefixed)
             const returnedMetaSigner = await certLib.verifySignature(sigFromMetaMask, prefixed)
 
-            returnedEtherSigner.should.be.equal(wallet.address, "it verifies the signer")
+            returnedEthersSigner.should.be.equal(wallet.address, "it verifies the signer")
             returnedMetaSigner.should.be.equal(address, "it verifies the signer")
         })
 
