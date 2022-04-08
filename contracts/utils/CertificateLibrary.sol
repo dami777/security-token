@@ -66,7 +66,7 @@ library Certificate {
     /// @param  _to The struct of the account to be credited
    
 
-    function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount) external view returns (bytes32) {
+    function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount) external pure returns (bytes32) {
         
         bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
         
