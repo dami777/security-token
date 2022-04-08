@@ -95,19 +95,6 @@ contract("Certificate Data Test", ([issuer])=>{
             Holder: holder
         }
     
-    
-        let typedData = {
-            types : {
-                EIP712Domain: domain,
-                TransferData: transfer,
-                Holder: holder
-            },
-
-            domain: domainData,  
-            primaryType: "TransferData",  
-            message: message
-        
-        }
 
 
         let prefixed
@@ -122,11 +109,11 @@ contract("Certificate Data Test", ([issuer])=>{
 
         it("generate signature", async()=>{
 
-           /* const digest = TypedDataUtils.encodeDigest(typedData)
+            /*const digest = TypedDataUtils.encodeDigest(typedData)
             const digestHex = ethers.utils.hexlify(digest)
             
             wallet = new ethers.Wallet("a9f4d42f169cdb7d9a1f6e3186a416db27fd7dfd03f4f4a282547892e0b72684")        // get the address using private key
-            signature = await wallet.signMessage(digestHex)
+            signature = await wallet.signMessage(digest)
             signature.should.not.be.equal("", "it returns the signature")*/
 
             wallet = new ethers.Wallet("a9f4d42f169cdb7d9a1f6e3186a416db27fd7dfd03f4f4a282547892e0b72684")        // get the address using private key
@@ -139,7 +126,7 @@ contract("Certificate Data Test", ([issuer])=>{
         it("verifies the signer of the data", async()=>{
     
             const returnedSigner = await certLib.verifySignature(signature, prefixed)
-            console.log(returnedSigner)
+            returnedSigner.should.be.equal(wallet.address, "it verifies the signer")
         })
 
     })
