@@ -30,7 +30,7 @@ contract("Certificate Data Test", ([issuer])=>{
 
     describe("Prefixed hash", ()=>{
 
-        const address = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+        let address = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
 
         let _from = {
             firstName: "Israel",
@@ -125,8 +125,13 @@ contract("Certificate Data Test", ([issuer])=>{
 
         it("verifies the signer of the data", async()=>{
     
-            const returnedSigner = await certLib.verifySignature(signature, prefixed)
-            returnedSigner.should.be.equal(wallet.address, "it verifies the signer")
+            const sigFromMetaMask = "0x112ec2161fb45d6c51ee3235b889a3d416e6c14236321bd1f133e0ec31454de176a313a7de9e939bd9f4370b3445e870dbbe46aa38859ed2a0111db79da97e061c"
+            
+            const returnedEthersSigner = await certLib.verifySignature(signature, prefixed)
+            const returnedMetaSigner = await certLib.verifySignature(sigFromMetaMask, prefixed)
+
+            returnedEtherSigner.should.be.equal(wallet.address, "it verifies the signer")
+            returnedMetaSigner.should.be.equal(address, "it verifies the signer")
         })
 
     })
