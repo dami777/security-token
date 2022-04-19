@@ -22,9 +22,9 @@ contract ERC1400 {
 
     // *************************************** Integers ********************************************************* //
 
-    uint256 public granularity;   // token granularity
-    uint256 public totalSupply; // token total supply
-    uint256 public decimals; //token decimals
+    uint256 public granularity;                     // token granularity
+    uint256 public totalSupply;                     // token total supply
+    uint256 public decimals;                        //token decimals
 
 
     // *************************************** Addresses ********************************************************* //
@@ -128,16 +128,24 @@ contract ERC1400 {
 
     // *************************************** Internal functions ********************************************************* //
 
-    // 1. internal funtion to transfer tokens from an address to another address
+    /// @dev    internal funtion to transfer tokens from an address to another address
+    /// @notice `0x57` revert message if receiver is address 0
+    /// @notice balance must be more or equal to the value to be transferred
+    /// @dev    this version of solidity handles the underflow and overflow error
+    /// @notice the emit of Transfer event
+    /// @param  _from is the address the token is sent from
+    /// @param  _to is the address the token is sent to
+    /// @param  _amount is the value of tokens to be sent
+
     
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
-        require(_to != address(0),  "0x57");        // invalid receiver
-        require(_balanceOf[_from] >= _amount, "0x52");      // insufficient amount
+        require(_to != address(0),  "0x57");        
+        require(_balanceOf[_from] >= _amount, "0x52");      
 
-        _balanceOf[_from] = _balanceOf[_from] - _amount;                  // reduce the sender's balance --> use safemath
-        _balanceOf[_to] = _balanceOf[_to] + _amount;                      // increase the value of the receiver ---> usesafemath
-        emit Transfer (_from, _to, _amount);                            // emit the Tranfer event
+        _balanceOf[_from] = _balanceOf[_from] - _amount;                  
+        _balanceOf[_to] = _balanceOf[_to] + _amount;                      
+        emit Transfer (_from, _to, _amount);                            
         return true;
      }
 
