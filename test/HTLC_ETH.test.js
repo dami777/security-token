@@ -341,7 +341,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("returns the ether balance of the htlc", async()=>{
                         const balance = await web3.eth.getBalance(htlcEth.address)
-                        balance.toString().should.be.equal((price * 2).toString(), "it returns the balanc of the htlc contract")
+                        balance.toString().should.be.equal((price * 2).toString(), "it returns the balance of the htlc contract")
                     })
 
                 })
