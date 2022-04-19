@@ -130,9 +130,10 @@ contract ERC1400 {
 
     /// @dev    internal funtion to transfer tokens from an address to another address
     /// @notice `0x57` revert message if receiver is address 0
+    /// @notice `0x52` insufficient balance
     /// @notice balance must be more or equal to the value to be transferred
     /// @dev    this version of solidity handles the underflow and overflow error
-    /// @notice the emit of Transfer event
+    /// @notice the emission of Transfer event
     /// @param  _from is the address the token is sent from
     /// @param  _to is the address the token is sent to
     /// @param  _amount is the value of tokens to be sent
@@ -150,16 +151,18 @@ contract ERC1400 {
      }
 
 
-     // 2. internal funtion to transfer tokens by partitions from an address to another address
+     /// @dev   internal funtion to transfer tokens by partitions from an address to another address
+     /// @notice `0x57` revert message if receiver is address 0
+     /// @notice `0x52` insufficient balance
+     /// @dev   the total supply is the balance accross all partitions
+     /// @notice the global balance of the sender and receiver is adjusted respectively
+     /// @notice the emission of TransferByPartition and Transfer events
 
     function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
        
-       /*if (_partition == "") {
-           _transfer(_from, _to, _value);
-       }*/
-
-       require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); // the partiton balance of the holder must be greater than or equal to the value
-       require(_to != address(0),  "0x57");   //  can't send to ether address
+    
+       require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
+       require(_to != address(0),  "0x57");   
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
