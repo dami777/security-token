@@ -1,26 +1,50 @@
 const ERC1400 = artifacts.require("ERC1400");
 const HTLC1400 = artifacts.require("HTLC1400");
 const Certificate = artifacts.require("Certificate")
+const OrderLibrary = artifacts.require("OrderLibrary")
+const ERC20 = artifacts.require("ERC20");
+const HTLC20 = artifacts.require("HTLC20");
+
 const GenerateEthSignature = artifacts.require("GenerateEthSignature")
 let classA = web3.utils.asciiToHex("CLASS A");
 let classB = web3.utils.asciiToHex("CLASS B");
 
-module.exports = function (deployer) {
+module.exports = async function (deployer) {
 
-  deployer.deploy(Certificate).then(
-    () => {
-      deployer.link(Certificate, ERC1400)
-      deployer.link(Certificate, GenerateEthSignature)
-      deployer.deploy(GenerateEthSignature)
+
+      // libray deployment
+
+      await deployer.deploy(Certificate)
+      await deployer.deploy(OrderLibrary)
+
+      // link libraries before contract deployment
+
+      await deployer.link(Certificate, GenerateEthSignature)
+      await deployer.link(Certificate, ERC1400)
+
+
+      await deployer.link(OrderLibrary, HTLC1400)
+      await deployer.link(OrderLibrary, HTLC20)
+
+
+      //  deploy the contracts
+
+      await deployer.deploy(GenerateEthSignature)
+      await deployer.deploy(ERC1400, "TANGLE", "TAN", 18, 0, [classA, classB])
+      await deployer.deploy(HTLC1400, ERC1400.address)
+      await deployer.deploy(ERC20, "US Dollar Tether", "USDT")
+      await deployer.deploy(HTLC20, ERC20.address)
+
+
       
-      deployer.deploy(ERC1400, "TANGLE", "TAN", 18, 0, [classA, classB]).then(
 
-        ()=>deployer.deploy(HTLC1400, ERC1400.address)
-    
-      )
-    }
-  )
-  
+
+      
+
+
+
+
+
  
 
 };

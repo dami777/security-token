@@ -33,7 +33,7 @@ contract HTLC1400 {
 
 
 
-    IERC1400 ERC1400_TOKEN;
+    //IERC1400 ERC1400_TOKEN;
    
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
@@ -52,24 +52,17 @@ contract HTLC1400 {
         bytes32 _secretKey;
         bytes32 _partition;
         bytes32 _swapID;
-        
+        IERC1400 ERC1400_TOKEN;
     }
 
 
-    /*enum SwapState {
 
-        INVALID,
-        OPEN,
-        CLOSED,
-        EXPIRED
-    }*/
-
-    constructor(address _securityToken) {
+    /*constructor(address _securityToken) {
 
         ERC1400_TOKEN = IERC1400(_securityToken);
         _owner = msg.sender;
         
-    }
+    }*/
 
 
 

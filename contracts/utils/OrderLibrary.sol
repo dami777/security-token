@@ -16,6 +16,7 @@ library OrderLibrary {
         bytes32 _swapID;
         bytes32 _partition;
         bool _funded;
+        IERC1400 ERC1400_TOKEN;
         
     }
 
