@@ -1,6 +1,6 @@
 pragma solidity 0.8.10;
 
-import "IERC1400.sol";
+import "./IERC1400.sol";
 
 
 library OrderLibrary {
@@ -10,7 +10,7 @@ library OrderLibrary {
         
         address _recipient;
         address _investor;
-        IERC1400 _ERC1400_TOKEN;
+        address _paymentAddress;
         uint256 _price;
         uint256 _amount;
         uint256 _expiration;

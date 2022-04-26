@@ -50,7 +50,7 @@ contract HTLC_ETH {
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
+        _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, address(0), _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_swapID] = OrderLibrary.SwapState.OPEN;
         emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
 

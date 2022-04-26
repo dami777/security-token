@@ -18,15 +18,15 @@ contract HTLC20 {
     
     address private  _owner;
 
-    IERC20 ERC20_TOKEN;
+    
 
 
-    constructor(address _usdtAddress) {
+    /*constructor(address _usdtAddress) {
 
         ERC20_TOKEN = IERC20(_usdtAddress);
         _owner = msg.sender;
 
-    }
+    }*/
 
     /// @dev    Issuer initializes the order with the same orderID in the htlc1400 contract
     /// @dev    The issuer uses the ID to withdraw USDT from this contract, while the investor uses the ID to withdraw from the htlc1400 contract
@@ -36,12 +36,12 @@ contract HTLC20 {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
+    function openOrder(bytes32 _swapID, address _investor, address _erc20, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
+        _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _erc20, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_swapID] = OrderLibrary.SwapState.OPEN;
         emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
 
@@ -59,7 +59,7 @@ contract HTLC20 {
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
         require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        ERC20_TOKEN.transferFrom(_order._investor, address(this), _order._price);
+        IERC20(_order._paymentAddress).transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_swapID]._funded = true;
         emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
 
@@ -81,7 +81,7 @@ contract HTLC20 {
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
         require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
-        ERC20_TOKEN.transfer(_order._recipient, _order._price);
+        IERC20(_order._paymentAddress).transfer(_order._recipient, _order._price);
         _orderSwap[_swapID]._secretKey = _secretKey;
         _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
@@ -99,7 +99,7 @@ contract HTLC20 {
         require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
         require(_orderSwap[_swapID]._funded == true, "this order was not funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
-        ERC20_TOKEN.transfer(_order._investor, _order._price);
+        IERC20(_order._paymentAddress).transfer(_order._investor, _order._price);
         _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundedOrder(_order._investor, _swapID, _order._price, _order._expiration);
 
