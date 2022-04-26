@@ -8,6 +8,7 @@ library OrderLibrary {
         
         address _recipient;
         address _investor;
+        IERC1400 _ERC1400_TOKEN;
         uint256 _price;
         uint256 _amount;
         uint256 _expiration;
@@ -16,7 +17,7 @@ library OrderLibrary {
         bytes32 _swapID;
         bytes32 _partition;
         bool _funded;
-        IERC1400 ERC1400_TOKEN;
+        
         
     }
 

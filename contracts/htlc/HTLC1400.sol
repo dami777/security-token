@@ -46,13 +46,14 @@ contract HTLC1400 {
         
         address _recipient;
         address _issuer;
+        IERC1400 _ERC1400_TOKEN;
         uint256 _tokenValue;
         uint256 _expiration;
         bytes32 _secretHash;
         bytes32 _secretKey;
         bytes32 _partition;
         bytes32 _swapID;
-        IERC1400 ERC1400_TOKEN;
+        
     }
 
 
@@ -79,15 +80,15 @@ contract HTLC1400 {
     /// @dev    with the uniqueness of the IDS, the secrets dont have to be unique accross the blockchain. The unique ID will keep track of each unique swap orders
     /// @notice ERC1400_TOKEN.operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
-    function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _recipient, uint256 _tokenValue, uint256 _expiration, bytes memory _data) external {
+    function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _recipient, address _securityToken, uint256 _tokenValue, uint256 _expiration, bytes memory _data) external {
 
         /// --->    logic to check the whitelist status of the recipient should be checked here
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
-        _orderSwap[_swapID] = OrderSwap(_recipient, msg.sender, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
-        ERC1400_TOKEN.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
+        _orderSwap[_swapID] = OrderSwap(_recipient, msg.sender, _securityToken, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
+        _orderSwap[_swapID]._securityToken.operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_swapID] = OrderLibrary.SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
         emit OpenedOrder(_recipient, _swapID, _tokenValue, _expiration, _secretHash, _partition);
 
