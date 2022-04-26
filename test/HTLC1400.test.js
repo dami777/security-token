@@ -144,7 +144,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             it("fetches the order details", async()=>{
 
                 const order = await htlc1400.checkOrder(orderID, erc1400.address)
-                order._recipient.should.be.equal(investor1, "it fetched the recipient of the order")
+                order._investor.should.be.equal(investor1, "it fetched the recipient of the order")
                 order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
                 order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of the order")
