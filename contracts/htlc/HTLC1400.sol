@@ -40,7 +40,7 @@ contract HTLC1400 {
 
     mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
     mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
-    address private _owner;
+   
 
 
     struct OrderSwap {
@@ -58,14 +58,6 @@ contract HTLC1400 {
         
     }
 
-
-
-    /*constructor(address _securityToken) {
-
-        ERC1400_TOKEN = IERC1400(_securityToken);
-        _owner = msg.sender;
-        
-    }*/
 
 
 
@@ -154,6 +146,8 @@ contract HTLC1400 {
         return (_order._recipient, _order._issuer, _order._tokenValue, _order._expiration, _order._partition, _swapID, _state, _order._secretKey);
 
     }
+
+   
 
 
     

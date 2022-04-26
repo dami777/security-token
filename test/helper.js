@@ -1,4 +1,5 @@
 const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
+const BYTES_0 = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 const tokens=(n)=>{
     return new web3.utils.BN(
@@ -31,5 +32,5 @@ const swapState = {
 
 }
 
-module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether }
+module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0 }
 

@@ -3,8 +3,9 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0} = require("./helper.js")
 const moment = require("moment");
+
 
 
 
@@ -103,7 +104,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
         })
 
-        describe("failed open order", ()=>{
+       /* describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
                 await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), 10000, data, {from: issuer}).should.be.rejected
@@ -247,12 +248,12 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.checkOrder(web3.utils.asciiToHex("x23dfdbvsdgdp")).should.be.rejected
             })
 
-        })
+        })*/
 
 
     })
 
     
-
+    
    
 })
