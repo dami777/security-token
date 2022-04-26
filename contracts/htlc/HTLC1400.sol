@@ -38,7 +38,7 @@ contract HTLC1400 {
     
    
 
-    mapping(bytes32 => OrderSwap) private _orderSwap;      //  map the order struct to the order ID
+    mapping(address => mapping(bytes32 => OrderSwap)) private _orderSwap;      //  map the order struct to the order ID
     mapping(address => mapping(bytes32 => OrderLibrary.SwapState)) private _swapState;      //  to keep track of the swap state of an id
    
 
