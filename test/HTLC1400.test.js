@@ -101,6 +101,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
                 createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
+                createOrder.logs[0].args._securityToken.should.be.equal(erc1400.address, "it emits the security token address used to create the order")
             })
         })
 
