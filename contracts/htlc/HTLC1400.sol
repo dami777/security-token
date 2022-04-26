@@ -121,14 +121,14 @@ contract HTLC1400 {
     /// @notice `ERC1400_TOKEN.transferByPartition` refunds the issuer
     /// @notice `_swapState[_swapID] = OrderLibrary.SwapState.EXPIRED` sets the order's state to EXPIRED
 
-    function refund(bytes32 _swapID) external {
+    function refund(bytes32 _swapID, address _securityToken) external {
 
-        OrderSwap memory _order = _orderSwap[_swapID];
+        OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         require(_order._issuer == msg.sender, "invalid caller");
-        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
+        require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
         require(block.timestamp > _order._expiration, "the order is yet to expire"); 
-        IERC1400(_orderSwap[_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
-        _swapState[_swapID] = OrderLibrary.SwapState.EXPIRED;
+        IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
+        _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundOrder(msg.sender, _swapID, _order._tokenValue, _order._expiration, _order._partition);
 
     }
@@ -138,11 +138,11 @@ contract HTLC1400 {
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
 
-    function checkOrder(bytes32 _swapID) external view returns (address _investor, address _issuer, uint256 _amount, uint256 _expiration, bytes32 _partition, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
+    function checkOrder(bytes32 _swapID, address _securityToken) external view returns (address _investor, address _issuer, uint256 _amount, uint256 _expiration, bytes32 _partition, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
 
-        require(_swapState[_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
-        OrderSwap memory _order = _orderSwap[_swapID];
-        OrderLibrary.SwapState _state = _swapState[_swapID];
+        require(_swapState[_securityToken][_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
+        OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
+        OrderLibrary.SwapState _state = _swapState[_securityToken][_swapID];
         return (_order._investor, _order._issuer, _order._tokenValue, _order._expiration, _order._partition, _swapID, _state, _order._secretKey);
 
     }
