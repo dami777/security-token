@@ -120,12 +120,12 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-        /*describe("successful withdrawal", ()=>{
+        describe("successful withdrawal", ()=>{
 
             let successfulWithDrawal
 
             beforeEach(async()=>{
-                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, {from: investor1})
+                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, erc1400.address, {from: investor1})
             })
 
             it("emits the Closed Order event", ()=>{
@@ -154,7 +154,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-        describe("failed withdrawal", ()=>{
+        /*describe("failed withdrawal", ()=>{
 
             let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
             const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
