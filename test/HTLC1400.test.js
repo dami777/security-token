@@ -66,7 +66,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
             await erc1400.issueByPartition(classA, issuer, 100, data)
             await erc1400.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), expiration, data, {from: issuer})
+            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, erc1400.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -97,7 +97,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("emits the correct open order event data", ()=>{
-                createOrder.logs[0].args._recipient.should.be.equal(investor1, "it emits the correct recipient address of the security token")
+                createOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the correct recipient address of the security token")
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
                 createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
