@@ -32,7 +32,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
     beforeEach(async()=>{
 
         erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
-        htlc1400 = await HTLC1400.new(erc1400.address)
+        htlc1400 = await HTLC1400.new()
 
         await erc1400.setController(signer)
     })
