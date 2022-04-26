@@ -62,6 +62,7 @@ contract HTLC1400 {
 
 
     /// @dev    when an order is opened, the issuer funds the contract with the token
+    /// @notice the security token address is used to keep track of the order and swap state 
     /// @param   _swapID is the ID of the swap order that keeps track of the state of the order. The withdrawee will make reference to this ID on this contract and their deposit contract as well. The SwapState of that ID must be invalid which means it has not been used
     /// @param  _recipient is the target recipient/withdrawal of the deposited token
     /// @param  _tokenValue is the amount of token to be withdrawn by the investor
@@ -153,7 +154,7 @@ contract HTLC1400 {
 
     
     
-    event OpenedOrder(address indexed _recipient, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
+    event OpenedOrder(address indexed _issuer, address indexed _investor, address _securityToken, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
     event ClosedOrder(address indexed _recipient, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
     event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
 
