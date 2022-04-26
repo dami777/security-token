@@ -73,7 +73,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         describe("successful open orders", ()=>{
             
-            it("made the htlc contract an operator", async ()=>{
+            it("should register the htlc contract address as an operator", async ()=>{
 
                 const isOperator = await erc1400.isOperator(htlc1400.address, issuer)
                 isOperator.should.be.equal(true, "the htlc for the security token is an operator")
@@ -102,24 +102,25 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
                 createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
                 createOrder.logs[0].args._securityToken.should.be.equal(erc1400.address, "it emits the security token address used to create the order")
+                
             })
         })
 
-       /* describe("failed open order", ()=>{
+        describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, erc1400.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, erc1400.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
         })
 
-        describe("successful withdrawal", ()=>{
+        /*describe("successful withdrawal", ()=>{
 
             let successfulWithDrawal
 
