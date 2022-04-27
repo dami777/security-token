@@ -110,7 +110,7 @@ contract HTLC1400 {
         IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, _order._investor, _order._tokenValue, hex"00");           // the htlc contract releases the token to the investor
         _orderSwap[_securityToken][_swapID]._secretKey = _secretKey;                                                                    //  update the secretKey value to be publicly available on the on-chain
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.CLOSED;                                                                         //  close the order
-        emit ClosedOrder(_order._investor, _swapID, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
+        emit ClosedOrder(_order._issuer, _order._investor, _securityToken, _swapID, _order._tokenValue, _secretKey, _order._secretHash, _order._partition);
         
     }
 
