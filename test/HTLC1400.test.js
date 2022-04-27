@@ -212,6 +212,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
+
             const expiration2 = expired(2)       // set expiration to 2 days before
             
             
@@ -238,14 +239,14 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             
         })
 
-        /*describe("refund", ()=>{
+        describe("refund", ()=>{
 
-            let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
-            const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let orderID3 = stringToHex("x23d33sdgdp").hex
+            const expiration2 = expired(2)       // set expiration to 2 days before
             let refund
 
             beforeEach(async()=>{
-                await htlc1400.openOrder(orderID3, secretPhrase1, secretHash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
+                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
                 
             })
 
@@ -253,21 +254,23 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
                 it("updates the htlc's and issuer's balance after order was placed", async()=>{
 
-                    const htlcBalance = await tanglSecurityToken.balanceOfByPartition(classA, htlc1400.address)
-                    const issuerBalance = await tanglSecurityToken.balanceOfByPartition(classA, issuer)
-                    htlcBalance.toString().should.be.equal(tokens(10).toString(), "the htlc balance was incremented")
-                    issuerBalance.toString().should.be.equal(tokens(90).toString(), "the htlc balance was incremented")
+                    const htlcTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
+                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, issuer)
+
+                    htlcTanglBalance.toString().should.be.equal(tokens(10).toString(), "the htlc balance was incremented")
+                    issuerTanglBalance.toString().should.be.equal(tokens(90).toString(), "the htlc balance was incremented")
                 
                 })
 
                 it("checks that order state is 'OPEN' ", async()=>{
                     const order = await htlc1400.checkOrder(orderID3)
+                    
                     order._orderState.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
                 })
 
             })
 
-            describe("after refund", ()=>{
+            /*describe("after refund", ()=>{
 
                 beforeEach(async()=>{
                     refund = await htlc1400.refund(orderID3)
