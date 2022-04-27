@@ -163,14 +163,16 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         describe("successful withdrawal", ()=>{
 
-            let successfulWithDrawal
+            let successfulTangleWithdrawal
+            let successfulReitWithdrawal
 
             beforeEach(async()=>{
-                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, tangleSecurityToken.address, {from: investor1})
+                successfulTangleWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, tangleSecurityToken.address, {from: investor1})
+                successfulReitWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, {from: investor2})
             })
 
             it("emits the Closed Order event", ()=>{
-                successfulWithDrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                successfulTangleWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
             })
 
             it("updates the balance of the investor and the htlc contract", async()=>{
