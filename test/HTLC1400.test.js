@@ -264,16 +264,16 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
                 it("checks that order state is 'OPEN' ", async()=>{
                     const order = await htlc1400.checkOrder(orderID3)
-                    
+
                     order._orderState.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
                 })
 
             })
 
-            /*describe("after refund", ()=>{
+            describe("after refund", ()=>{
 
                 beforeEach(async()=>{
-                    refund = await htlc1400.refund(orderID3)
+                    refund = await htlc1400.refund(orderID3, tanglSecurityToken.address)
                 })
 
                 it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
@@ -301,7 +301,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-        describe("order checking", ()=>{
+        /*describe("order checking", ()=>{
 
             it("checks valid orders", async()=>{
                 const validOrder = await htlc1400.checkOrder(orderID)
