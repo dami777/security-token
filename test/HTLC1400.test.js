@@ -246,7 +246,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             let refund
 
             beforeEach(async()=>{
-                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
+                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor2, tanglSecurityToken, tokens(5), expiration2, data, {from: issuer})         // expired order
                 
             })
 
@@ -281,7 +281,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                     const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, issuer)
 
                     //  refund the issuer
-                    
+
                     htlcTanglBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
                     issuerTanglBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
                 })
