@@ -173,6 +173,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
             it("emits the Closed Order event", ()=>{
                 successfulTangleWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                successfulReitWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
             })
 
             it("updates the balance of the investor and the htlc contract", async()=>{
