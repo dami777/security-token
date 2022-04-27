@@ -45,7 +45,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         htlc1400 = await HTLC1400.new()
 
         await tangleSecurityToken.setController(signer)
-        await reit.setController(signer)
+        await reitSecurityToken.setController(signer)
     
         
     })
