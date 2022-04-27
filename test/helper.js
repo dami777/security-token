@@ -1,5 +1,7 @@
 const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 const BYTES_0 = "0x0000000000000000000000000000000000000000000000000000000000000000"
+const moment = require("moment");
+const { ethers } = require("ethers")
 
 const tokens=(n)=>{
     return new web3.utils.BN(
@@ -55,12 +57,32 @@ const encodeSecret =(secretPhrase)=>{
 
 }
 
+//  convert string to hex (bytes32)
 
 const stringToHex = (string)=>{
 
     const hex = web3.utils.asciiToHex(string)
     return { string, hex }
-    
+
+}
+
+//  function to set future expiration
+//  the function converts the date to unix time format
+
+const expire=(days)=>{
+
+    return new Date(moment().add(days, 'days').unix()).getTime()
+
+}
+
+
+//  function to get past expiration
+//  the function converts the date to unix time format
+
+const expired=(days)=>{
+
+    return new Date(moment().subtract(days, 'days').unix()).getTime()
+
 }
 
 module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0, setToken, encodeSecret }
