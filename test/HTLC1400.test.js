@@ -154,32 +154,32 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-        /*describe("failed withdrawal", ()=>{
+        describe("failed withdrawal", ()=>{
 
             let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
             const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
             
             
             beforeEach(async()=>{
-                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})
+                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, erc1400.address, tokens(5), expiration2, data, {from: issuer})
             })
 
 
             it("fails to withdraw because the withdrawal date has expired", async()=>{
-                await htlc1400.recipientWithdrawal(orderID2, secret1, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID2, secret1, erc1400.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
-                await htlc1400.recipientWithdrawal(orderID, secret1, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID, secret1, erc1400.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
-                await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, {from: investor1}).should.be.rejected
+                await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, erc1400.address, {from: investor1}).should.be.rejected
             })
             
         })
 
-        describe("refund", ()=>{
+        /*describe("refund", ()=>{
 
             let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
             const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
