@@ -103,7 +103,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
 
             createTangleOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
-            createReitOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classB.hex, investor1, reitSecurityToken.address, tokens(5), expiration, data, {from: issuer})
+            createReitOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classB.hex, investor2, reitSecurityToken.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -216,6 +216,10 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
                 await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tangleSecurityToken.address, {from: investor1}).should.be.rejected
+            })
+
+            it("fails to withdraw if an investor tries to use his order ID to withdraw from another security token order of same ID", async()=>{
+                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, reitSecurityToken.address, {from: investor1}).should.be.rejected
             })
             
         })
