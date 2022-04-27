@@ -69,7 +69,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         let secretPhrase1 = "anonymous"
         let secretPhrase2 = "avalanche"
         let orderID = stringToHex("x23dvsdgd").hex
-        let createOrder
+        let createTangleOrder
 
         
         let secretHex1= hashSecret(secretPhrase1).secretHex
@@ -78,17 +78,14 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         let secretHex2 = hashSecret(secretPhrase2).secretHex
         let secretHash2 = hashSecret(secretPhrase2).secretHash
-        
+
         let expiration = expire(1)                      // expiration will be present time + 1 day
 
         beforeEach(async()=>{
 
-
-            console.log(secretHash1, secretHex1)
-
             await tangleSecurityToken.issueByPartition(classA.hex, issuer, 100, data)
             await tangleSecurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
+            createTangleOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -104,7 +101,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
             it("opens order", async()=>{
                 
-                createOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
+                createTangleOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the Open Order event")
 
             })
 
@@ -119,11 +116,11 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("emits the correct open order event data", ()=>{
-                createOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the correct recipient address of the security token")
-                createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
-                createOrder.logs[0].args._secretHash1.should.be.equal(secretHash1, "it emits the hash of the open order")
-                createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
-                createOrder.logs[0].args._securityToken.should.be.equal(tangleSecurityToken.address, "it emits the security token address used to create the order")
+                createTangleOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the correct recipient address of the security token")
+                createTangleOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
+                createTangleOrder.logs[0].args._secretHash.should.be.equal(secretHash1, "it emits the hash of the open order")
+                createTangleOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
+                createTangleOrder.logs[0].args._securityToken.should.be.equal(tangleSecurityToken.address, "it emits the security token address used to create the order")
                 
             })
         })
@@ -183,7 +180,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             
             
             beforeEach(async()=>{
-                createOrder2 = await htlc1400.openOrder(orderID2.hex, secretHex1, secretHash1, classA.hex, investor2, tangleSecurityToken.address, tokens(5), expiration2, data, {from: issuer})
+                createTangleOrder2 = await htlc1400.openOrder(orderID2.hex, secretHex1, secretHash1, classA.hex, investor2, tangleSecurityToken.address, tokens(5), expiration2, data, {from: issuer})
             })
 
 
