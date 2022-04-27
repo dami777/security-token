@@ -57,13 +57,14 @@ const setToken =(name, symbol, decimal, totalSupply, shareClass)=> {
 
 //  function to genere secret Hash
 
-const encodeSecret =(secretPhrase)=>{
+const hashSecret =(secretPhrase)=>{
 
-    const dataHex = web3.eth.abi.encodeParameter("bytes32", secretPhrase)
+    const secretHex = stringToHex(secretPhrase).hex
+    const dataHex = web3.eth.abi.encodeParameter("bytes32", secretHex)
     const secretHash = ethers.utils.sha256(dataHex)
 
     //  return the secret phrase and its encoded data
-    return { secretPhrase, secretHash}
+    return { secretHex, secretHash}
 
 }
 
@@ -97,6 +98,6 @@ const expired=(days)=>{
 
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
-        wait, swapState, ether, BYTES_0, setToken, encodeSecret, 
+        wait, swapState, ether, BYTES_0, setToken, hashSecret, 
         stringToHex, expire, expired }
 

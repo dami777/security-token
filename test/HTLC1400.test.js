@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex, expire, expired, hash, hashSecret} = require("./helper.js")
 const moment = require("moment");
 
 
@@ -66,20 +66,21 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     describe("htlc1400", ()=>{
 
-        let secret1 = web3.utils.asciiToHex("anonymous")
-        let secret2 = web3.utils.asciiToHex("avalanche")
-        let orderID = web3.utils.asciiToHex("x23dvsdgd")
+        let secretPhrase1 = "anonymous"
+        let secretPhrase2 = "avalanche"
+        let orderID = stringToHex("x23dvsdgd").hex
         let createOrder
 
-        let dataHex1 = web3.eth.abi.encodeParameter("bytes32", secret1)
-        let hash1 = ethers.utils.sha256(dataHex1)
-        let expiration = new Date(moment().add(1, 'days').unix()).getTime()    // expiration will be present time + 1 day
+        
+        let { secretHex1, secretHash1} = hashSecret(secretPhrase1)
+        let { secretHex2, secretHash2} = hashSecret(secretPhrase2)
+        let expiration = expire(1)                      // expiration will be present time + 1 day
 
         beforeEach(async()=>{
 
-            await tangleSecurityToken.issueByPartition(classA, issuer, 100, data)
+            await tangleSecurityToken.issueByPartition(classA.hex, issuer, 100, data)
             await tangleSecurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
+            createOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -100,19 +101,19 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the htlc contract", async()=>{
-                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
+                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
                 htlcBalance.toString().should.be.equal(tokens(5).toString(), "the token was deposited to the htlc contract")
             })
 
             it("updates the balance of the issuer", async()=>{
-                const issuerBalance = await tangleSecurityToken.balanceOfByPartition(classA, issuer)
+                const issuerBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, issuer)
                 issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's wallet")
             })
 
             it("emits the correct open order event data", ()=>{
                 createOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the correct recipient address of the security token")
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
-                createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
+                createOrder.logs[0].args._secretHash1.should.be.equal(secretHash1, "it emits the hash of the open order")
                 createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
                 createOrder.logs[0].args._securityToken.should.be.equal(tangleSecurityToken.address, "it emits the security token address used to create the order")
                 
@@ -122,13 +123,13 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor1, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA, investor2, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
         })
@@ -138,7 +139,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             let successfulWithDrawal
 
             beforeEach(async()=>{
-                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, tangleSecurityToken.address, {from: investor1})
+                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, tangleSecurityToken.address, {from: investor1})
             })
 
             it("emits the Closed Order event", ()=>{
@@ -146,8 +147,8 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the investor and the htlc contract", async()=>{
-                const investorBalance = await tangleSecurityToken.balanceOfByPartition(classA, investor1)
-                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
+                const investorBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, investor1)
+                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
 
                 investorBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
                 htlcBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
@@ -169,25 +170,25 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         describe("failed withdrawal", ()=>{
 
-            let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
-            const expiration2 = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let orderID2 = stringToHex("x23d33sdgdp")
+            const expiration2 = expired(2)       // set expiration to 2 days before
             
             
             beforeEach(async()=>{
-                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tangleSecurityToken.address, tokens(5), expiration2, data, {from: issuer})
+                createOrder2 = await htlc1400.openOrder(orderID2.hex, secretHex1, secretHash1, classA.hex, investor2, tangleSecurityToken.address, tokens(5), expiration2, data, {from: issuer})
             })
 
 
             it("fails to withdraw because the withdrawal date has expired", async()=>{
-                await htlc1400.recipientWithdrawal(orderID2, secret1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID2.hex, secretHex1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
-                await htlc1400.recipientWithdrawal(orderID, secret1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
-                await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, tangleSecurityToken.address, {from: investor1}).should.be.rejected
+                await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tangleSecurityToken.address, {from: investor1}).should.be.rejected
             })
             
         })
@@ -199,7 +200,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             let refund
 
             beforeEach(async()=>{
-                await htlc1400.openOrder(orderID3, secret1, hash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
+                await htlc1400.openOrder(orderID3, secretPhrase1, secretHash1, classA, investor2, tokens(5), expiration2, data, {from: issuer})         // expired order
                 
             })
 
