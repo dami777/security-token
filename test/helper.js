@@ -32,5 +32,9 @@ const swapState = {
 
 }
 
+const setToken =(name, symbol, decimal, totalSupply, shareClass)=> {
+    return { name, symbol, decimal, totalSupply, shareClass }
+}
+
 module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0 }
 

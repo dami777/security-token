@@ -32,10 +32,13 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     beforeEach(async()=>{
 
-        tangleSeurityToken = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] )
+        tangleSeurityToken = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
+        reit = await ERC1400.new("Real Estate Investment Trust", "REIT", decimal, totalSupply, [classA, classB])
+
         htlc1400 = await HTLC1400.new()
 
         await tangleSeurityToken.setController(signer)
+        await reit.setController(signer)
     })
 
 
