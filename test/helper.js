@@ -55,5 +55,13 @@ const encodeSecret =(secretPhrase)=>{
 
 }
 
+
+const stringToHex = (string)=>{
+
+    const hex = web3.utils.asciiToHex(string)
+    return { string, hex }
+    
+}
+
 module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0, setToken, encodeSecret }
 
