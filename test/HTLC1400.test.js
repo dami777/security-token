@@ -126,7 +126,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             it("updates the balance of the htlc contract", async()=>{
 
                 const htlcTangleBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
-                const htlReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, htlc1400.address)
+                const htlcReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, htlc1400.address)
 
                 htlcTangleBalance.toString().should.be.equal(tokens(5).toString(), "the Tangle token was deposited to the htlc contract")
                 htlcReitBalance.toString().should.be.equal(tokens(5).toString(), "the Reit token was deposited to the htlc contract")
