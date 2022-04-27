@@ -32,9 +32,28 @@ const swapState = {
 
 }
 
+
+//  function to initialize token parameters
+
 const setToken =(name, symbol, decimal, totalSupply, shareClass)=> {
+
     return { name, symbol, decimal, totalSupply, shareClass }
+
 }
 
-module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0 }
+
+
+//  function to genere secret Hash
+
+const encodeSecret =(secretPhrase)=>{
+
+    const dataHex = web3.eth.abi.encodeParameter("bytes32", secretPhrase)
+    const secretHash = ethers.utils.sha256(dataHex)
+
+    //  return the secret phrase and its encoded data
+    return { secretPhrase, secretHash}
+
+}
+
+module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0, setToken, encodeSecret }
 
