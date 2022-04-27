@@ -21,7 +21,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
     
     let htlc1400
     let tangleSecurityToken          //  security token called tangle
-    let reit                        //  security token for real estate investment trust
+    let reitSecurityToken                        //  security token for real estate investment trust
 
     let classA = stringToHex("CLASS A")
     let classB = stringToHex("CLASS B")
@@ -40,7 +40,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         //  create security tokens for TANGL and REIT
 
         tangleSecurityToken = await ERC1400.new(tangleTokenDetails.name, tangleTokenDetails.symbol, tangleTokenDetails.decimal, tangleTokenDetails.totalSupply, tangleTokenDetails.shareClass)
-        reit = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
 
         htlc1400 = await HTLC1400.new()
 
@@ -58,7 +58,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
            
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
             tangleSecurityToken.address.should.not.be.equal("", "the security token contract has an address")
-            reit.address.should.not.be.equal("", "it has a contract address")
+            reitSecurityToken.address.should.not.be.equal("", "it has a contract address")
 
         })
 
@@ -69,7 +69,10 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         let secretPhrase1 = "anonymous"
         let secretPhrase2 = "avalanche"
         let orderID = stringToHex("x23dvsdgd").hex
+
+        //  initialize the order
         let createTangleOrder
+        let createReitOrder
 
         
         let secretHex1= hashSecret(secretPhrase1).secretHex
@@ -83,9 +86,24 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         beforeEach(async()=>{
 
+            //  issuers issue tokens to themselves before depositing to the htlc contract
+
             await tangleSecurityToken.issueByPartition(classA.hex, issuer, 100, data)
-            await tangleSecurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
+            await reitSecurityToken.issueByPartition(classB.hex, issuer, 100, data)
+
+            /**
+             * 
+             * issuers authorize the htlc contract as an operator. This implies that the htlc contract will automatically move the tokens
+             * from their wallets once the order is created
+             * 
+             * */  
+
+            await tangleSecurityToken.authorizeOperator(htlc1400.address, {from: issuer})       //set the htlc contract to be an operator
+            await reitSecurityToken.authorizeOperator(htlc1400.address, {from: issuer})       //set the htlc contract to be an operator
+
+
             createTangleOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
+            createReitOrder = await htlc1400.openOrder(orderID, secretHex1, secretHash1, classB.hex, investor1, reitSecurityToken.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -106,8 +124,12 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the htlc contract", async()=>{
-                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
-                htlcBalance.toString().should.be.equal(tokens(5).toString(), "the token was deposited to the htlc contract")
+
+                const htlcTangleBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
+                const htlReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, htlc1400.address)
+
+                htlcTangleBalance.toString().should.be.equal(tokens(5).toString(), "the Tangle token was deposited to the htlc contract")
+                htlcReitBalance.toString().should.be.equal(tokens(5).toString(), "the Reit token was deposited to the htlc contract")
             })
 
             it("updates the balance of the issuer", async()=>{
