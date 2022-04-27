@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex} = require("./helper.js")
 const moment = require("moment");
 
 
@@ -20,25 +20,33 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     
     let htlc1400
-    let tangleSeurityToken
-    
+    let tangleSecurityToken          //  security token called tangle
+    let reit                        //  security token for real estate investment trust
 
-    let name = "Tangl"
-    let symbol = "TAN"
-    let decimal = 18
-    let totalSupply = 0
-    let classA = web3.utils.asciiToHex("CLASS A")
-    let classB = web3.utils.asciiToHex("CLASS B")
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+
+    
+    
+    
+    let tangleTokenDetails = setToken("TANGLE", "TAN", 18, 0, [classA.hex,classB.hex])
+    let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA.hex,classB.hex])
+    
+    
+    
 
     beforeEach(async()=>{
 
-        tangleSeurityToken = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
-        reit = await ERC1400.new("Real Estate Investment Trust", "REIT", decimal, totalSupply, [classA, classB])
+       console.log(tangleTokenDetails)
+
+        tangleSecurityToken = await ERC1400.new(tangleTokenDetails.name, tangleTokenDetails.symbol, tangleTokenDetails.decimal, tangleTokenDetails.totalSupply, tangleTokenDetails.shareClass)
+        reit = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
 
         htlc1400 = await HTLC1400.new()
 
-        await tangleSeurityToken.setController(signer)
-        await reit.setController(signer)
+        await tangleSecurityToken.setController(signer)
+    
+        
     })
 
 
@@ -48,7 +56,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
            
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
-            tangleSeurityToken.address.should.not.be.equal("", "the security token contract has an address")
+            tangleSecurityToken.address.should.not.be.equal("", "the security token contract has an address")
 
         })
 
@@ -67,9 +75,9 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         beforeEach(async()=>{
 
-            await tangleSeurityToken.issueByPartition(classA, issuer, 100, data)
-            await tangleSeurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
-            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSeurityToken.address, tokens(5), expiration, data, {from: issuer})
+            await tangleSecurityToken.issueByPartition(classA, issuer, 100, data)
+            await tangleSecurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
+            createOrder = await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSecurityToken.address, tokens(5), expiration, data, {from: issuer})
             
         })
 
@@ -78,7 +86,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             
             it("should register the htlc contract address as an operator", async ()=>{
 
-                const isOperator = await tangleSeurityToken.isOperator(htlc1400.address, issuer)
+                const isOperator = await tangleSecurityToken.isOperator(htlc1400.address, issuer)
                 isOperator.should.be.equal(true, "the htlc for the security token is an operator")
                 
             })
@@ -90,12 +98,12 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the htlc contract", async()=>{
-                const htlcBalance = await tangleSeurityToken.balanceOfByPartition(classA, htlc1400.address)
+                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
                 htlcBalance.toString().should.be.equal(tokens(5).toString(), "the token was deposited to the htlc contract")
             })
 
             it("updates the balance of the issuer", async()=>{
-                const issuerBalance = await tangleSeurityToken.balanceOfByPartition(classA, issuer)
+                const issuerBalance = await tangleSecurityToken.balanceOfByPartition(classA, issuer)
                 issuerBalance.toString().should.be.equal(tokens(95).toString(), "the token was transferred from the issuer's wallet")
             })
 
@@ -104,7 +112,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 createOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
                 createOrder.logs[0].args._secretHash.should.be.equal(hash1, "it emits the hash of the open order")
                 createOrder.logs[0].args._expiration.toString().should.be.equal(expiration.toString(), "it emits the day and time the withdrawal expires")
-                createOrder.logs[0].args._securityToken.should.be.equal(tangleSeurityToken.address, "it emits the security token address used to create the order")
+                createOrder.logs[0].args._securityToken.should.be.equal(tangleSecurityToken.address, "it emits the security token address used to create the order")
                 
             })
         })
@@ -112,13 +120,13 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSeurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID, secret1, hash1, classA, investor1, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, tangleSeurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secret2, hash1, classA, investor2, tangleSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
             })
 
         })
@@ -128,7 +136,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             let successfulWithDrawal
 
             beforeEach(async()=>{
-                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, tangleSeurityToken.address, {from: investor1})
+                successfulWithDrawal = await htlc1400.recipientWithdrawal(orderID, secret1, tangleSecurityToken.address, {from: investor1})
             })
 
             it("emits the Closed Order event", ()=>{
@@ -136,8 +144,8 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the investor and the htlc contract", async()=>{
-                const investorBalance = await tangleSeurityToken.balanceOfByPartition(classA, investor1)
-                const htlcBalance = await tangleSeurityToken.balanceOfByPartition(classA, htlc1400.address)
+                const investorBalance = await tangleSecurityToken.balanceOfByPartition(classA, investor1)
+                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
 
                 investorBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
                 htlcBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
@@ -146,7 +154,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
             it("fetches the order details", async()=>{
 
-                const order = await htlc1400.checkOrder(orderID, tangleSeurityToken.address)
+                const order = await htlc1400.checkOrder(orderID, tangleSecurityToken.address)
                 order._investor.should.be.equal(investor1, "it fetched the recipient of the order")
                 order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
@@ -164,20 +172,20 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             
             
             beforeEach(async()=>{
-                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tangleSeurityToken.address, tokens(5), expiration2, data, {from: issuer})
+                createOrder2 = await htlc1400.openOrder(orderID2, secret1, hash1, classA, investor2, tangleSecurityToken.address, tokens(5), expiration2, data, {from: issuer})
             })
 
 
             it("fails to withdraw because the withdrawal date has expired", async()=>{
-                await htlc1400.recipientWithdrawal(orderID2, secret1, tangleSeurityToken.address, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID2, secret1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
-                await htlc1400.recipientWithdrawal(orderID, secret1, tangleSeurityToken.address, {from: investor2}).should.be.rejected
+                await htlc1400.recipientWithdrawal(orderID, secret1, tangleSecurityToken.address, {from: investor2}).should.be.rejected
             })
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
-                await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, tangleSeurityToken.address, {from: investor1}).should.be.rejected
+                await htlc1400.recipientWithdrawal(web3.utils.asciiToHex("35trgd"), secret1, tangleSecurityToken.address, {from: investor1}).should.be.rejected
             })
             
         })
@@ -197,8 +205,8 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
                 it("updates the htlc's and issuer's balance after order was placed", async()=>{
 
-                    const htlcBalance = await tangleSeurityToken.balanceOfByPartition(classA, htlc1400.address)
-                    const issuerBalance = await tangleSeurityToken.balanceOfByPartition(classA, issuer)
+                    const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
+                    const issuerBalance = await tangleSecurityToken.balanceOfByPartition(classA, issuer)
                     htlcBalance.toString().should.be.equal(tokens(10).toString(), "the htlc balance was incremented")
                     issuerBalance.toString().should.be.equal(tokens(90).toString(), "the htlc balance was incremented")
                 
@@ -218,8 +226,8 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 })
 
                 it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
-                    const htlcBalance = await tangleSeurityToken.balanceOfByPartition(classA, htlc1400.address)
-                    const issuerBalance = await tangleSeurityToken.balanceOfByPartition(classA, issuer)
+                    const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA, htlc1400.address)
+                    const issuerBalance = await tangleSecurityToken.balanceOfByPartition(classA, issuer)
                     htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
                     issuerBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
                 })

@@ -3,12 +3,17 @@ const BYTES_0 = "0x0000000000000000000000000000000000000000000000000000000000000
 const moment = require("moment");
 const { ethers } = require("ethers")
 
+
+//  convert number to wei for token value
+
 const tokens=(n)=>{
     return new web3.utils.BN(
         web3.utils.toWei(n.toString(), 'ether')
     )
     
 }
+
+//  convert number to wei for ether value
 
 const ether = (n) => tokens(n)
 
@@ -20,11 +25,14 @@ const signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e73477
 const ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
 const data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
 
+
+//  function to create delay in seconds
 const wait=(seconds)=>{
     const milliseconds= seconds * 1000
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+//  an object that map numbers to state 
 const swapState = {
 
     INVALID: "0",
@@ -39,7 +47,9 @@ const swapState = {
 
 const setToken =(name, symbol, decimal, totalSupply, shareClass)=> {
 
-    return { name, symbol, decimal, totalSupply, shareClass }
+    const result = { name, symbol, decimal, totalSupply, shareClass }
+
+    return result
 
 }
 
@@ -85,5 +95,8 @@ const expired=(days)=>{
 
 }
 
-module.exports = { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, ether, BYTES_0, setToken, encodeSecret }
+module.exports = { 
+        ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
+        wait, swapState, ether, BYTES_0, setToken, encodeSecret, 
+        stringToHex, expire, expired }
 
