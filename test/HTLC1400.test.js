@@ -37,7 +37,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
     beforeEach(async()=>{
 
-       console.log(tangleTokenDetails)
+        //  create security tokens for TANGL and REIT
 
         tangleSecurityToken = await ERC1400.new(tangleTokenDetails.name, tangleTokenDetails.symbol, tangleTokenDetails.decimal, tangleTokenDetails.totalSupply, tangleTokenDetails.shareClass)
         reit = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
@@ -45,6 +45,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         htlc1400 = await HTLC1400.new()
 
         await tangleSecurityToken.setController(signer)
+        await reit.setController(signer)
     
         
     })
@@ -57,6 +58,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
            
             htlc1400.address.should.be.not.equal("", "the htlc contract for the security token has an address")
             tangleSecurityToken.address.should.not.be.equal("", "the security token contract has an address")
+            reit.address.should.not.be.equal("", "it has a contract address")
 
         })
 
