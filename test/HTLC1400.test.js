@@ -177,11 +177,22 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             })
 
             it("updates the balance of the investor and the htlc contract", async()=>{
-                const investorBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, investor1)
-                const htlcBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
 
-                investorBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
-                htlcBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
+                //  investors balance after withdrawal
+                const investorTangleBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, investor1)
+                const investorReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, investor2)
+
+                //  htlc contract balance after withdrawal by investors
+
+                const htlcTangleBalance = await tangleSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
+                const htlcReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, htlc1400.address)
+
+                investorTangleBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
+                investorReitBalance.toString().should.be.equal(tokens(5).toString(), "the token was transferred to the investor's wallet after providing the valid secret")
+
+                htlcTangleBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
+                htlcReitBalance.toString().should.be.equal(tokens(0).toString(), "the token was removed from the htlc contract address to the investor's wallet")
+
 
             })
 
