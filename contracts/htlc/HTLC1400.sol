@@ -65,6 +65,7 @@ contract HTLC1400 {
     /// @notice the security token address is used to keep track of the order and swap state 
     /// @param   _swapID is the ID of the swap order that keeps track of the state of the order. The withdrawee will make reference to this ID on this contract and their deposit contract as well. The SwapState of that ID must be invalid which means it has not been used
     /// @param  _investor is the target recipient/withdrawal of the deposited token
+    /// @param  _securityToken is the address of the security token to be deposited by the issuer and to be withdrawn by the investor
     /// @param  _tokenValue is the amount of token to be withdrawn by the investor
     /// @param  _expiration is the time the token withdrawal elasp. There will be a refund to the issuer's wallet if the token isn't withdrawn
     /// @param  _secretKey is the secret word or phrase attached to an order
@@ -73,11 +74,10 @@ contract HTLC1400 {
     /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
     /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
     /// @dev    with the uniqueness of the IDS, the secrets dont have to be unique accross the blockchain. The unique ID will keep track of each unique swap orders
-    /// @notice ERC1400_TOKEN.operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
+    /// @notice IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
     function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _investor, address _securityToken, uint256 _tokenValue, uint256 _expiration, bytes memory _data) external {
 
-        /// --->    logic to check the whitelist status of the recipient should be checked here
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
@@ -155,7 +155,7 @@ contract HTLC1400 {
     
     
     event OpenedOrder(address indexed _issuer, address indexed _investor, address _securityToken, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
-    event ClosedOrder(address indexed _investor, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
+    event ClosedOrder(address indexed _issuer, address indexed _investor, address _securityToken, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
     event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
 
 }
