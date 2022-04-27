@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 const { ethers } = require("ethers")
-const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex, expire, expired, hash, hashSecret} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex, expire, expired, hashSecret} = require("./helper.js")
 const moment = require("moment");
 
 
@@ -72,11 +72,19 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         let createOrder
 
         
-        let { secretHex1, secretHash1} = hashSecret(secretPhrase1)
-        let { secretHex2, secretHash2} = hashSecret(secretPhrase2)
+        let secretHex1= hashSecret(secretPhrase1).secretHex
+        let secretHash1 = hashSecret(secretPhrase1).secretHash
+
+
+        let secretHex2 = hashSecret(secretPhrase2).secretHex
+        let secretHash2 = hashSecret(secretPhrase2).secretHash
+        
         let expiration = expire(1)                      // expiration will be present time + 1 day
 
         beforeEach(async()=>{
+
+
+            console.log(secretHash1, secretHex1)
 
             await tangleSecurityToken.issueByPartition(classA.hex, issuer, 100, data)
             await tangleSecurityToken.authorizeOperator(htlc1400.address)       //set the htlc contract to be an operator
