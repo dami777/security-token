@@ -277,10 +277,13 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 })
 
                 it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
-                    const htlcBalance = await tanglSecurityToken.balanceOfByPartition(classA, htlc1400.address)
-                    const issuerBalance = await tanglSecurityToken.balanceOfByPartition(classA, issuer)
-                    htlcBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
-                    issuerBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
+                    const htlcTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
+                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, issuer)
+
+                    //  refund the issuer
+                    
+                    htlcTanglBalance.toString().should.be.equal(tokens(5).toString(), "the htlc balance was incremented")
+                    issuerTanglBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
                 })
 
                 it("checks that order state has been set to 'EXPIRED' ", async()=>{
