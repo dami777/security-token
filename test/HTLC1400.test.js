@@ -5,6 +5,7 @@ require("chai")
 const { ethers } = require("ethers")
 const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex, expire, expired, hashSecret} = require("./helper.js")
 const moment = require("moment");
+const { describe } = require("yargs");
 
 
 
@@ -263,7 +264,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 })
 
                 it("checks that order state is 'OPEN' ", async()=>{
-                    const order = await htlc1400.checkOrder(orderID3)
+                    const order = await htlc1400.checkOrder(orderID3, tanglSecurityToken.address)
 
                     order._orderState.toString().should.be.equal(swapState.OPEN, "the order state is 'OPEN' ")
                 })
@@ -288,7 +289,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
                 it("checks that order state has been set to 'EXPIRED' ", async()=>{
 
-                    const expiredOrder = await htlc1400.checkOrder(orderID3)
+                    const expiredOrder = await htlc1400.checkOrder(orderID3, tanglSecurityToken.address)
                     expiredOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state has 'EXPIRED' ")
                 
                 })
@@ -301,6 +302,14 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
            
 
             
+
+        })
+
+        describe("failed refund", ()=>{
+
+            it("should fail to refund orders that is yet to be expired", ()=>{
+
+            })
 
         })
 
