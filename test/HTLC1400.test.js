@@ -317,18 +317,18 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
        
 
-        /*describe("order checking", ()=>{
+        describe("order checking", ()=>{
 
             it("checks valid orders", async()=>{
-                const validOrder = await htlc1400.checkOrder(orderID)
+                const validOrder = await htlc1400.checkOrder(orderID, tanglSecurityToken.address)
                 validOrder._orderState.toString().should.be.equal(swapState.OPEN)
             })
 
             it("fails to check invalid orders", async()=>{
-                await htlc1400.checkOrder(web3.utils.asciiToHex("x23dfdbvsdgdp")).should.be.rejected
+                await htlc1400.checkOrder(stringToHex("x23dfdbvsdgdp").hex, tanglSecurityToken.address).should.be.rejected
             })
 
-        })*/
+        })
 
 
     })
