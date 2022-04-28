@@ -2,14 +2,8 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ethers } = require("ethers")
+
 const { ETHER_ADDRESS, tokens, signer, data, signature, ethHash, wait, swapState, BYTES_0, setToken, stringToHex, expire, expired, hashSecret} = require("./helper.js")
-const moment = require("moment");
-const { describe } = require("yargs");
-
-
-
-
 
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
@@ -274,7 +268,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
             describe("after refund", ()=>{
 
                 beforeEach(async()=>{
-                    refund = await htlc1400.refund(orderID3, tanglSecurityToken.address)
+                    refund = await htlc1400.refund(orderID3, tanglSecurityToken.address, {from:issuer})
                 })
 
                 it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
@@ -287,7 +281,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                     issuerTanglBalance.toString().should.be.equal(tokens(95).toString(), "the htlc balance was incremented")
                 })
 
-                it("checks that order state has been set to 'EXPIRED' ", async()=>{
+                it("checks that order state has been set to `EXPIRED` after successful refund", async()=>{
 
                     const expiredOrder = await htlc1400.checkOrder(orderID3, tanglSecurityToken.address)
                     expiredOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state has 'EXPIRED' ")
@@ -299,19 +293,25 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 })
             })
 
+            describe("failed refund", ()=>{
+
+                it("should fail to refund orders that is yet to be expired", ()=>{
+                    await htlc1400.refund(orderID, tanglSecurityToken.address, {from:issuer}).should.be.rejected
+                })
+
+                it("fails to refund if called by an invalid address", ()=>{
+                    await htlc1400.refund(orderID, tanglSecurityToken.address, {from:investor1}).should.be.rejected
+                })
+    
+            })
+
            
 
             
 
         })
 
-        describe("failed refund", ()=>{
-
-            it("should fail to refund orders that is yet to be expired", ()=>{
-
-            })
-
-        })
+       
 
         /*describe("order checking", ()=>{
 
