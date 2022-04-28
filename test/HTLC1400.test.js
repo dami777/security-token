@@ -302,6 +302,10 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 it("fails to refund if called by an invalid address", async()=>{
                     await htlc1400.refund(orderID, tanglSecurityToken.address, {from:investor1}).should.be.rejected
                 })
+
+                it("fails to refund an invalid order", async()=>{
+                    await htlc1400.refund(stringToHex("dfgdfdd").hex, tanglSecurityToken.address, {from:issuer}).should.be.rejected
+                })
     
             })
 
