@@ -2,32 +2,41 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken} = require("./helper.js")
 
 //  connect to the smart contract
 
 const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
-
+const ERC1400 = artifacts.require("./ERC1400")
 
 contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     let htlc20 
     let erc20
+    let tanglSecurityToken
     let secret_phrase = "anonymous"
     let secretHash = hashSecret(secret_phrase).secretHash
     let orderID = stringToHex("x23dvsdgd").hex
-    let expiration = expire(1)     // expiration will be present time + 1 day
-    let classA = stringToHex("CLASS A").hex
+    let expiration = expire(1)                                              // expiration will be present time + 1 day
     let price = tokens(1000)                                                // price of the asset
     let amount = tokens(10)                                                 // quantity of asset to be issued
 
+
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+
+    
+    
+    
+    let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
 
     beforeEach(async()=>{
 
         
         erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
         htlc20 = await HTLC20.new(erc20.address)
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass)
         
 
     })    
@@ -52,7 +61,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, price, amount, expiration, secretHash, secretBytes32, classA)
+            openOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretBytes32, classA)
 
         })
 
