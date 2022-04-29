@@ -45,7 +45,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     })
 
-   /* describe("open order", ()=>{
+    describe("open order", ()=>{
 
         let openOrder
         
@@ -193,7 +193,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     })
 
-    describe("refund expired order", ()=>{
+    /*describe("refund expired order", ()=>{
 
         let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
         const expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
