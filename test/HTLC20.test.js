@@ -2,7 +2,6 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const moment = require("moment");
 const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret} = require("./helper.js")
 
 //  connect to the smart contract
@@ -46,7 +45,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     })
 
-    describe("open order", ()=>{
+   /* describe("open order", ()=>{
 
         let openOrder
         
@@ -261,6 +260,6 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         })
 
-    })
+    })*/
 
 })
