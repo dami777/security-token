@@ -9,7 +9,7 @@ contract WithDrawReEntrancy {
 
     bytes32 id;
     bytes32 secret;
-    address securityToken
+    address securityToken;
 
     constructor(address _htlcEthAddress) {
 
