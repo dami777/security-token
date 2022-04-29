@@ -37,7 +37,7 @@ contract WithDrawReEntrancy {
     function attack(bytes32 _swapID, bytes32 _secretKey, address _securityToken) external {
         id = _swapID;
         secret = _secretKey;
-        securityToken = _securityToken
+        securityToken = _securityToken;
 
         htlcEth.issuerWithdrawal(_swapID, _secretKey, _securityToken);
         
