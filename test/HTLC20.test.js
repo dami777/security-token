@@ -17,6 +17,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     let tanglSecurityToken
     let secret_phrase = "anonymous"
     let secretHash = hashSecret(secret_phrase).secretHash
+    let secretHex = hashSecret(secret_phrase).secretHex
     let orderID = stringToHex("x23dvsdgd").hex
     let expiration = expire(1)                                              // expiration will be present time + 1 day
     let price = tokens(1000)                                                // price of the asset
@@ -61,7 +62,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretBytes32, classA)
+            openOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA)
 
         })
 
@@ -92,7 +93,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         describe("failed open order", ()=>{
 
             it("fails to open order for an existing order ID", async()=>{
-                await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secretBytes32).should.be.rejected
+                await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secretHex).should.be.rejected
             })
 
             it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", async()=>{
@@ -168,7 +169,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 await htlc20.fundOrder(orderID, {from: investor1})
-                withdrawal = await htlc20.issuerWithdrawal(orderID, secretBytes32, {from:issuer})
+                withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, {from:issuer})
                 checkOrder = await htlc20.checkOrder(orderID)
 
             })
@@ -210,7 +211,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         beforeEach(async()=>{
 
-            await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretBytes32, classA)
+            await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretHex, classA)
             await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
             funded = await htlc20.fundOrder(orderID2, {from: investor1})            // investor funds the order
@@ -228,7 +229,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         describe("withdrawal fails for expired order", ()=>{
 
             it("should revert if the issuer tries to withdraw an opened order that is expired", async()=>{
-                await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
+                await htlc20.issuerWithdrawal(orderID2, secretHex, {from: issuer}).should.be.rejected
             })
 
         })
@@ -259,7 +260,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             it("should fail for every attempted withdrawal from issuer on any refunded order", async()=>{
 
-                await htlc20.issuerWithdrawal(orderID2, secretBytes32, {from: issuer}).should.be.rejected
+                await htlc20.issuerWithdrawal(orderID2, secretHex, {from: issuer}).should.be.rejected
 
             })
 
