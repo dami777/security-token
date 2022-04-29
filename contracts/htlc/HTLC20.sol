@@ -28,10 +28,10 @@ contract HTLC20 {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function openOrder(bytes32 _swapID, address _investor, address _erc20, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
+    function openOrder(bytes32 _swapID, address _investor, address _erc20, address _securityToken, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
+        require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
         _orderSwap[_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _erc20, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_swapID] = OrderLibrary.SwapState.OPEN;
@@ -45,11 +45,11 @@ contract HTLC20 {
     /// @notice `_swapState[_swapID] == OrderLibrary.SwapState.OPEN` ,  i.e the order state must be opened
     /// @dev this contract must be approved by the caller before calling this function
 
-    function fundOrder(bytes32 _swapID) external {
+    function fundOrder(bytes32 _swapID, address _securityToken) external {
 
-        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
-        require(_orderSwap[_swapID]._funded == false, "this order has been funded");
-        require(_orderSwap[_swapID]._investor == msg.sender, "invalid caller");
+        require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
+        require(_orderSwap[_securityToken[_swapID]._funded == false, "this order has been funded");
+        require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         IERC20(_order._paymentAddress).transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_swapID]._funded = true;
@@ -65,17 +65,17 @@ contract HTLC20 {
     /// @notice the order must not be an expired order
     /// @notice the hash of the secretKey must equal the hash in the order
 
-    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external {
+    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey, address _securityToken) external {
 
         require(msg.sender == _owner, "invalid caller");
-        require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
-        require(_orderSwap[_swapID]._funded == true, "this order has not been funded");
+        require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "this order is not opened");
+        require(_orderSwap[_securityToken][_swapID]._funded == true, "this order has not been funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
         require(block.timestamp < _order._expiration, "order has expired");
         require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         IERC20(_order._paymentAddress).transfer(_order._recipient, _order._price);
-        _orderSwap[_swapID]._secretKey = _secretKey;
-        _swapState[_swapID] = OrderLibrary.SwapState.CLOSED;
+        _orderSwap[_securityToken][_swapID]._secretKey = _secretKey;
+        _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.CLOSED;
         emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
 
     }
