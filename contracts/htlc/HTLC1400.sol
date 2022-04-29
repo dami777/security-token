@@ -81,6 +81,7 @@ contract HTLC1400 {
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "order ID exist already");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
+        require(_expiration > block.timestamp, "expiration date but be greater than present day");
         _orderSwap[_securityToken][_swapID] = OrderSwap(_investor, msg.sender, _securityToken, _tokenValue, _expiration, _secretHash, bytes32(0), _partition, _swapID);         // save the order on the blockchain so that the target investor can make reference to it for withdrawal
         IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).operatorTransferByPartition(_partition, msg.sender, address(this), _tokenValue, "", _data);                        // the htlc contract moves tokens from the caller's wallet, i.e the issuer and deposits them in its address to be released to the expected recipient
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.OPEN;                                                                                            // keep the order state OPEN till it is CLOSES or EXPIRES
