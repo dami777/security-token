@@ -13,20 +13,12 @@ contract HTLC20 {
     //using OrderLibrary for OrderLibrary.SwapState;
     //using OrderLibrary for OrderLibrary.OrderSwap;
 
-    mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
-    mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
+    mapping(address => mapping(bytes32 => OrderLibrary.OrderSwap)) private _orderSwap;      //  map the order struct to the order ID
+    mapping(address => mapping(bytes32 => OrderLibrary.SwapState)) private _swapState;      //  to keep track of the swap state of an id
     
     address private  _owner;
 
-    
 
-
-    /*constructor(address _usdtAddress) {
-
-        ERC20_TOKEN = IERC20(_usdtAddress);
-        _owner = msg.sender;
-
-    }*/
 
     /// @dev    Issuer initializes the order with the same orderID in the htlc1400 contract
     /// @dev    The issuer uses the ID to withdraw USDT from this contract, while the investor uses the ID to withdraw from the htlc1400 contract

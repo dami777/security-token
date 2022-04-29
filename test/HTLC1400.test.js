@@ -208,7 +208,11 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
 
         })
 
-        describe("failed withdrawal", ()=>{
+         /**
+         * To test for failed withdrawal, comment out the require statement that reverts opening orders for expired time
+         */
+
+        /*describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
 
@@ -236,7 +240,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, reitSecurityToken.address, {from: investor1}).should.be.rejected
             })
             
-        })
+        })*/
 
         /**
          * To test for refund, comment out the require statement that reverts opening orders for expired time
