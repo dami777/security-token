@@ -11,6 +11,7 @@ library OrderLibrary {
         address _recipient;
         address _investor;
         address _paymentAddress;
+        address _ERC1400_ADDRESS;
         uint256 _price;
         uint256 _amount;
         uint256 _expiration;
