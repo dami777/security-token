@@ -45,7 +45,7 @@ contract HTLC_ETH {
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
-    function openOrder(bytes32 _swapID, address _investor, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
+    function openOrder(bytes32 _swapID, address _investor, address _securityToken, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.INVALID, "this order id exist already");
@@ -62,7 +62,7 @@ contract HTLC_ETH {
     /// @notice `_swapState[_swapID] == OrderLibrary.SwapState.OPEN` ,  i.e the order state must be opened
     /// @dev this contract must be approved by the caller before calling this function
 
-    function fundOrder(bytes32 _swapID) payable external {
+    function fundOrder(bytes32 _swapID, address _securityToken) payable external {
 
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "this order isn't opened");
         require(_orderSwap[_swapID]._funded == false, "this order has been funded");
@@ -82,7 +82,7 @@ contract HTLC_ETH {
     /// @notice the order must not be an expired order
     /// @notice the hash of the secretKey must equal the hash in the order
 
-    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey) external noReEntrancy {
+    function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey, address _securityToken) external noReEntrancy {
 
         require(msg.sender == _owner, "invalid caller");
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "must be an opened order");
@@ -104,7 +104,7 @@ contract HTLC_ETH {
     /// @notice swapt state becomes `expired`
 
 
-    function refund(bytes32 _swapID) external noReEntrancy {
+    function refund(bytes32 _swapID, address _securityToken) external noReEntrancy {
 
         require(_swapState[_swapID] == OrderLibrary.SwapState.OPEN, "order is not opened");
         require(block.timestamp > _orderSwap[_swapID]._expiration, "order has not expired");
@@ -122,7 +122,7 @@ contract HTLC_ETH {
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
 
-    function checkOrder(bytes32 _swapID) external view returns (address _recipient, address _investor, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
+    function checkOrder(bytes32 _swapID, address _securityToken) external view returns (address _recipient, address _investor, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
 
         require(_swapState[_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_swapID];
