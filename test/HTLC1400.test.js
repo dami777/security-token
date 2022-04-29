@@ -154,7 +154,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA, investor2, tanglSecurityToken.address, tokens(5), expiration, data, {from: issuer}).should.be.rejected
             })
 
-            it("fails to open orders for expired dates", ()=>{
+            it("fails to open orders for expired dates", async()=>{
                 await htlc1400.openOrder(stringToHex("4t5d").hex, secretHex1, secretHash1, classA, investor1, tanglSecurityToken.address, expired(1), 10000, data, {from: issuer}).should.be.rejected
             })
 
