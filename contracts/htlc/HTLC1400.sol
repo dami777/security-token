@@ -130,7 +130,7 @@ contract HTLC1400 {
         require(block.timestamp > _order._expiration, "the order is yet to expire"); 
         IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.EXPIRED;
-        emit RefundOrder(msg.sender, _swapID, _order._tokenValue, _order._expiration, _order._partition);
+        emit RefundOrder(msg.sender, _securityToken, _swapID, _order._tokenValue, _order._expiration, _order._partition);
 
     }
 
