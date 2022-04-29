@@ -106,7 +106,7 @@ contract HTLC20 {
         require(_swapState[_securityToken][_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         OrderLibrary.SwapState _state = _swapState[_securityToken][_swapID];
-        return (_order._recipient, _order._investor, _order._price, _order._expiration, _order._funded, _swapID, _state, _order._secretKey);
+        return (_order._recipient, _order._investor, _order._price, _order._expiration, _order._funded, _order._swapID, _state, _order._secretKey);
 
     }
 
