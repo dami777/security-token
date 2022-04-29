@@ -14,8 +14,8 @@ contract HTLC_ETH {
 
     address private _owner;
 
-    mapping(bytes32 => OrderLibrary.OrderSwap) private _orderSwap;      //  map the order struct to the order ID
-    mapping(bytes32 => OrderLibrary.SwapState) private _swapState;      //  to keep track of the swap state of an id
+    mapping(address => mapping(bytes32 => OrderLibrary.OrderSwap)) private _orderSwap;      //  map the order struct to the order ID
+    mapping(address => mapping(bytes32 => OrderLibrary.SwapState)) private _swapState;      //  to keep track of the swap state of an id
     bool private locked;                                                //  boolean variable used to handle reEntrancy
                                                     
     
