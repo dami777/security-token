@@ -145,17 +145,17 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
         describe("failed open order", ()=>{
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor1, tanglSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor1, tanglSecurityToken.address, tokens(5), expiration, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA, investor2, tanglSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA, investor2, tanglSecurityToken.address, tokens(5), expiration, data, {from: issuer}).should.be.rejected
             })
 
             it("fails to open orders for expired dates", ()=>{
-                await htlc1400.openOrder(stringToHex("4t5d").hex, secretHex1, secretHash1, classA, investor1, tanglSecurityToken.address, tokens(5), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(stringToHex("4t5d").hex, secretHex1, secretHash1, classA, investor1, tanglSecurityToken.address, expired(1), 10000, data, {from: issuer}).should.be.rejected
             })
 
         })
