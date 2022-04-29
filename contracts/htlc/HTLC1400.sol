@@ -157,6 +157,6 @@ contract HTLC1400 {
     
     event OpenedOrder(address indexed _issuer, address indexed _investor, address indexed _securityToken, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _partition);
     event ClosedOrder(address indexed _issuer, address indexed _investor, address indexed _securityToken, bytes32 _swapID, uint256 _amount,bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition);
-    event RefundOrder(address indexed _to, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
+    event RefundOrder(address indexed _to, address indexed _securityToken, bytes32 _swapID, uint256 _amount, uint256 _expiration, bytes32 _partition);
 
 }
