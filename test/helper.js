@@ -96,6 +96,21 @@ const expired=(days)=>{
 
 }
 
+const reverts = {
+
+    INVALID_CALLER: "invalid caller",
+    EXISTING_ID: "existing id",
+    INVALID_SECRET: "the secret doesn't match the hash",
+    NOT_OPENED: "not opened",
+    FUNDED: "funded order",
+    NOT_FUNDED: "not funded",
+    EXPIRED: "expired order",
+    NOT_EXPIRED: "not expired",
+    INVALID_ORDER: "invalid order"
+
+}
+
+
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
         wait, swapState, ether, BYTES_0, setToken, hashSecret, 
