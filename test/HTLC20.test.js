@@ -15,6 +15,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     let htlc20 
     let erc20
     let tanglSecurityToken
+    let reitSecurityToken
     let secret_phrase = "anonymous"
     let secretHash = hashSecret(secret_phrase).secretHash
     let secretHex = hashSecret(secret_phrase).secretHex
@@ -31,6 +32,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     
     
     let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
+    let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA.hex,classB.hex])
 
     beforeEach(async()=>{
 
@@ -38,7 +40,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
         htlc20 = await HTLC20.new(erc20.address)
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass)
-        
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
 
     })    
 
