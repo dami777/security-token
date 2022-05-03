@@ -114,5 +114,5 @@ const reverts = {
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
         wait, swapState, ether, BYTES_0, setToken, hashSecret, 
-        stringToHex, expire, expired }
+        stringToHex, expire, expired, reverts }
 
