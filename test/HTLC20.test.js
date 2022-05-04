@@ -241,10 +241,14 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                     const tanglAdministratorBalance = await erc20.balanceOf(tanglAdministrator)
                     const htlcBalance = await erc20.balanceOf(htlc20.address)
                     htlcBalance.toString().should.be.equal("0", "htlc released the token")
+                    tanglAdministratorBalance.toString().should.be.equal(price.toString(), "the issuer withdrew the payment")
                 })
 
-                it("emits the closed order event after successful withdrawal by the tanglAdministrator of the security token", async()=>{
-                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tanglAdministrator withdraws and closes the order")
+                it("emits the closed order event and the data associated with it after successful withdrawal by the tanglAdministrator of the security token", async()=>{
+                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tangl administrator withdraws and closes the order")
+                    withdrawal.logs[0].args._investor.should.be.equal(address1, "it emits the investor of the order")
+                    web3.utils.hexToUtf8(withdrawal.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition of the data")
+
                 })
 
                 it("made the secret visible to the investor, hence the investor can withdraw the security token with the secret", ()=>{
@@ -252,7 +256,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
                 it("should have a closed order state", ()=>{
-                    tanglCheckOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order is closed after withdrawal by the tanglAdministrator")
+                    tanglCheckOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order is closed after withdrawal by the tangl administrator")
                 })
 
                
