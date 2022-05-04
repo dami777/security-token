@@ -216,7 +216,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 await htlc20.refund(orderID, {from: investor1}).should.be.rejected
             })
 
-        })
+        })*/
 
 
         describe("withdrawal by tanglAdministrator", ()=>{
@@ -226,11 +226,11 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             beforeEach(async()=>{
 
-                await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
-                await htlc20.fundOrder(orderID, {from: investor1})
-                withdrawal = await htlc20.tanglAdministratorWithdrawal(orderID, secretHex, {from:tanglAdministrator})
-                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID)
+                await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
+                withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
+                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID, tanglSecurityToken.address)
 
             })
             
@@ -259,7 +259,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             })
 
-        })*/
+        })
 
     })
 
