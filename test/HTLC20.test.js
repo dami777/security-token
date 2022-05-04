@@ -150,19 +150,26 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             let fundedTangleOrder
             let tanglCheckOrder
 
+
+            /**
+             * Investor purchases usdt from an exchange/escrow
+             * Investor approves the htlc contract to move the tokens from his wallet
+             * Investor funds the order. The contract moves the token and deposits it because it has been approved
+             */
+
             beforeEach(async()=>{
 
                 await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 fundedTangleOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
-                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
+                tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
             
             })
 
             describe("successful funding", ()=>{
 
                 it("emits the funded event", ()=>{
-                    funded.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
+                    fundedTangleOrder.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
                 })
     
                 it("changes the order's fund status to true after funding", async()=>{
@@ -176,16 +183,16 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             describe("failed funding", ()=>{
 
                 it("fails to fund any order that isn't OPEN", async()=>{
-                    const orderID3 = web3.utils.asciiToHex("xg23dlsdgd")
-                    await htlc20.fundOrder(orderID3, {from: investor1}).should.be.rejected
+                    const orderID3 = stringToHex("xg23dlsdgd").hex
+                    await htlc20.fundOrder(orderID3, tanglSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_OPENED)
                 })
 
                 it("fails to fund any order if attempted by the wrong investor of the order", async()=>{
-                    await htlc20.fundOrder(orderID, {from: investor2}).should.be.rejected
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor2}).should.be.rejectedWith(reverts.INVALID_CALLER)
                 })
 
                 it("fails to fund an already funded order", async()=>{
-                    await htlc20.fundOrder(orderID, {from: investor1}).should.be.rejected
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.FUNDED)
                 })
 
             })
