@@ -104,7 +104,7 @@ contract("HTLC20", ([htlc20Deployer, tangleAdminstrator, reitAdmintrator, invest
             it("registers the correct order information", ()=>{
                 checkOrder._amount.toString().should.be.equal(tokens(1000).toString(), "it registers the correct price")
                 checkOrder._investor.should.be.equal(investor1, "it registers the investor needed to fund this order")
-                checkOrder._recipient.should.be.equal(tangleAdminstrator, "the tangleAdminstrator is the recipient of the order")
+                checkOrder._issuer.should.be.equal(tangleAdminstrator, "the tangleAdminstrator is the recipient of the order")
             })
 
         })
