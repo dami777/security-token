@@ -203,6 +203,7 @@ contract("HTLC1400", ([issuer, investor1, investor2, investor3])=>{
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
                 order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of the order")
                 order._orderState.toString().should.be.equal(swapState.CLOSED, "it fetched the updated order state which is closed")
+                order._securityToken.should.be.equal(tanglSecurityToken.address, "it returns the security token registered in the order")
                 
             })
 
