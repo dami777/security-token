@@ -81,7 +81,7 @@ contract("HTLC20", ([htlc20Deployer, tangleAdminstrator, reitAdmintrator, invest
 
         beforeEach(async()=>{
 
-            tangleOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex)
+            tangleOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tangleAdminstrator})
 
         })
 
