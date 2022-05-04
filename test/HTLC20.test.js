@@ -137,11 +137,11 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
             })
 
-            /*it("fails to open order if the tanglAdministrator tries to open an order with a secret that is incompatible with the provided hash", async()=>{
+            it("fails to open order if the tanglAdministrator tries to open an order with a secret that is incompatible with the provided hash", async()=>{
                 
-                const orderID2 = web3.utils.asciiToHex("x23dlsdgd")
-                await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
-            })*/
+                const orderID2 = stringToHex("x23dlsdgd").hex
+                await htlc20.openOrder(orderID2, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, hashSecret("avalanche").secretHex).should.be.rejectedWith(reverts.INVALID_SECRET)
+            })
 
         })
 
