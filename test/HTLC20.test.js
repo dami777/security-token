@@ -2,7 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
 
 //  connect to the smart contract
 
@@ -10,7 +10,14 @@ const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 const ERC1400 = artifacts.require("./ERC1400")
 
-contract("HTLC20", ([issuer, investor1, investor2])=>{
+
+/**
+ * tangleAdministrator represents the issuer/regulator/adminstrator of tangl security token
+ * reitAdministrator represents the issuer/regulator/adminstrator of reit security token
+ * USDT_MARKET represents the market where usdt will be issued to the investors
+ */
+
+contract("HTLC20", ([tangleAdminstrator, reitAdmintrator, investor1, investor2, USDT_MARKET])=>{
 
     let htlc20 
     let erc20
@@ -37,7 +44,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
     beforeEach(async()=>{
 
         
-        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT")
+        erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT", {from: USDT_MARKET})
         htlc20 = await HTLC20.new(erc20.address)
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass)
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
@@ -59,12 +66,12 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
     describe("open order", ()=>{
 
-        let openOrder
+        let tangleOpenOrder
         
 
         beforeEach(async()=>{
 
-            openOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA)
+            tangleOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA)
 
         })
 
@@ -77,7 +84,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             })
 
             it("emits the open order event", ()=>{
-                openOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the open order event")
+                tangleOpenOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the open order event")
             })
 
             it("changes the swap state from INVALID to OPEN", ()=>{
@@ -87,7 +94,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             it("registers the correct order information", ()=>{
                 checkOrder._amount.toString().should.be.equal(tokens(1000).toString(), "it registers the correct price")
                 checkOrder._investor.should.be.equal(investor1, "it registers the investor needed to fund this order")
-                checkOrder._recipient.should.be.equal(issuer, "the issuer is the recipient of the order")
+                checkOrder._recipient.should.be.equal(tangleAdminstrator, "the tangleAdminstrator is the recipient of the order")
             })
 
         })
@@ -98,7 +105,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await htlc20.openOrder(orderID, investor1, tokens(1000), expiration, secretHash, secretHex).should.be.rejected
             })
 
-            it("fails to open order if the issuer tries to open an order with a secret that is incompatible with the provided hash", async()=>{
+            it("fails to open order if the tangleAdminstrator tries to open an order with a secret that is incompatible with the provided hash", async()=>{
                 
                 const orderID2 = web3.utils.asciiToHex("x23dlsdgd")
                 await htlc20.openOrder(orderID2, investor1, tokens(1000), expiration, secretHash, web3.utils.asciiToHex("avalanche")).should.be.rejected
@@ -161,7 +168,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
         })
 
 
-        describe("withdrawal by issuer", ()=>{
+        describe("withdrawal by tangleAdminstrator", ()=>{
 
             let withdrawal 
             let checkOrder
@@ -171,7 +178,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 await erc20.transfer(investor1, tokens(2000))           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 await htlc20.fundOrder(orderID, {from: investor1})
-                withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, {from:issuer})
+                withdrawal = await htlc20.tangleAdminstratorWithdrawal(orderID, secretHex, {from:tangleAdminstrator})
                 checkOrder = await htlc20.checkOrder(orderID)
 
             })
@@ -179,14 +186,14 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
             describe("successful withdrawal", ()=>{
 
-                it("transfers the payment token to the issuer", async()=>{
-                    const issuerBalance = await erc20.balanceOf(issuer)
+                it("transfers the payment token to the tangleAdminstrator", async()=>{
+                    const tangleAdminstratorBalance = await erc20.balanceOf(tangleAdminstrator)
                     const htlcBalance = await erc20.balanceOf(htlc20.address)
                     htlcBalance.toString().should.be.equal("0", "htlc released the token")
                 })
 
-                it("emits the closed order event after successful withdrawal by the issuer of the security token", async()=>{
-                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "issuer withdraws and closes the order")
+                it("emits the closed order event after successful withdrawal by the tangleAdminstrator of the security token", async()=>{
+                    withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tangleAdminstrator withdraws and closes the order")
                 })
 
                 it("made the secret visible to the investor, hence the investor can withdraw the security token with the secret", ()=>{
@@ -194,7 +201,7 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
                 })
 
                 it("should have a closed order state", ()=>{
-                    checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order is closed after withdrawal by the issuer")
+                    checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order is closed after withdrawal by the tangleAdminstrator")
                 })
 
                
@@ -230,8 +237,8 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
 
         describe("withdrawal fails for expired order", ()=>{
 
-            it("should revert if the issuer tries to withdraw an opened order that is expired", async()=>{
-                await htlc20.issuerWithdrawal(orderID2, secretHex, {from: issuer}).should.be.rejected
+            it("should revert if the tangleAdminstrator tries to withdraw an opened order that is expired", async()=>{
+                await htlc20.tangleAdminstratorWithdrawal(orderID2, secretHex, {from: tangleAdminstrator}).should.be.rejected
             })
 
         })
@@ -260,9 +267,9 @@ contract("HTLC20", ([issuer, investor1, investor2])=>{
             })
 
 
-            it("should fail for every attempted withdrawal from issuer on any refunded order", async()=>{
+            it("should fail for every attempted withdrawal from tangleAdminstrator on any refunded order", async()=>{
 
-                await htlc20.issuerWithdrawal(orderID2, secretHex, {from: issuer}).should.be.rejected
+                await htlc20.tangleAdminstratorWithdrawal(orderID2, secretHex, {from: tangleAdminstrator}).should.be.rejected
 
             })
 
