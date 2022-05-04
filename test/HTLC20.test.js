@@ -219,7 +219,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         })*/
 
 
-        describe("withdrawal by tanglAdministrator", ()=>{
+        /*describe("withdrawal by tanglAdministrator", ()=>{
 
             let withdrawal 
             let tanglCheckOrder
@@ -230,7 +230,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
                 await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
                 withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
-                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID, tanglSecurityToken.address)
+                tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)
 
             })
             
@@ -246,7 +246,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 it("emits the closed order event and the data associated with it after successful withdrawal by the tanglAdministrator of the security token", async()=>{
                     withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tangl administrator withdraws and closes the order")
-                    withdrawal.logs[0].args._investor.should.be.equal(address1, "it emits the investor of the order")
+                    withdrawal.logs[0].args._investor.should.be.equal(investor1, "it emits the investor of the order")
                     web3.utils.hexToUtf8(withdrawal.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition of the data")
 
                 })
@@ -263,28 +263,28 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             })
 
-        })
+        })*/
 
     })
 
-    /*describe("refund expired order", ()=>{
+    describe("expired order", ()=>{
 
-        let orderID2 = web3.utils.asciiToHex("x23d33sdgdp")
-        const expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+        let orderID2 = stringToHex("x23d33sdgdp").hex
+        const expiredDate = expired(2)       // set expiration to 2 days before
         let refund
 
         beforeEach(async()=>{
 
-            await htlc20.openOrder(orderID2, investor1, price, amount, expired, secretHash, secretHex, classA)
-            await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+            await htlc20.openOrder(orderID2, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
+            await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
-            funded = await htlc20.fundOrder(orderID2, {from: investor1})            // investor funds the order
+            funded = await htlc20.fundOrder(orderID2, reitSecurityToken.address, {from: investor1})            // investor funds the order
         })
 
         describe("the order is opened", ()=>{
 
             it("check the order to be opened", async()=>{
-                const tanglCheckOrder = await htlc20.tanglCheckOrder(orderID2)
+                const reitCheckOrder = await htlc20.tanglCheckOrder(orderID2, reitSecurityToken.address)
                 tanglCheckOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
             })
 
@@ -292,19 +292,19 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         describe("withdrawal fails for expired order", ()=>{
 
-            it("should revert if the tanglAdministrator tries to withdraw an opened order that is expired", async()=>{
-                await htlc20.tanglAdministratorWithdrawal(orderID2, secretHex, {from: tanglAdministrator}).should.be.rejected
+            it("should revert if the administrator tries to withdraw an opened order that is expired", async()=>{
+                await htlc20.issuerWithdrawal(orderID2, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejected
             })
 
         })
 
         describe("refund", ()=>{
 
-            let tanglCheckOrder
+            let reitCheckOrder
 
             beforeEach(async()=>{
-                refund = await htlc20.refund(orderID2, {from: investor1})
-                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID2)
+                refund = await htlc20.refund(orderID2, reitAdministrator, {from: investor1})
+                reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
 
             })
 
@@ -324,7 +324,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             it("should fail for every attempted withdrawal from tanglAdministrator on any refunded order", async()=>{
 
-                await htlc20.tanglAdministratorWithdrawal(orderID2, secretHex, {from: tanglAdministrator}).should.be.rejected
+                await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejected
 
             })
 
@@ -334,6 +334,6 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-    })*/
+    })
 
 })
