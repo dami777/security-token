@@ -85,7 +85,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             reitOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: reitAdministrator})
         })
 
-        describe("successful open order", ()=>{
+        /*describe("successful open order", ()=>{
 
             let tanglCheckOrder
             let reitCheckOrder
@@ -129,9 +129,9 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
             })      
 
-        })
+        })*/
 
-        describe("failed open order", ()=>{
+        /*describe("failed open order", ()=>{
 
             it("fails to open order for an existing order ID", async()=>{
                 await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
@@ -140,21 +140,23 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             it("fails to open order if the tanglAdministrator tries to open an order with a secret that is incompatible with the provided hash", async()=>{
                 
                 const orderID2 = stringToHex("x23dlsdgd").hex
-                await htlc20.openOrder(orderID2, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, hashSecret("avalanche").secretHex).should.be.rejectedWith(reverts.INVALID_SECRET)
+                await htlc20.openOrder(orderID2, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, hashSecret("avalanche").secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
             })
 
-        })
+        })*/
 
-        /*describe("funding order", ()=>{
+        describe("funding order", ()=>{
 
-            let funded
+            let fundedTangleOrder
             let tanglCheckOrder
 
             beforeEach(async()=>{
-                await erc20.transfer(investor1, tokens(2000))                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+
+                await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
-                funded = await htlc20.fundOrder(orderID, {from: investor1})
-                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID)                            // check the order after funding
+                fundedTangleOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
+                tanglCheckOrder = await htlc20.tanglCheckOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
+            
             })
 
             describe("successful funding", ()=>{
@@ -191,7 +193,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                  
         })
 
-        describe("failed refund before expiration", ()=>{
+        /*describe("failed refund before expiration", ()=>{
             
             it("should revert if refund is attempted before the expiration period", async()=>{
                 await htlc20.refund(orderID, {from: investor1}).should.be.rejected

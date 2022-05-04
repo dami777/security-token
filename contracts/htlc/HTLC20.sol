@@ -24,7 +24,7 @@ contract HTLC20 {
     /// @dev    The issuer uses the ID to withdraw USDT from this contract, while the investor uses the ID to withdraw from the htlc1400 contract
     /// @param  _swapID is the ID of the swap order. This ID must be valid on the htlc1400 contract for swap to occur
     /// @param _investor is the address that will fund this contract with the given _swapID
-    /// @param  _price is the price of the security token to be purchased. This contract is funded by investor for this particular order
+    /// @param  _price is the set price of the security token to be purchased. This contract is funded by investor for this particular order
     /// @param _expiration is the time expected for this order to expire before a refund can enabled
     /// @param _secretHash is the hash of the secret set on this contract and htlc1400 for this particular swap ID
 
