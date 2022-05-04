@@ -284,7 +284,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         describe("the order is opened", ()=>{
 
             it("check the order to be opened", async()=>{
-                const reitCheckOrder = await htlc20.tanglCheckOrder(orderID2, reitSecurityToken.address)
+                const reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
                 tanglCheckOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
             })
 
@@ -303,7 +303,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             let reitCheckOrder
 
             beforeEach(async()=>{
-                refund = await htlc20.refund(orderID2, reitAdministrator, {from: investor1})
+                refund = await htlc20.refund(orderID2, reitSecurityToken.address, {from: investor1})
                 reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
 
             })
