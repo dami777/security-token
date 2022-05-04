@@ -90,7 +90,7 @@ contract("HTLC20", ([htlc20Deployer, tangleAdminstrator, reitAdmintrator, invest
             let checkOrder
 
             beforeEach(async()=>{
-                checkOrder = await htlc20.checkOrder(orderID, tanglSecurityToken)
+                checkOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)
             })
 
             it("emits the open order event", ()=>{
