@@ -8,7 +8,7 @@ library OrderLibrary {
     struct OrderSwap {
 
         
-        address _recipient;
+        address _issuer;
         address _investor;
         address _paymentAddress;
         address _ERC1400_ADDRESS;
