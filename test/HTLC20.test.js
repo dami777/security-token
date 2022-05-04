@@ -161,12 +161,18 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
-                fundedTangleOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
-                tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
+                
             
             })
 
             describe("successful funding", ()=>{
+
+
+                beforeEach(async()=>{
+
+                    fundedTangleOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
+                    tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
+                })
 
                 it("emits the funded event", ()=>{
                     fundedTangleOrder.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
@@ -192,6 +198,10 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
                 it("fails to fund an already funded order", async()=>{
+
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})      //  fund the order
+
+                    //  attempted funding again
                     await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.FUNDED)
                 })
 
