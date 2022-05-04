@@ -17,7 +17,7 @@ const ERC1400 = artifacts.require("./ERC1400")
  * USDT_MARKET represents the market where usdt will be issued to the investors
  */
 
-contract("HTLC20", ([tangleAdminstrator, reitAdmintrator, investor1, investor2, USDT_MARKET])=>{
+contract("HTLC20", ([htlc20Deployer, tangleAdminstrator, reitAdmintrator, investor1, investor2, USDT_MARKET])=>{
 
     let htlc20 
     let erc20
@@ -43,11 +43,19 @@ contract("HTLC20", ([tangleAdminstrator, reitAdmintrator, investor1, investor2, 
 
     beforeEach(async()=>{
 
+
+        /**
+         * Deploy the USDT in the USDT market so that investors can be issued usdt from the market
+         * Deploy the HTLC20 contract which will be used by all security token administrator to issue and track the DVP for the security token asset
+         * Deploy a security token by a tangl administrator which will be used to handle DVP for the tangl asset
+         * Deploy a security token by an reit administrator which will be used to handle DVP for the reit asset
+         */
+
         
         erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT", {from: USDT_MARKET})
-        htlc20 = await HTLC20.new(erc20.address)
-        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass)
-        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass)
+        htlc20 = await HTLC20.new(erc20.address, {from: htlc20Deployer})
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tangleAdminstrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdmintrator})
 
     })    
 
@@ -58,7 +66,8 @@ contract("HTLC20", ([tangleAdminstrator, reitAdmintrator, investor1, investor2, 
 
             htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
             erc20.address.should.not.be.equal("", "the erc20_usdt has a contract address")
-            
+            tanglSecurityToken.address.should.not.be.equal("", "tangle security token has a contract address")
+            reitSecurityToken.address.should.not.be.equal("", "reit security token has a contract address")
 
         })
 
@@ -67,6 +76,7 @@ contract("HTLC20", ([tangleAdminstrator, reitAdmintrator, investor1, investor2, 
     describe("open order", ()=>{
 
         let tangleOpenOrder
+        let reitOpenOrder
         
 
         beforeEach(async()=>{
