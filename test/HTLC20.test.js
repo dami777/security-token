@@ -2,7 +2,8 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { describe } = require("yargs")
+
+
 const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
 
 //  connect to the smart contract
@@ -222,21 +223,30 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         describe("withdrawal by tanglAdministrator", ()=>{
 
-            let withdrawal 
-            let tanglCheckOrder
 
             beforeEach(async()=>{
 
                 await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})              // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
                 await erc20.approve(htlc20.address, tokens(1000), {from: investor1})            // investor approves the htlc contract to move the tokens from his wallet to fund the order
-                await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})  // investor funds the order
-                withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
-                tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)
+                
+            
 
             })
             
 
             describe("successful withdrawal", ()=>{
+
+
+                let withdrawal 
+                let tanglCheckOrder
+
+                beforeEach(async()=>{
+
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})  // investor funds the order
+                    withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
+                    tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)
+
+                })
 
                 it("transfers the payment token to the tanglAdministrator", async()=>{
                     const tanglAdministratorBalance = await erc20.balanceOf(tanglAdministrator)
@@ -262,6 +272,39 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
                
+
+            })
+
+            describe("failed withdrawal", ()=>{
+
+
+                it("fails to withdraw from a closed order", async()=>{
+
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})                              // investor funds the order
+                    await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})    //  withdraw and close the order
+
+                    //  attempt another withdrawal on the closed order
+                    await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
+
+                })
+
+                it("fails to withdraw from orders not funded", async()=>{
+
+                    await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.NOT_FUNDED)
+
+                })
+
+                it("fails to withdraw from an expired order", ()=>{
+                    
+
+                    const orderID = stringToHex("dfbdfb").hex 
+                    const expiredDate = expired(2)
+                    await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
+                    await htlc20.fundOrder(orderID, reitSecurityToken.address, {from: investor1})
+                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
+
+
+                })
 
             })
 
@@ -292,13 +335,6 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-        describe("withdrawal fails for expired order", ()=>{
-
-            it("should revert if the administrator tries to withdraw an opened order that is expired", async()=>{
-                await htlc20.issuerWithdrawal(orderID2, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejected
-            })
-
-        })
 
         describe("refund", ()=>{
 
@@ -337,11 +373,11 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
 
-                /*it("should fail for every attempted withdrawal from dministrator on any refunded order", async()=>{
+                it("should fail for every attempted withdrawal from dministrator on any refunded order", async()=>{
 
-                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejected
+                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
 
-                })*/
+                })
             })
 
             describe("failed refund", ()=>{
