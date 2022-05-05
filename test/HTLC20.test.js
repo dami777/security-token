@@ -301,7 +301,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                     const expiredDate = expired(2)
                     await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
                     await htlc20.fundOrder(orderID, reitSecurityToken.address, {from: investor1})
-                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
+                    await htlc20.issuerWithdrawal(orderID, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
 
 
                 })
@@ -373,9 +373,9 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
 
-                it("should fail for every attempted withdrawal from dministrator on any refunded order", async()=>{
+                it("should fail for every attempted withdrawal by aministrator on any refunded order", async()=>{
 
-                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
+                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
 
                 })
             })
