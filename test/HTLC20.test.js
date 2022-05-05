@@ -322,9 +322,16 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                     const balance = await erc20.balanceOf(investor1)
                     balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
+                    
+
+
+                })
+
+                it("emits the event and the data associated with it", ()=>{
                     refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refund event")
-
-
+                    refund.logs[0].args._securityToken.should.be.equal(reitSecurityToken.address,"it emits the security token address associated with the order")
+                    refund.logs[0].args._issuer.should.be.equal(reitAdministrator, "it emits the issuer's address associated with the order")
+                    refund.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
                 })
 
 
