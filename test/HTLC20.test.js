@@ -344,8 +344,16 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                it("should fail if the order to be refunded has not expired", async()=>{
+                it("should fail if the order to be refunded has not been funded by the investor", async()=>{
                     
+                    await htlc20.refund(orderID, reitSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_FUNDED)
+
+                })
+
+                it("should fail of the order has not expired", async()=>{
+
+                    await htlc20.openOrder(stringToHex("gegr").hex, investor1, erc20.address, reitSecurityToken.address,  price, amount, expire(1), secretHash, secretHex, classA.hex, {from: reitAdministrator})
+                    await htlc20.fundOrder(orderID2, reitSecurityToken.address, {from: investor1})
                     await htlc20.refund(orderID, reitSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_EXPIRED)
 
                 })

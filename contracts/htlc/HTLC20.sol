@@ -87,8 +87,8 @@ contract HTLC20 {
     function refund(bytes32 _swapID, address _securityToken) external {
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
-        require(block.timestamp > _orderSwap[_securityToken][_swapID]._expiration, "not expired");
         require(_orderSwap[_securityToken][_swapID]._funded == true, "not funded");
+        require(block.timestamp > _orderSwap[_securityToken][_swapID]._expiration, "not expired");    
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         IERC20(_order._paymentAddress).transfer(_order._investor, _order._price);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.EXPIRED;
