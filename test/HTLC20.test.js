@@ -176,8 +176,10 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                     tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
                 })
 
-                it("emits the funded event", ()=>{
+                it("emits the funded event and the data associated with it", ()=>{
                     fundedTangleOrder.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
+                    fundedTangleOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the address of the investor that funded the order")
+                    fundedTangleOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security token address associated with the order")
                 })
     
                 it("changes the order's fund status to true after funding", async()=>{
@@ -215,6 +217,9 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         describe("failed refund before expiration", ()=>{
             
             it("should revert if refund is attempted before the expiration period", async()=>{
+
+                await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.approve(htlc20.address, tokens(1000), {from: investor1})
 
                 //  investor funds the order
 
@@ -265,6 +270,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                     withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tangl administrator withdraws and closes the order")
                     withdrawal.logs[0].args._investor.should.be.equal(investor1, "it emits the investor of the order")
                     withdrawal.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the issuer associated with the order")
+                    withdrawal.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security token associated with the order")
                     web3.utils.hexToUtf8(withdrawal.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition of the data")
 
                 })
