@@ -219,6 +219,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                     await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.FUNDED)
                 })
 
+                
             })
 
                  
@@ -316,7 +317,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                it("fails to withdraw from an expired order", async()=>{
+                /*it("fails to withdraw from an expired order", async()=>{*/
 
                     /**
                      * set the orde id
@@ -327,14 +328,14 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                      */
                     
 
-                    const orderID = stringToHex("dfbdfb").hex 
+                    /*const orderID = stringToHex("dfbdfb").hex 
                     const expiredDate = expired(2)
                     await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
                     await htlc20.fundOrder(orderID, reitSecurityToken.address, {from: investor1})
                     await htlc20.issuerWithdrawal(orderID, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
 
 
-                })
+                })*/
 
                 it("fails to withdraw if the secret provided by the administrator does not match the secret registered with the order", async()=>{
 
@@ -355,7 +356,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
     })
 
-    describe("expired order", ()=>{
+    /*describe("expired order", ()=>{
 
         let orderID2 = stringToHex("x23d33sdgdp").hex
         const expiredDate = expired(2)       // set expiration to 2 days before
@@ -457,7 +458,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-    })
+    })*/
 
 })
 
