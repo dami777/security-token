@@ -34,7 +34,7 @@ contract HTLC20 {
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
         _orderSwap[_securityToken][_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _erc20, _securityToken, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.OPEN;
-        emit OpenedOrder(_investor, _swapID, _partition, _amount, _price, _expiration, _secretHash);
+        emit OpenedOrder(msg.sender, _investor, _securityToken, _swapID, _partition, _amount, _price, _expiration, _secretHash);
 
     }
 
@@ -52,7 +52,7 @@ contract HTLC20 {
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         IERC20(_order._paymentAddress).transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_securityToken][_swapID]._funded = true;
-        emit Funded(_order._investor, _order._partition, _order._amount, _order._price);
+        emit Funded(_order._investor, _order._ERC1400_ADDRESS, _order._partition, _order._amount, _order._price);
 
     }
 
@@ -75,7 +75,7 @@ contract HTLC20 {
         IERC20(_order._paymentAddress).transfer(_order._issuer, _order._price);
         _orderSwap[_securityToken][_swapID]._secretKey = _secretKey;
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.CLOSED;
-        emit ClosedOrder(_order._investor, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
+        emit ClosedOrder(_order._issuer, _order._investor, _order._ERC1400_ADDRESS, _swapID, _order._partition, _order._amount, _order._price, _order._secretKey, _order._secretHash);
 
     }
 
@@ -92,7 +92,7 @@ contract HTLC20 {
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         IERC20(_order._paymentAddress).transfer(_order._investor, _order._price);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.EXPIRED;
-        emit RefundedOrder(_order._investor, _swapID, _order._price, _order._expiration);
+        emit RefundedOrder(_order._issuer, _order._investor, _order._ERC1400_ADDRESS ,_swapID, _order._price, _order._expiration);
 
     }
 
