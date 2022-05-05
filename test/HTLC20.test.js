@@ -2,6 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const { describe } = require("yargs")
 const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
 
 //  connect to the smart contract
@@ -219,16 +220,16 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         })*/
 
 
-        /*describe("withdrawal by tanglAdministrator", ()=>{
+        describe("withdrawal by tanglAdministrator", ()=>{
 
             let withdrawal 
             let tanglCheckOrder
 
             beforeEach(async()=>{
 
-                await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
-                await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  // investor approves the htlc contract to move the tokens from his wallet to fund the order
-                await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
+                await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})              // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
+                await erc20.approve(htlc20.address, tokens(1000), {from: investor1})            // investor approves the htlc contract to move the tokens from his wallet to fund the order
+                await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})  // investor funds the order
                 withdrawal = await htlc20.issuerWithdrawal(orderID, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
                 tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)
 
@@ -247,6 +248,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 it("emits the closed order event and the data associated with it after successful withdrawal by the tanglAdministrator of the security token", async()=>{
                     withdrawal.logs[0].event.should.be.equal("ClosedOrder", "tangl administrator withdraws and closes the order")
                     withdrawal.logs[0].args._investor.should.be.equal(investor1, "it emits the investor of the order")
+                    withdrawal.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the issuer associated with the order")
                     web3.utils.hexToUtf8(withdrawal.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition of the data")
 
                 })
@@ -263,7 +265,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             })
 
-        })*/
+        })
 
     })
 
