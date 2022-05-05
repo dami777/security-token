@@ -32,6 +32,7 @@ contract HTLC20 {
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "existing id");
         require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
+        require(_expiration > block.timestamp, "expiration time is less than present time");
         _orderSwap[_securityToken][_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _erc20, _securityToken, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.OPEN;
         emit OpenedOrder(msg.sender, _investor, _securityToken, _swapID, _partition, _amount, _price, _expiration, _secretHash);
@@ -49,6 +50,7 @@ contract HTLC20 {
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
         require(_orderSwap[_securityToken][_swapID]._funded == false, "funded order");
         require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
+        require(_orderSwap[_securityToken][_swapID]._expiration > block.timestamp, "can't fund expired order");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         IERC20(_order._paymentAddress).transferFrom(_order._investor, address(this), _order._price);
         _orderSwap[_securityToken][_swapID]._funded = true;

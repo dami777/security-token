@@ -432,7 +432,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                it("should fail of the order has not expired", async()=>{
+                it("should fail if the order has not expired", async()=>{
 
                     await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           
                     await erc20.approve(htlc20.address, tokens(1000), {from: investor1})  
