@@ -294,7 +294,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                it("fails to withdraw from an expired order", ()=>{
+                it("fails to withdraw from an expired order", async()=>{
                     
 
                     const orderID = stringToHex("dfbdfb").hex 
