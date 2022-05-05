@@ -462,9 +462,3 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
 })
 
-
-
-//  test failed withdrawal
-//  update the events with the issuer's address and the security token address
-//  test the failed refund
-//  ensure that deposits can not be made for dates greater than now
