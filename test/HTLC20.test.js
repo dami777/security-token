@@ -212,13 +212,19 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                  
         })
 
-        /*describe("failed refund before expiration", ()=>{
+        describe("failed refund before expiration", ()=>{
             
             it("should revert if refund is attempted before the expiration period", async()=>{
-                await htlc20.refund(orderID, {from: investor1}).should.be.rejected
+
+                //  investor funds the order
+
+                await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})          
+                
+                //  investor attempts refund on an order before the order expiration
+                await htlc20.refund(orderID, tanglSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_EXPIRED)
             })
 
-        })*/
+        })
 
 
         describe("withdrawal by tanglAdministrator", ()=>{
