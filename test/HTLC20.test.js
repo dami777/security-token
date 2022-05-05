@@ -348,7 +348,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
     })
 
-    /*describe("expired order", ()=>{
+    describe("expired order", ()=>{
 
         let orderID2 = stringToHex("x23d33sdgdp").hex
         const expiredDate = expired(2)       // set expiration to 2 days before
@@ -450,7 +450,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-    })*/
+    })
 
 })
 
