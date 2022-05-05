@@ -14,7 +14,7 @@ const ERC1400 = artifacts.require("./ERC1400")
 
 
 /**
- * tangleAdministrator represents the issuer/regulator/adminstrator of tangl security token
+ * tanglAdministrator represents the issuer/regulator/adminstrator of tangl security token
  * reitAdministrator represents the issuer/regulator/adminstrator of reit security token
  * USDT_MARKET represents the market where usdt will be issued to the investors
  */
@@ -68,7 +68,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             htlc20.address.should.be.not.equal("", "the htlc contract for the erc20 token has an address")
             erc20.address.should.not.be.equal("", "the erc20_usdt has a contract address")
-            tanglSecurityToken.address.should.not.be.equal("", "tangle security token has a contract address")
+            tanglSecurityToken.address.should.not.be.equal("", "tangl security token has a contract address")
             reitSecurityToken.address.should.not.be.equal("", "reit security token has a contract address")
 
         })
@@ -77,17 +77,17 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
     describe("open order", ()=>{
 
-        let tangleOpenOrder
+        let tanglOpenOrder
         let reitOpenOrder
         
 
         beforeEach(async()=>{
 
-            tangleOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tanglAdministrator})
+            tanglOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tanglAdministrator})
             reitOpenOrder = await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: reitAdministrator})
         })
 
-        /*describe("successful open order", ()=>{
+        describe("successful open order", ()=>{
 
             let tanglCheckOrder
             let reitCheckOrder
@@ -117,7 +117,9 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
             describe("tangl open order test", ()=>{
 
                 it("emits the open order event", ()=>{
-                    tangleOpenOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the open order event")
+                    tanglOpenOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the open order event")
+                    tanglOpenOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
+                    tanglOpenOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security token address associated with the order")
                 })
     
                 it("changes the swap state from INVALID to OPEN", ()=>{
@@ -127,13 +129,14 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 it("registers the correct order information", ()=>{
                     tanglCheckOrder._amount.toString().should.be.equal(tokens(1000).toString(), "it registers the correct price")
                     tanglCheckOrder._investor.should.be.equal(investor1, "it registers the investor needed to fund this order")
-                    tanglCheckOrder._issuer.should.be.equal(tanglAdministrator, "the tangle adminstrator is the recipient of the order")
+                    tanglCheckOrder._issuer.should.be.equal(tanglAdministrator, "the tangl adminstrator is the recipient of the order")
+                    tanglCheckOrder._securityTokenAddress.should.be.equal(tanglSecurityToken.address, "it registers the security token with the order")    
                 })
             })      
 
-        })*/
+        })
 
-        /*describe("failed open order", ()=>{
+        describe("failed open order", ()=>{
 
             it("fails to open order for an existing order ID", async()=>{
                 await htlc20.openOrder(orderID, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
@@ -145,11 +148,11 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 await htlc20.openOrder(orderID2, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, hashSecret("avalanche").secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
             })
 
-        })*/
+        })
 
         describe("funding order", ()=>{
 
-            let fundedTangleOrder
+            let fundedtanglOrder
             let tanglCheckOrder
 
 
@@ -172,14 +175,14 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 beforeEach(async()=>{
 
-                    fundedTangleOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
+                    fundedtanglOrder = await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})
                     tanglCheckOrder = await htlc20.checkOrder(orderID, tanglSecurityToken.address)                            // check the order after funding
                 })
 
                 it("emits the funded event and the data associated with it", ()=>{
-                    fundedTangleOrder.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
-                    fundedTangleOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the address of the investor that funded the order")
-                    fundedTangleOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security token address associated with the order")
+                    fundedtanglOrder.logs[0].event.should.be.equal("Funded", "it emits the Funded event after an investor funds an order with his payment")
+                    fundedtanglOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the address of the investor that funded the order")
+                    fundedtanglOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security token address associated with the order")
                 })
     
                 it("changes the order's fund status to true after funding", async()=>{
