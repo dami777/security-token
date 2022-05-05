@@ -106,7 +106,9 @@ const reverts = {
     NOT_FUNDED: "not funded",
     EXPIRED: "expired order",
     NOT_EXPIRED: "not expired",
-    INVALID_ORDER: "invalid order"
+    INVALID_ORDER: "invalid order",
+    CANT_FUND_EXPIRED_ORDER:"can't fund expired order",
+    EXPIRATION_TIME_LESS_THAN_NOW: "expiration time is less than present time"
 
 }
 

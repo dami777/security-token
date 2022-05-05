@@ -148,6 +148,13 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 await htlc20.openOrder(orderID2, investor1, erc20.address, tanglSecurityToken.address, price, amount, expiration, secretHash, hashSecret("avalanche").secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
             })
 
+            it("fails to open order if the expiration time is lesser than the order opening time", async()=>{
+
+                const orderID3 = stringToHex("dfbdfb").hex
+                await htlc20.openOrder(orderID3, investor1, erc20.address, tanglSecurityToken.address, price, amount, expired(1), secretHash, secretHex, classA.hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXPIRATION_TIME_LESS_THAN_NOW)
+
+            })
+
         })
 
         describe("funding order", ()=>{
