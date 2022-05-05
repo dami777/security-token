@@ -295,6 +295,14 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                 })
 
                 it("fails to withdraw from an expired order", async()=>{
+
+                    /**
+                     * set the orde id
+                     * set the date --> expired date    // this functionality will be disabled in the smart contract but needed for this particular test
+                     * open the order
+                     * fund the order
+                     * withdrawal fails for orders that have exceeds their validity period
+                     */
                     
 
                     const orderID = stringToHex("dfbdfb").hex 
@@ -306,13 +314,26 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
+                it("fails to withdraw if the secret provided by the administrator does not match the secret registered with the order", async()=>{
+
+                    /**
+                     * Fund the order
+                     * administrator attempts withdrawal with the wrong secret
+                     */
+
+                    const invalidSecret = stringToHex("invalid").hex
+                    await htlc20.fundOrder(orderID, tanglSecurityToken.address, {from: investor1})  // investor funds the order
+                    await htlc20.issuerWithdrawal(orderID, invalidSecret, tanglSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
+
+                })
+
             })
 
         })
 
     })
 
-    describe("expired order", ()=>{
+    /*describe("expired order", ()=>{
 
         let orderID2 = stringToHex("x23d33sdgdp").hex
         const expiredDate = expired(2)       // set expiration to 2 days before
@@ -414,7 +435,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-    })
+    })*/
 
 })
 
