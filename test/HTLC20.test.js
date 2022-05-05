@@ -2,6 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const { describe } = require("yargs")
 const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
 
 //  connect to the smart contract
@@ -285,7 +286,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             it("check the order to be opened", async()=>{
                 const reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
-                tanglCheckOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
+                reitCheckOrder._orderState.toString().should.be.equal(swapState.OPEN, "the order is opened")
             })
 
         })
@@ -302,38 +303,65 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
             let reitCheckOrder
 
-            beforeEach(async()=>{
-                refund = await htlc20.refund(orderID2, reitSecurityToken.address, {from: investor1})
-                reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
+                beforeEach(async()=>{
+                    
+                    refund = await htlc20.refund(orderID2, reitSecurityToken.address, {from: investor1})
+                    reitCheckOrder = await htlc20.checkOrder(orderID2, reitSecurityToken.address)
 
-            })
-
-            it("should have an expired order state after refund", ()=>{
-                tanglCheckOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state changes to EXPIRED after refund")
-            })
-
-            it("refunds the investor's payment to the investor's wallet", async()=>{
-
-                const balance = await erc20.balanceOf(investor1)
-                balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
-                refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refund event")
-
-
-            })
-
-
-            it("should fail for every attempted withdrawal from tanglAdministrator on any refunded order", async()=>{
-
-                await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejected
-
-            })
+                })
 
             
+            describe("successful refund",()=>{
 
-            
+                
+
+                it("should have an expired order state after refund", ()=>{
+                    reitCheckOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "the order state changes to EXPIRED after refund")
+                })
+
+                it("refunds the investor's payment to the investor's wallet", async()=>{
+
+                    const balance = await erc20.balanceOf(investor1)
+                    balance.toString().should.be.equal(tokens(2000).toString(), "it refunds the deposited token to the investor's wallet")
+                    refund.logs[0].event.should.be.equal("RefundedOrder", "it emits the refund event")
+
+
+                })
+
+
+                /*it("should fail for every attempted withdrawal from dministrator on any refunded order", async()=>{
+
+                    await htlc20.issuerWithdrawal(orderID2, secretHex, reitAdministrator, {from: tanglAdministrator}).should.be.rejected
+
+                })*/
+            })
+
+            describe("failed refund", ()=>{
+
+                it("should fail if the order to be refunded is not opened", async()=>{
+
+                    await htlc20.refund(orderID2, reitSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_OPENED)
+
+                })
+
+                it("should fail if the order to be refunded has not expired", async()=>{
+                    
+                    await htlc20.refund(orderID, reitSecurityToken.address, {from: investor1}).should.be.rejectedWith(reverts.NOT_EXPIRED)
+
+                })
+
+            })
+
 
         })
 
     })
 
 })
+
+
+
+//  test failed withdrawal
+//  update the events with the issuer's address and the security token address
+//  test the failed refund
+//  ensure that deposits can not be made for dates greater than now
