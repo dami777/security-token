@@ -73,7 +73,7 @@ contract HTLC20 {
         require(_orderSwap[_securityToken][_swapID]._funded == true, "not funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         require(block.timestamp < _order._expiration, "expired order");
-        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "the secret doesn't match the hash"); 
+        require(sha256(abi.encode(_secretKey)) == _order._secretHash, "invalid secret"); 
         IERC20(_order._paymentAddress).transfer(_order._issuer, _order._price);
         _orderSwap[_securityToken][_swapID]._secretKey = _secretKey;
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.CLOSED;
