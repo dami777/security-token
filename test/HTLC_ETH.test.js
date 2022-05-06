@@ -195,22 +195,18 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             let fundTanglOrder
             const orderID_1 = stringToHex("1").hex
+            let contractEtherBalanceBeforeFunding
+
 
             beforeEach(async()=>{
+
+                contractEtherBalanceBeforeFunding = await web3.eth.getBalance(htlcEth.address)
 
                 fundTanglOrder = await htlcEth.fundOrder(orderID_1, tanglSecurityToken.address, {from: investor1, value: price})
             
             })
 
             describe("contract ether balance", ()=>{
-
-                let contractEtherBalanceBeforeFunding
-
-                beforeEach(async()=>{
-
-                    contractEtherBalanceBeforeFunding = await web3.eth.getBalance(htlcEth.address)
-                
-                })
 
                 it("should increase the ether balance of the contract", async()=>{
                     
