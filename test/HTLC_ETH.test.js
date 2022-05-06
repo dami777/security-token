@@ -193,39 +193,57 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
         describe("funding order", ()=>{
 
-            let fund 
+            let fundTanglOrder
+            const orderID_1 = stringToHex("1").hex
 
-           /* beforeEach(async()=>{
-                fund = await htlcEth.fundOrder(orderID, {from: investor, value: price})
+            beforeEach(async()=>{
+
+                fundTanglOrder = await htlcEth.fundOrder(orderID_1, tanglSecurityToken.address, {from: investor1, value: price})
+            
             })
 
             describe("contract ether balance", ()=>{
 
+                let contractEtherBalanceBeforeFunding
+
+                beforeEach(async()=>{
+
+                    contractEtherBalanceBeforeFunding = await web3.eth.getBalance(htlcEth.address)
+                
+                })
+
                 it("should increase the ether balance of the contract", async()=>{
                     
-                    const ethBalance = await web3.eth.getBalance(htlcEth.address)
-                    ethBalance.toString().should.be.equal(price.toString(), "ether was successfully deposited")
+                    const contractEtherBalanceAfterFunding = await web3.eth.getBalance(htlcEth.address)
+                    
+                    Number(contractEtherBalanceAfterFunding - contractEtherBalanceBeforeFunding).should.been.equal(Number(price), "ether was deposited to the contract by the investor associated with the order")
      
                 })
 
-            })*/
+            })
 
-            /*describe("check order", ()=>{
+            describe("check order", ()=>{
 
-                let checkOrder
+                let checkOrderAfterFunding
+
+                const orderID_1 = stringToHex("1").hex 
 
                 beforeEach(async()=>{
-                    checkOrder = await htlcEth.checkOrder(orderID)
+                    checkOrderAfterFunding = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
                 })
 
                 it("should be funded", ()=>{
-                    checkOrder._funded.should.be.equal(true, "the order has been funded")
+
+                    checkOrderAfterFunding._funded.should.be.equal(true, "the order has been funded")
+                
                 })
 
                 it("shouldn't have the secret yet", ()=>{
-                    web3.utils.hexToUtf8(checkOrder._secretKey).should.not.be.equal(secretHash, "secret hasn't been revealed yet") 
+
+                    web3.utils.hexToUtf8(checkOrderAfterFunding._secretKey).should.be.equal("", "secret hasn't been revealed yet") 
+                
                 })
-            })*/
+            })
 
             /*describe("failed funding", ()=>{
                 
