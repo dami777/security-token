@@ -88,7 +88,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             tanglOrder = await htlcEth.openOrder(orderID1, investor1, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
             reitOrder = await htlcEth.openOrder(orderID1, investor2, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
-            
+
         })
 
         describe("opening order", ()=>{
@@ -96,6 +96,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
             describe("successful opened order", ()=>{
 
                 it("emits the open order event for tangl opened order and the data associated with it", ()=>{
+                    
                     tanglOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
                     tanglOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
                     tanglOrder.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the administraot/issuer's address associated with the order")
@@ -104,21 +105,35 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     tanglOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
                     tanglOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
                     web3.utils.hexToUtf8(tanglOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
+                    tanglOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
+                
                 })
 
                 it("emits the open order event for reit opened order and the data associated with it", ()=>{
+                    
                     reitOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                    reitOrder.logs[0].args._investor.should.be.equal(investor2, "it emits the investor's address associated with the order")
+                    reitOrder.logs[0].args._issuer.should.be.equal(reitAdministrator, "it emits the administraot/issuer's address associated with the order")
+                    reitOrder.logs[0].args._securityToken.should.be.equal(reitSecurityToken.address, "it emits the security address associated with the order")
+                    web3.utils.hexToUtf8(reitOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
+                    reitOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
+                    reitOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
+                    web3.utils.hexToUtf8(reitOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
+                    reitOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
+                
                 })
 
             })
 
-            /*describe("failed opened order", ()=>{
+            describe("failed opened order", ()=>{
 
                 it("fails to reopen an opened order", async()=>{
 
-                    await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA).should.be.rejected
+                    await htlcEth.openOrder(orderID, investor2, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                    await htlcEth.openOrder(orderID, investor1, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                
                 })
-            })*/
+            })
 
             
     
