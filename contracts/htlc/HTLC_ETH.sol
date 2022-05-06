@@ -47,7 +47,6 @@ contract HTLC_ETH {
 
     function openOrder(bytes32 _swapID, address _investor, address _securityToken, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
-        require(msg.sender == _owner, "invalid caller");
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "existing id");
         require( _secretHash == sha256(abi.encode(_secretKey)), "invalid secret");
         _orderSwap[_securityToken][_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, address(0), _securityToken, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);

@@ -88,6 +88,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             tanglOrder = await htlcEth.openOrder(orderID1, investor1, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
             reitOrder = await htlcEth.openOrder(orderID1, investor2, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+            
         })
 
         describe("opening order", ()=>{
