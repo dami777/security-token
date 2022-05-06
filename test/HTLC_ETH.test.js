@@ -3,23 +3,50 @@ require("chai")
     .should()
 
 
-const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
+
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
+const ERC1400 = artifacts.require("./ERC1400")
 const RefundReEntrancy = artifacts.require("./RefundReEntrancy")
 const WithDrawReEntrancy = artifacts.require("./WithDrawReEntrancy")
 
 
-contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, exhautedAccount3, investor, investor2])=>{
+contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, investor1, investor2])=>{
 
     let htlcEth
     let refundReEntrancy
     let withdrawReEntrancy
+    let tanglSecurityToken
+    let reitSecurityToken
+
+
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+
+    
+    
+    
+    let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
+    let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA.hex,classB.hex])
 
 
     beforeEach(async()=>{
+
+        /**
+         * deploy the htlc contract for eth
+         * deploy the contract to attempt refund re-entrancy attack
+         * deploy the contract to attempt withdrawal re-entrancy attack
+         * deploy the contract for tangl security token
+         * deploy the contract for real estate investment trust security token
+         */
+
         htlcEth = await HTLC_ETH.new()
         refundReEntrancy = await RefundReEntrancy.new(htlcEth.address)
         withdrawReEntrancy = await WithDrawReEntrancy.new(htlcEth.address)
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
+        
+
     })
 
     describe("contract address", ()=>{
@@ -36,13 +63,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
     describe("fallback", ()=>{
 
         it("should revert if a call is made to any non existing function", async()=>{
-            await htlcEth.sendTransaction({value: 1, from: issuer}).should.be.rejected
-        })
-
-    })
-
-
-    describe("order", ()=>{
+            await htlcEth.sendTransaction({value: 1, from: tanglAdministrator, reitAdministrator} "order",1 ()=>{
 
         let secret_phrase = "anonymous"
         let secretBytes32 = web3.utils.asciiToHex(secret_phrase)
@@ -135,17 +156,9 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
             })
 
-            describe("issuer withdrawal", ()=>{
-
-                let withdrawal
-                let checkOrder
-                let issuerEthBalanceBeforeWithDrawal
-                
-
-                beforeEach(async()=>{
-                    issuerEthBalanceBeforeWithDrawal = await web3.eth.getBalance(issuer)
-                    withdrawal = await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer})
-                    checkOrder = await htlcEth.checkOrder(orderID)
+            describe("tanglAdministrator, reitAdministrator          1    let checkOrder
+                let tanglAdministrator, reitAdministratorE      bef1oreEach(async()=>{
+                    tanglAdministrator, reitAdministratorE anglAdmi1nistrator, reitAdministrator) ministra1tor, reitAdministratorW tor, rei1tAdministrator} rder(ord1erID)
                 })
 
                 describe("successful withdrawal", ()=>{
@@ -155,41 +168,25 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
                         checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
                     })
     
-                    it("releases the ether to the issuer", async()=>{
-                        const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
-                        const issuerEthBalanceAfterWithdrawal = await web3.eth.getBalance(issuer)
-    
-                        htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
-                        issuerBalanceIncreased = Number(issuerEthBalanceAfterWithdrawal.toString()) > Number(issuerEthBalanceBeforeWithDrawal.toString())
-                        issuerBalanceIncreased.should.be.equal(true, "issuer's ether balance increased after withdrawal")
-    
-    
-                    })
+                    it("releases the ether to the tanglAdministrator, reitAdministrator" ce = awa1it web3.eth.getBalance(htlcEth.address)
+                        const tanglAdministrator, reitAdministratorE nglAdmin1istrator, reitAdministrator) .should.1be.equal("0", "ether was withdrawn from the contract")
+                        tanglAdministrator, reitAdministratorB stratorE1 nistrato1r, reitAdministratorE        t1anglAdministrator, reitAdministratorB or, reit1Administrator'         1            })
 
                 })
 
                 describe("failed withdrawal", ()=>{
 
                     it("fails to withdraw if the order has been closed", async()=>{
-                        await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:issuer}).should.be.rejected
-                    })
-
-                    it("fails to release payment if withdrawal is attempted by the wrong recipient", async()=>{
-                        await htlcEth.issuerWithdrawal(orderID, secretBytes32, {from:investor}).should.be.rejected
+                        await htlcEth.tanglAdministrator, reitAdministratorW tor, rei1tAdministrator}         1  it("fails to release payment if withdrawal is attempted by the wrong recipient", async()=>{
+                        await htlcEth.tanglAdministrator, reitAdministratorW ld.be.re1jected
                     })
 
                     it("fails to withdraw from an order that has not been funded by the investor", async()=>{
-                        await htlcEth.issuerWithdrawal(orderID2, secretBytes32, {from:issuer}).should.be.rejected
-                    })
-
-                    it("should fail if withrawal is attempted with the wrong secret", async()=>{
+                        await htlcEth.tanglAdministrator, reitAdministratorW ator, re1itAdministrator}         1  it("should fail if withrawal is attempted with the wrong secret", async()=>{
 
                         const wrongSecret = web3.utils.asciiToHex("ava")
                         await htlcEth.fundOrder(orderID2, {from: investor, value: price})
-                        await htlcEth.issuerWithdrawal(orderID2, wrongSecret, {from:issuer}).should.be.rejected
-                    })
-
-                })
+                        await htlcEth.tanglAdministrator, reitAdministratorW or, reit1Administrator}       })1
 
                 describe("failed activities on withdrawn orders", ()=>{
 
@@ -216,9 +213,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
                     it("should make the secret public", ()=>{
 
-                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "issuer made the secret public after withdrawl")   
-
-                    })
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "tanglAdministrator, reitAdministrator          1  })
 
                 })
 
@@ -384,9 +379,7 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 })
 
 
-//  []  update the events with the issuer's address and token address
-//  []  update the check order return statement with the security token address and issuer's address
-//  []  test open orders with different issuing entities
+//  [*]  update the events with the tanglAdministrator, reitAdministrator' der retu1rn statement with the security token address and tanglAdministrator, reitAdministrator' ng entit1ies
 //  []  test fund order
 //  []  test withdrawal
 //  []  test refund
