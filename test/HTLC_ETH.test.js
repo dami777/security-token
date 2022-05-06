@@ -113,7 +113,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
     
 
-                    it("data of the order", async()=>{
+                    it("verifies data of the order", async()=>{
 
                         const orderID_1 = stringToHex("1").hex
 
@@ -122,13 +122,13 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                         checkTanglOrder._issuer.should.be.equal(tanglAdministrator, "it returned the administrator associated with the order")
                         checkTanglOrder._investor.should.be.equal(investor1, "it returned the investor asscociated with the order")
                         checkTanglOrder._securityTokenAddress.should.be.equal(tanglSecurityToken.address, "it returned the security token associated with the order")
-                        checkTanglOrder._amount.toString().should.be.equal(amount.toString(), "it emits the token amount associated with the order")
                         checkTanglOrder._price.toString().should.be.equal(price.toString(), "it returned the price of the token in ether associated with the order")
                         checkTanglOrder._expiration.toString().should.be.equal(expiration.toString(), "it returned the expiration period associated with the order")
                         checkTanglOrder._funded.should.be.equal(false, "it returns false as the fund status of the order")
-                        web3.utils.hexToUtf8(checkTanglOrder._swapID).should.be.equal("1", "it reurns the order id")
+                        web3.utils.hexToUtf8(checkTanglOrder._orderID).should.be.equal("1", "it reurns the order id")
                         checkTanglOrder._orderState.toString().should.be.equal(swapState.OPEN, "it returns the order state as OPEN")
-                        web3.utils.hexToUtf8(checkTanglOrder._secretKey).should.be.equal("0", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
+                        web3.utils.hexToUtf8(checkTanglOrder._secretKey).should.be.equal("", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
+
                     })
 
                 })
@@ -149,6 +149,26 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                         reitOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
                     
                     })
+
+
+                    it("verifies data of the order", async()=>{
+
+                        const orderID_1 = stringToHex("1").hex
+
+                        const checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
+
+                        checkTanglOrder._issuer.should.be.equal(reitAdministrator, "it returned the administrator associated with the order")
+                        checkTanglOrder._investor.should.be.equal(investor2, "it returned the investor asscociated with the order")
+                        checkTanglOrder._securityTokenAddress.should.be.equal(reitSecurityToken.address, "it returned the security token associated with the order")
+                        checkTanglOrder._price.toString().should.be.equal(price.toString(), "it returned the price of the token in ether associated with the order")
+                        checkTanglOrder._expiration.toString().should.be.equal(expiration.toString(), "it returned the expiration period associated with the order")
+                        checkTanglOrder._funded.should.be.equal(false, "it returns false as the fund status of the order")
+                        web3.utils.hexToUtf8(checkTanglOrder._orderID).should.be.equal("1", "it reurns the order id")
+                        checkTanglOrder._orderState.toString().should.be.equal(swapState.OPEN, "it returns the order state as OPEN")
+                        web3.utils.hexToUtf8(checkTanglOrder._secretKey).should.be.equal("", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
+
+                    })
+
 
                 })
 
