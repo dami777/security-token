@@ -121,7 +121,7 @@ contract HTLC_ETH {
     /// @param _swapID is the id of the order to be fetched
     /// @notice `_swapID` must not be INVALID. it can be OPEN, CLOSED or EXPIRED. 
 
-    function checkOrder(bytes32 _swapID, address _securityToken) external view returns (address _issuer, address _investor, address _securityTokenAddress, uint256 _amount, uint256 _expiration, bool _funded, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
+    function checkOrder(bytes32 _swapID, address _securityToken) external view returns (address _issuer, address _investor, address _securityTokenAddress, uint256 _price, uint256 _expiration, bool _funded, bytes32 _orderID, OrderLibrary.SwapState _orderState, bytes32 _secretKey) {
 
         require(_swapState[_securityToken][_swapID] != OrderLibrary.SwapState.INVALID, "invalid order");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];

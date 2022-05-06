@@ -115,6 +115,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                     it("data of the order", async()=>{
 
+                        const orderID_1 = stringToHex("1").hex
+
                         const checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
 
                         checkTanglOrder._issuer.should.be.equal(tanglAdministrator, "it returned the administrator associated with the order")
@@ -173,7 +175,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             let fund 
 
-            beforeEach(async()=>{
+           /* beforeEach(async()=>{
                 fund = await htlcEth.fundOrder(orderID, {from: investor, value: price})
             })
 
@@ -186,7 +188,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
      
                 })
 
-            })
+            })*/
 
             /*describe("check order", ()=>{
 
