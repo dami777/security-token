@@ -157,15 +157,15 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                         const checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
 
-                        checkTanglOrder._issuer.should.be.equal(reitAdministrator, "it returned the administrator associated with the order")
-                        checkTanglOrder._investor.should.be.equal(investor2, "it returned the investor asscociated with the order")
-                        checkTanglOrder._securityTokenAddress.should.be.equal(reitSecurityToken.address, "it returned the security token associated with the order")
-                        checkTanglOrder._price.toString().should.be.equal(price.toString(), "it returned the price of the token in ether associated with the order")
-                        checkTanglOrder._expiration.toString().should.be.equal(expiration.toString(), "it returned the expiration period associated with the order")
-                        checkTanglOrder._funded.should.be.equal(false, "it returns false as the fund status of the order")
-                        web3.utils.hexToUtf8(checkTanglOrder._orderID).should.be.equal("1", "it reurns the order id")
-                        checkTanglOrder._orderState.toString().should.be.equal(swapState.OPEN, "it returns the order state as OPEN")
-                        web3.utils.hexToUtf8(checkTanglOrder._secretKey).should.be.equal("", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
+                        checkReitOrder._issuer.should.be.equal(reitAdministrator, "it returned the administrator associated with the order")
+                        checkReitOrder._investor.should.be.equal(investor2, "it returned the investor asscociated with the order")
+                        checkReitOrder._securityTokenAddress.should.be.equal(reitSecurityToken.address, "it returned the security token associated with the order")
+                        checkReitOrder._price.toString().should.be.equal(price.toString(), "it returned the price of the token in ether associated with the order")
+                        checkReitOrder._expiration.toString().should.be.equal(expiration.toString(), "it returned the expiration period associated with the order")
+                        checkReitOrder._funded.should.be.equal(false, "it returns false as the fund status of the order")
+                        web3.utils.hexToUtf8(checkReitOrder._orderID).should.be.equal("1", "it reurns the order id")
+                        checkReitOrder._orderState.toString().should.be.equal(swapState.OPEN, "it returns the order state as OPEN")
+                        web3.utils.hexToUtf8(checkReitOrder._secretKey).should.be.equal("", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
 
                     })
 
