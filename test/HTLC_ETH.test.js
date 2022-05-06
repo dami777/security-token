@@ -2,8 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const { ethers } = require("ethers");
-const moment = require("moment");
+
 const { ETHER_ADDRESS, tokens, swapState,ether} = require("./helper.js")
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const RefundReEntrancy = artifacts.require("./RefundReEntrancy")
@@ -383,3 +382,12 @@ contract ("HTLC for ETH Deposit", ([issuer, exhautedAccount1, exhautedAccount2, 
 
 
 })
+
+
+//  []  update the events with the issuer's address and token address
+//  []  update the check order return statement with the security token address and issuer's address
+//  []  test open orders with different issuing entities
+//  []  test fund order
+//  []  test withdrawal
+//  []  test refund
+//  []  disable opening and funding expired orders
