@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 
-const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, ether, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
 
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ERC1400 = artifacts.require("./ERC1400")
