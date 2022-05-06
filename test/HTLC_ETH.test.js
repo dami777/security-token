@@ -11,7 +11,7 @@ const RefundReEntrancy = artifacts.require("./RefundReEntrancy")
 const WithDrawReEntrancy = artifacts.require("./WithDrawReEntrancy")
 
 
-contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, exhautedAccount1, exhautedAccount2, exhautedAccount3, investor, investor2])=>{
+contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, investor1, investor2])=>{
 
     let htlcEth
     let refundReEntrancy
@@ -62,7 +62,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, exhau
 
     describe("fallback", ()=>{
 
-        it("should revert if a call is made to any non existing function", async()=>{
+        it("should revert if a call is made to any non existing function to transfer ether", async()=>{
             await htlcEth.sendTransaction({value: 1, from: tanglAdministrator, reitAdministrator}).should.be.rejected
         })
 
@@ -74,8 +74,6 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, exhau
         let secret_phrase = "anonymous"
         let secretHex = hashSecret(secret_phrase).secretHex
         let secretHash = hashSecret(secret_phrase).secretHash
-        let orderID = stringToHex("x23dvsdgd").hex
-        let orderID2 = stringToHex("x23dvsdgdu").hex
         let expiration = expire(1)                      // expiration will be present time + 1 day
         let price = ether(0.2)                                                // price of the asset
         let amount = tokens(10)
@@ -83,32 +81,47 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, exhau
         let reitorder
         
         
-        /*beforeEach(async()=>{
-            tanglOrder = await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA)
-            reitOrder = await htlcEth.openOrder(orderID2, investor, price, amount, expiration, secretHash, secretHex, classA)
-        })*/
+        beforeEach(async()=>{
 
-        /*describe("opening order", ()=>{
+            let orderID1 = stringToHex("1").hex
+           
+
+            tanglOrder = await htlcEth.openOrder(orderID1, investor1, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
+            reitOrder = await htlcEth.openOrder(orderID1, investor2, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+        })
+
+        describe("opening order", ()=>{
 
             describe("successful opened order", ()=>{
 
-                it("emits the open order event", ()=>{
-                    order.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                it("emits the open order event for tangl opened order and the data associated with it", ()=>{
+                    tanglOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                    tanglOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
+                    tanglOrder.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the administraot/issuer's address associated with the order")
+                    tanglOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security address associated with the order")
+                    web3.utils.hexToUtf8(tanglOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
+                    tanglOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
+                    tanglOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
+                    web3.utils.hexToUtf8(tanglOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
+                })
+
+                it("emits the open order event for reit opened order and the data associated with it", ()=>{
+                    reitOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
                 })
 
             })
 
-            describe("failed opened order", ()=>{
+            /*describe("failed opened order", ()=>{
 
                 it("fails to reopen an opened order", async()=>{
 
                     await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA).should.be.rejected
                 })
-            })
+            })*/
 
             
     
-        })*/
+        })
 
         /*describe("funding order", ()=>{
 
