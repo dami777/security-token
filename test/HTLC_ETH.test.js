@@ -83,11 +83,11 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         
         beforeEach(async()=>{
 
-            let orderID1 = stringToHex("1").hex
+            const orderID_1 = stringToHex("1").hex
            
 
-            tanglOrder = await htlcEth.openOrder(orderID1, investor1, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
-            reitOrder = await htlcEth.openOrder(orderID1, investor2, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+            tanglOrder = await htlcEth.openOrder(orderID_1, investor1, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
+            reitOrder = await htlcEth.openOrder(orderID_1, investor2, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
 
         })
 
@@ -95,33 +95,61 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             describe("successful opened order", ()=>{
 
-                it("emits the open order event for tangl opened order and the data associated with it", ()=>{
+                describe("tangl opened order", ()=>{
+
+
+                    it("emits the open order event for tangl opened order and the data associated with it", ()=>{
                     
-                    tanglOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
-                    tanglOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
-                    tanglOrder.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the administraot/issuer's address associated with the order")
-                    tanglOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security address associated with the order")
-                    web3.utils.hexToUtf8(tanglOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
-                    tanglOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
-                    tanglOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
-                    web3.utils.hexToUtf8(tanglOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
-                    tanglOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
-                
+                        tanglOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                        tanglOrder.logs[0].args._investor.should.be.equal(investor1, "it emits the investor's address associated with the order")
+                        tanglOrder.logs[0].args._issuer.should.be.equal(tanglAdministrator, "it emits the administraot/issuer's address associated with the order")
+                        tanglOrder.logs[0].args._securityToken.should.be.equal(tanglSecurityToken.address, "it emits the security address associated with the order")
+                        web3.utils.hexToUtf8(tanglOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
+                        tanglOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
+                        tanglOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
+                        web3.utils.hexToUtf8(tanglOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
+                        tanglOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
+                    
+                    })
+    
+
+                    it("data of the order", async()=>{
+
+                        const checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
+
+                        checkTanglOrder._issuer.should.be.equal(tanglAdministrator, "it returned the administrator associated with the order")
+                        checkTanglOrder._investor.should.be.equal(investor1, "it returned the investor asscociated with the order")
+                        checkTanglOrder._securityTokenAddress.should.be.equal(tanglSecurityToken.address, "it returned the security token associated with the order")
+                        checkTanglOrder._amount.toString().should.be.equal(amount.toString(), "it emits the token amount associated with the order")
+                        checkTanglOrder._price.toString().should.be.equal(price.toString(), "it returned the price of the token in ether associated with the order")
+                        checkTanglOrder._expiration.toString().should.be.equal(expiration.toString(), "it returned the expiration period associated with the order")
+                        checkTanglOrder._funded.should.be.equal(false, "it returns false as the fund status of the order")
+                        web3.utils.hexToUtf8(checkTanglOrder._swapID).should.be.equal("1", "it reurns the order id")
+                        checkTanglOrder._orderState.toString().should.be.equal(swapState.OPEN, "it returns the order state as OPEN")
+                        web3.utils.hexToUtf8(checkTanglOrder._secretKey).should.be.equal("0", "it returns 0 as the current secret key because the secret is yet to be revealed by the issuer")
+                    })
+
                 })
 
-                it("emits the open order event for reit opened order and the data associated with it", ()=>{
+
+                describe("reit opened order", ()=>{
+
+                    it("emits the open order event for reit opened order and the data associated with it", ()=>{
                     
-                    reitOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
-                    reitOrder.logs[0].args._investor.should.be.equal(investor2, "it emits the investor's address associated with the order")
-                    reitOrder.logs[0].args._issuer.should.be.equal(reitAdministrator, "it emits the administraot/issuer's address associated with the order")
-                    reitOrder.logs[0].args._securityToken.should.be.equal(reitSecurityToken.address, "it emits the security address associated with the order")
-                    web3.utils.hexToUtf8(reitOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
-                    reitOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
-                    reitOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
-                    web3.utils.hexToUtf8(reitOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
-                    reitOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
-                
+                        reitOrder.logs[0].event.should.be.equal("OpenedOrder", "it emits the OpenedOrder event")
+                        reitOrder.logs[0].args._investor.should.be.equal(investor2, "it emits the investor's address associated with the order")
+                        reitOrder.logs[0].args._issuer.should.be.equal(reitAdministrator, "it emits the administraot/issuer's address associated with the order")
+                        reitOrder.logs[0].args._securityToken.should.be.equal(reitSecurityToken.address, "it emits the security address associated with the order")
+                        web3.utils.hexToUtf8(reitOrder.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition/share class associated with the order")
+                        reitOrder.logs[0].args._amount.toString().should.be.equal(amount.toString(), "it emits the amount of token associated with the order")
+                        reitOrder.logs[0].args._price.toString().should.be.equal(price.toString(), "it emits the price of token in ether associated with the order")
+                        web3.utils.hexToUtf8(reitOrder.logs[0].args._swapID).should.be.equal("1", "it emits the order id associated with the order")
+                        reitOrder.logs[0].args._secretHash.should.be.equal(secretHash, "it emits the secret hash of the order")
+                    
+                    })
+
                 })
+
 
             })
 
@@ -129,8 +157,10 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 it("fails to reopen an opened order", async()=>{
 
-                    await htlcEth.openOrder(orderID, investor2, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
-                    await htlcEth.openOrder(orderID, investor1, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                    const orderID_1 = stringToHex("1").hex
+
+                    await htlcEth.openOrder(orderID_1, investor2, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                    await htlcEth.openOrder(orderID_1, investor1, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
                 
                 })
             })
@@ -139,7 +169,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
     
         })
 
-        /*describe("funding order", ()=>{
+        describe("funding order", ()=>{
 
             let fund 
 
@@ -158,7 +188,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            describe("check order", ()=>{
+            /*describe("check order", ()=>{
 
                 let checkOrder
 
@@ -173,9 +203,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 it("shouldn't have the secret yet", ()=>{
                     web3.utils.hexToUtf8(checkOrder._secretKey).should.not.be.equal(secretHash, "secret hasn't been revealed yet") 
                 })
-            })
+            })*/
 
-            describe("failed funding", ()=>{
+            /*describe("failed funding", ()=>{
                 
                 it("should fail to fund if attempted again by the investor", async()=>{
                     await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
@@ -187,9 +217,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 })
 
 
-            })
+            })*/
 
-            describe("tanglAdministrator, reitAdministrator withdrawal", ()=>{
+            /*describe("tanglAdministrator, reitAdministrator withdrawal", ()=>{
 
                 let withdrawal
                 let checkOrder
@@ -276,9 +306,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-            })
+            })*/
 
-            describe("reentrancy attack", ()=>{*/
+            /*describe("reentrancy attack", ()=>{*/
 
                 /// this commented test case is only valid is reEntrancy defence is removed from the withdraw function
 
@@ -312,9 +342,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
                 })*/
 
-           /* })
+          /* })*/
 
-        })*/
+        })
 
         /*describe("refunding expired order", ()=>{
 
