@@ -287,6 +287,36 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
+                it("should fail to fund an unopened order", async()=>{
+
+                    /**
+                     * This particular order ID isn't a valid opened id 
+                     * Funding an unopened id should be reverted
+                     */
+
+                    const unOpened_ID = stringToHex("4").hex
+
+                    await htlcEth.fundOrder(unOpened_ID, reitSecurityToken.address, {from: investor_Jeff, value: price}).should.be.rejectedWith(reverts.NOT_OPENED)
+
+                })
+
+                it("should fail if the amount to be deposited to the order doesn't match the set price of the order", async()=>{
+
+                    /**
+                     * The set price for this order is 0.2 ether as defined in the `price` global variable
+                     * Funding fails if the amount sent by the investor is not the set price in the order
+                     */
+
+                    
+                    const orderID_3 = stringToHex("3").hex
+
+                    await htlcEth.openOrder(orderID_3, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
+                    await htlcEth.fundOrder(orderID_3, reitSecurityToken.address, {from: investor_Jeff, value: ether(0.3)}).should.be.rejectedWith(reverts.INVALID_AMOUNT)
+
+
+                })
+
 
             })
 
