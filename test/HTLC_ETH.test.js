@@ -278,7 +278,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     const expiration = new Date(moment().add(10, 'seconds').unix()).getTime()
                     const orderID_2 = stringToHex("2").hex
 
-                    await htlcEth.openOrder(orderID_1, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+                    await htlcEth.openOrder(orderID_2, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
 
                     await wait(13)
 
