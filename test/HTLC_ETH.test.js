@@ -3,7 +3,7 @@ require("chai")
     .should()
 
 
-const { ETHER_ADDRESS, tokens, ether, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
+const { ETHER_ADDRESS, tokens, ether, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts, wait} = require("./helper.js")
 
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ERC1400 = artifacts.require("./ERC1400")
@@ -177,10 +177,12 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             describe("failed opened order", ()=>{
 
+                const orderID_1 = stringToHex("1").hex
+                const orderID_2 = stringToHex("2").hex
+
                 it("fails to reopen an opened order", async()=>{
 
-                    const orderID_1 = stringToHex("1").hex
-                    const orderID_2 = stringToHex("2").hex
+                    
 
                     await htlcEth.openOrder(orderID_1, investor_Jeff, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
                     await htlcEth.openOrder(orderID_1, investor_Dami, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
@@ -265,7 +267,25 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejectedWith(reverts.INVALID_CALLER)
                 })
 
-                it("")
+                it("should fail to fund an expired order", async()=>{
+
+                    /**
+                     * Open an order to expire in 10 seconds
+                     * wait for 13 seconds. After which the order should have expired
+                     * Attempt funding after expiration
+                     */
+
+                    const expiration = new Date(moment().add(10, 'seconds').unix()).getTime()
+                    const orderID_2 = stringToHex("2").hex
+
+                    await htlcEth.openOrder(orderID_1, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
+                    await wait(13)
+
+                    await htlcEth.fundOrder(orderID_2, reitSecurityToken.address, {from: investor_Jeff, value: price}).should.be.rejectedWith(reverts.EXPIRED)
+
+
+                })
 
 
             })
