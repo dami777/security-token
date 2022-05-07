@@ -194,7 +194,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
     
         })
 
-        describe("funding order", ()=>{
+        /*describe("funding order", ()=>{
 
             let fundTanglOrder
             const orderID_1 = stringToHex("1").hex
@@ -383,7 +383,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
           /* })*/
 
-        })
+        /*})*/
 
         /*describe("refunding expired order", ()=>{
 

@@ -68,6 +68,7 @@ contract HTLC_ETH {
         require(_orderSwap[_securityToken][_swapID]._funded == false, "funded order");
         require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
         require(_orderSwap[_securityToken][_swapID]._price == msg.value, "invalid amount");
+        require(_orderSwap[_securityToken][_swapID]._expiration > block.timestamp, "can't fund expired order");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         _orderSwap[_securityToken][_swapID]._funded = true;
         emit Funded(_order._issuer, _order._investor, _order._ERC1400_ADDRESS, _order._partition, _order._amount, _order._price);
