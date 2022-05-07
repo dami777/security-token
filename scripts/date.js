@@ -21,3 +21,12 @@ console.log(c.getTime())
 t2 = moment.unix(c.getTime()).format('h:mm:ss a M/D')
 
 console.log(t2)
+
+
+d = new Date(moment().add(15, 'seconds').unix())
+
+//console.log(d, "seconds")
+
+e = moment.unix(d.getTime()).format('h:mm:ss a M/D')
+
+console.log(e)

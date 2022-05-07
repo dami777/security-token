@@ -87,6 +87,8 @@ const expire=(days)=>{
 }
 
 
+
+
 //  function to get past expiration
 //  the function converts the date to unix time format
 
@@ -99,8 +101,9 @@ const expired=(days)=>{
 const reverts = {
 
     INVALID_CALLER: "invalid caller",
+    INVALID_AMOUNT: "invalid amount",
     EXISTING_ID: "existing id",
-    INVALID_SECRET: "the secret doesn't match the hash",
+    INVALID_SECRET: "invalid secret",
     NOT_OPENED: "not opened",
     FUNDED: "funded order",
     NOT_FUNDED: "not funded",
@@ -108,7 +111,8 @@ const reverts = {
     NOT_EXPIRED: "not expired",
     INVALID_ORDER: "invalid order",
     CANT_FUND_EXPIRED_ORDER:"can't fund expired order",
-    EXPIRATION_TIME_LESS_THAN_NOW: "expiration time is less than present time"
+    EXPIRATION_TIME_LESS_THAN_NOW: "expiration time is less than present time",
+    FAILED_TO_RELEASE_ETHER: "Failed to release Ether"
 
 }
 
