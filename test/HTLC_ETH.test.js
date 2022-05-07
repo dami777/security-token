@@ -257,12 +257,12 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 const orderID_1 = stringToHex("1").hex
                 
                 it("should fail to fund if attempted again by the investor", async()=>{
-                    await htlcEth.fundOrder(orderID_1, tanglSecurityToken.address, {from: investor, value: price}).should.be.rejected
+                    await htlcEth.fundOrder(orderID_1, tanglSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejectedWith(reverts.FUNDED)
                 })
 
                 it("should fail to fund if attempted by the wrong investor", async()=>{
                     
-                    await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejected
+                    await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejectedWith(reverts.INVALID_CALLER)
                 })
 
                 it("")
