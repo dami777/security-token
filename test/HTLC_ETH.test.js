@@ -185,6 +185,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     await htlcEth.openOrder(orderID_1, investor2, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
                     await htlcEth.openOrder(orderID_1, investor1, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
                     await htlcEth.openOrder(orderID_2, investor1, reitSecurityToken.address, price, amount, expired(1), secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRATION_TIME_LESS_THAN_NOW)
+                    await htlcEth.openOrder(orderID_2, investor1, reitSecurityToken.address, price, amount, expiration, hashSecret("invalid").secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
                 
                 })
             })
