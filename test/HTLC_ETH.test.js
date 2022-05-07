@@ -207,6 +207,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         describe("funding order", ()=>{
 
             let fundTanglOrder
+            let fundReitOrder
             const orderID_1 = stringToHex("1").hex
             let contractEtherBalanceBeforeFunding
 
@@ -216,6 +217,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 contractEtherBalanceBeforeFunding = await web3.eth.getBalance(htlcEth.address)
 
                 fundTanglOrder = await htlcEth.fundOrder(orderID_1, tanglSecurityToken.address, {from: investor_Dami, value: price})
+                fundReitOrder = await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Jeff, value: price})
             
             })
 
@@ -225,7 +227,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     
                     const contractEtherBalanceAfterFunding = await web3.eth.getBalance(htlcEth.address)
                     
-                    Number(contractEtherBalanceAfterFunding - contractEtherBalanceBeforeFunding).should.been.equal(Number(price), "ether was deposited to the contract by the investor associated with the order")
+                    Number(contractEtherBalanceAfterFunding - contractEtherBalanceBeforeFunding).should.been.equal(Number(price) * 2, "ether was deposited to the contract by the investor associated with the order")
      
                 })
 
@@ -263,8 +265,13 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 })
 
                 it("should fail to fund if attempted by the wrong investor", async()=>{
+
+                    const orderID_2 = stringToHex("1").hex
+
+                    await htlcEth.openOrder(orderID_2, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
                     
-                    await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejectedWith(reverts.INVALID_CALLER)
+                    await htlcEth.fundOrder(orderID_2, reitSecurityToken.address, {from: investor_Dami, value: price}).should.be.rejectedWith(reverts.INVALID_CALLER)
                 })
 
                 it("should fail to fund an expired order", async()=>{
@@ -320,40 +327,69 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            /*describe("tanglAdministrator, reitAdministrator withdrawal", ()=>{
+            describe("issuer's / administrator's withdrawal", ()=>{
 
-                let withdrawal
-                let checkOrder
-                let tanglAdministrator, reitAdministratorEthBalanceBeforeWithDrawal
+                let tanglAdministratorWithdrawal
+                let reitAdministratorWithdrawal
+
+                let reitAdministratorEthBalanceBeforeWithDrawal
+                let tanglAdministratorEthBalanceBeforeWithDrawal
+
+                let checkTangleOrder
+                let checkReitOrder
+
+                const orderID_1 = stringToHex("1").hex
                 
 
                 beforeEach(async()=>{
-                    tanglAdministrator, reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator, reitAdministrator)
-                    withdrawal = await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID, secretHex, {from:tanglAdministrator, reitAdministrator})
-                    checkOrder = await htlcEth.checkOrder(orderID)
+
+                    /**
+                     * get the ether balances of the two adminstrators / issuers before initiating withdrawal
+                     * Withdrawal initiated by the two administrators
+                     */
+
+                    reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
+                    tanglAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator)
+                    
+                    reitAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:reitAdministrator})
+                    tanglAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
+                    
+                    checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
+                    checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
+
                 })
 
                 describe("successful withdrawal", ()=>{
 
                     it("closes the order", ()=>{
-                        withdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
-                        checkOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+
+                        tanglAdministratorWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                        reitAdministratorWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
+                        
+                        checkTanglOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                        checkReitOrder._orderState.toString().should.be.equal(swapState.CLOSED, "the order state is updated to closed")
+                        
                     })
     
-                    it("releases the ether to the tanglAdministrator, reitAdministrator", async()=>{
-                        const htlcEthBalance = await web3.eth.getBalance(htlcEth.address)
-                        const tanglAdministrator, reitAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator, reitAdministrator)
+                    it("releases the ether to the administrator / issuer", async()=>{
+
+                        /**
+                         * Get the administrators' balance after withdrawal
+                         * Check that the difference between his balance after and before withdrawal is equal to the amount withdrawn
+                         */
+                        
+                        const tanglAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator)
+                        const reitAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(reitAdministrator)
     
-                        htlcEthBalance.toString().should.be.equal("0", "ether was withdrawn from the contract")
-                        tanglAdministrator, reitAdministratorBalanceIncreased = Number(tanglAdministrator, reitAdministratorEthBalanceAfterWithdrawal.toString()) > Number(tanglAdministrator, reitAdministratorEthBalanceBeforeWithDrawal.toString())
-                        tanglAdministrator, reitAdministratorBalanceIncreased.should.be.equal(true, "tanglAdministrator, reitAdministrator's ether balance increased after withdrawal")
-    
+                        Number(tanglAdministratorEthBalanceAfterWithdrawal - tanglAdministratorEthBalanceBeforeWithDrawal).should.be.equal(Number(price), "the administrator withdrew the investor's deposit successfully")
+                        Number(reitAdministratorEthBalanceAfterWithdrawal - reitAdministratorEthBalanceBeforeWithDrawal).should.be.equal(Number(price), "the administrator withdrew the investor's deposit successfully")
+                        
     
                     })
 
                 })
 
-                describe("failed withdrawal", ()=>{
+                /*describe("failed withdrawal", ()=>{
 
                     it("fails to withdraw if the order has been closed", async()=>{
                         await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID, secretHex, {from:tanglAdministrator, reitAdministrator}).should.be.rejected
@@ -405,9 +441,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                     })
 
-                })
+                })*/
 
-            })*/
+            })
 
             /*describe("reentrancy attack", ()=>{*/
 
