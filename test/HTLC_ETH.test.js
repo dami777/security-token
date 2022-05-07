@@ -2,7 +2,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-
+const moment = require("moment");
 const { ETHER_ADDRESS, tokens, ether, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts, wait} = require("./helper.js")
 
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
