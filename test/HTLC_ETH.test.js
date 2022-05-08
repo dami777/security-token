@@ -33,6 +33,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
     let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA,classB])
     let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA,classB])
 
+    let gasPrice
+
 
     beforeEach(async()=>{
 
@@ -52,7 +54,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         
         //  set the gas price
         
-        let gasPrice = await web3.eth.getGasPrice()
+        gasPrice = await web3.eth.getGasPrice()
     })
 
     describe("contract address", ()=>{
