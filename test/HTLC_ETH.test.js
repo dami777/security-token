@@ -3,7 +3,12 @@ require("chai")
     .should()
 
 const moment = require("moment");
-const { ETHER_ADDRESS, tokens, ether, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts, wait} = require("./helper.js")
+
+const { ETHER_ADDRESS, tokens, ether, 
+        swapState, expire, expired, stringToHex, 
+        hashSecret, setToken, reverts, wait,
+        toBN
+} = require("./helper.js")
 
 const HTLC_ETH = artifacts.require("./HTLC_ETH")
 const ERC1400 = artifacts.require("./ERC1400")
@@ -23,8 +28,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
     let classA = stringToHex("CLASS A").hex
     let classB = stringToHex("CLASS B").hex
 
-    
-    
+        
     
     let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA,classB])
     let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA,classB])
@@ -46,7 +50,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tanglAdministrator})
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
         
-
+        //  set the gas price
+        
+        let gasPrice = await web3.eth.getGasPrice()
     })
 
     describe("contract address", ()=>{
@@ -88,10 +94,12 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             tanglOrder = await htlcEth.openOrder(orderID_1, investor_Dami, tanglSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
             reitOrder = await htlcEth.openOrder(orderID_1, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
-
+            
         })
 
         describe("opening order", ()=>{
+
+            
 
             describe("successful opened order", ()=>{
 
@@ -266,7 +274,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 it("should fail to fund if attempted by the wrong investor", async()=>{
 
-                    const orderID_2 = stringToHex("1").hex
+                    const orderID_2 = stringToHex("2").hex
 
                     await htlcEth.openOrder(orderID_2, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
 
@@ -348,8 +356,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                      * Withdrawal initiated by the two administrators
                      */
 
-                    reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
-                    tanglAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator)
+                    reitAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(reitAdministrator))
+                    tanglAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(tanglAdministrator))
                     
                     reitAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:reitAdministrator})
                     tanglAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
@@ -357,6 +365,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
                     checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
 
+                    
                 })
 
                 describe("successful withdrawal", ()=>{
@@ -375,16 +384,24 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                         /**
                          * Get the administrators' balance after withdrawal
-                         * Check that the difference between his balance after and before withdrawal is equal to the amount withdrawn
+                         * Calculate the gas price used by the administrator to initiate the withdrawal
+                         * Check that the difference between his balance after and before withdrawal and the added gas price is equal to the amount withdrawn
+                         * For accurate calculation, the numbers were converted to Big Integer data type
                          */
+
+                        
                         
                         const tanglAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator)
                         const reitAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(reitAdministrator)
-    
-                        Number(tanglAdministratorEthBalanceAfterWithdrawal - tanglAdministratorEthBalanceBeforeWithDrawal).should.be.equal(Number(price), "the administrator withdrew the investor's deposit successfully")
-                        Number(reitAdministratorEthBalanceAfterWithdrawal - reitAdministratorEthBalanceBeforeWithDrawal).should.be.equal(Number(price), "the administrator withdrew the investor's deposit successfully")
+
+                        const tanglGasPrice = tanglAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
+                        const reitGasPrice = reitAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
+
                         
-    
+                        (BigInt(tanglAdministratorEthBalanceAfterWithdrawal) - BigInt(tanglAdministratorEthBalanceBeforeWithDrawal) + BigInt(tanglGasPrice)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
+                        (BigInt(reitAdministratorEthBalanceAfterWithdrawal) - BigInt(reitAdministratorEthBalanceBeforeWithDrawal) + BigInt(reitGasPrice)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
+                        
+                        
                     })
 
                 })
