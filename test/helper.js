@@ -13,6 +13,8 @@ const tokens=(n)=>{
     
 }
 
+const { toBN } = web3.utils
+
 //  convert number to wei for ether value
 
 const ether = (n) => tokens(n)
@@ -120,5 +122,5 @@ const reverts = {
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
         wait, swapState, ether, BYTES_0, setToken, hashSecret, 
-        stringToHex, expire, expired, reverts }
+        stringToHex, expire, expired, reverts, toBN }
 

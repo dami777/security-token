@@ -29,4 +29,3 @@ d = new Date(moment().add(15, 'seconds').unix())
 
 e = moment.unix(d.getTime()).format('h:mm:ss a M/D')
 
-console.log(e)
