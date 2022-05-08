@@ -53,8 +53,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
         
         //  set the gas price
-        
+
         gasPrice = await web3.eth.getGasPrice()
+
     })
 
     describe("contract address", ()=>{
@@ -396,12 +397,12 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                         const tanglAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator)
                         const reitAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(reitAdministrator)
 
-                        const tanglGasPrice = tanglAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
-                        const reitGasPrice = reitAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
+                        const tanglOrderWithdrawalGasFee = tanglAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
+                        const reitOrderWithdrawalGasFee = reitAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
 
                         
-                        (BigInt(tanglAdministratorEthBalanceAfterWithdrawal) - BigInt(tanglAdministratorEthBalanceBeforeWithDrawal) + BigInt(tanglGasPrice)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
-                        (BigInt(reitAdministratorEthBalanceAfterWithdrawal) - BigInt(reitAdministratorEthBalanceBeforeWithDrawal) + BigInt(reitGasPrice)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
+                        (BigInt(tanglAdministratorEthBalanceAfterWithdrawal) - BigInt(tanglAdministratorEthBalanceBeforeWithDrawal) + BigInt(tanglOrderWithdrawalGasFee)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
+                        (BigInt(reitAdministratorEthBalanceAfterWithdrawal) - BigInt(reitAdministratorEthBalanceBeforeWithDrawal) + BigInt(reitOrderWithdrawalGasFee)).toString().should.be.equal(price.toString(), "the administrator withdrew the investor's deposit successfully");
                         
                         
                     })
@@ -625,9 +626,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
 
 //  [*]  update the events with the tanglAdministrator, reitAdministrator's address and token address
-//  []  update the check order return statement with the security token address and tanglAdministrator, reitAdministrator's address
-//  []  test open orders with different issuing entities
-//  []  test fund order
+//  [*]  update the check order return statement with the security token address and tanglAdministrator, reitAdministrator's address
+//  [*]  test open orders with different issuing entities
+//  [*]  test fund order
 //  []  test withdrawal
 //  []  test refund
 //  []  disable opening and funding expired orders
