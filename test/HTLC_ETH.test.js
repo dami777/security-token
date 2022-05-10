@@ -409,30 +409,40 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-                /*describe("failed withdrawal", ()=>{
+                describe("failed withdrawal", ()=>{
 
-                    it("fails to withdraw if the order has been closed", async()=>{
-                        await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID, secretHex, {from:tanglAdministrator, reitAdministrator}).should.be.rejected
+                    const orderID_1 = stringToHex("1").hex
+                    const orderID_2 = stringToHex("2").hex
+
+                    beforeEach(async()=>{
+                            
+                        await htlcEth.openOrder(orderID_2, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
                     })
 
-                    it("fails to release payment if withdrawal is attempted by the wrong recipient", async()=>{
-                        await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID, secretHex, {from:investor}).should.be.rejected
+                    it("fails to withdraw if the order has been closed", async()=>{
+                        await htlcEth.issuerWithdrawal(orderID_1, secretHex, tanglSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
+                    })
+
+                    it("fails to release payment if withdrawal is attempted by the wrong issuer", async()=>{
+                        await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_CALLER)
                     })
 
                     it("fails to withdraw from an order that has not been funded by the investor", async()=>{
-                        await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID2, secretHex, {from:tanglAdministrator, reitAdministrator}).should.be.rejected
+
+                        await htlcEth.issuerWithdrawal(orderID_2, secretHex, reitSecurityToken.address, {from:reitAdministrator}).should.be.rejectedWith(reverts.NOT_FUNDED)
                     })
 
                     it("should fail if withrawal is attempted with the wrong secret", async()=>{
 
-                        const wrongSecret = web3.utils.asciiToHex("ava")
-                        await htlcEth.fundOrder(orderID2, {from: investor, value: price})
-                        await htlcEth.tanglAdministrator, reitAdministratorWithdrawal(orderID2, wrongSecret, {from:tanglAdministrator, reitAdministrator}).should.be.rejected
+                        const wrongSecret = hashSecret("ava").secretHex
+                        await htlcEth.fundOrder(orderID_2, reitSecurityToken.address, {from: investor_Jeff, value: price})
+                        await htlcEth.issuerWithdrawal(orderID_2, wrongSecret, reitSecurityToken.address, {from:reitAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
                     })
 
                 })
 
-                describe("failed activities on withdrawn orders", ()=>{
+                /*describe("failed activities on withdrawn orders", ()=>{
 
                     it("fails to open a closed order", async()=>{
                         await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA).should.be.rejected
