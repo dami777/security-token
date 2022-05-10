@@ -346,7 +346,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 let reitAdministratorEthBalanceBeforeWithDrawal
                 let tanglAdministratorEthBalanceBeforeWithDrawal
 
-                let checkTangleOrder
+                let checkTanglOrder
                 let checkReitOrder
 
                 const orderID_1 = stringToHex("1").hex
@@ -458,23 +458,27 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-                /*describe("updated order status", ()=>{
+                describe("updated order status", ()=>{
 
-                    let checkOrder
+                    let checkTanglOrder
+                    let checkReitOrder
 
                     beforeEach(async()=>{
 
-                        checkOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
+                        checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
+                        checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
 
                     })
 
                     it("should make the secret public", ()=>{
 
-                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "tanglAdministrator, reitAdministrator made the secret public after withdrawl")   
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkTanglOrder._secretKey), "secret was made public after tangl's administrator's withdrawal")   
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkReitOrder._secretKey), "secret was made public after tangl's administrator's withdrawal")   
+
 
                     })
 
-                })*/
+                })
 
             })
 
