@@ -605,7 +605,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 it("should fail to refund any unfunded order", async()=>{
 
-                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejectedWith(reverts.FUNDED)
+                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_FUNDED)
 
                 })
 
