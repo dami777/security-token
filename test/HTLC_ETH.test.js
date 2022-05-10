@@ -603,6 +603,10 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             describe("failed refund", ()=>{
 
+                it("should fail to refund if call is made by the wrong investor", async()=>{
+                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Jeff}).should.be.rejectedWith(reverts.INVALID_CALLER)
+                })
+
                 it("should fail to refund any unfunded order", async()=>{
 
                     await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_FUNDED)
@@ -615,6 +619,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejected
 
                 })
+
             })
 
             /*describe("reEntrancy attack at refund", ()=>{
