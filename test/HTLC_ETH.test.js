@@ -503,7 +503,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
                 })*/
 
-                describe("failed attack", ()=>{
+                /*describe("failed attack", ()=>{
 
                     const orderID_4 = stringToHex("4").hex
 
@@ -520,25 +520,36 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                         const balanceAfterFailedAttack = await withdrawReEntrancy.balance()
                         balanceAfterFailedAttack.toString().should.be.equal("0", "could not withdraw any ether")
                     })
-                })
+                })*/
 
             })
 
         })
 
-        /*describe("refunding expired order", ()=>{
+        describe("refunding expired order", ()=>{
 
-            let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
-            let orderID4 = web3.utils.asciiToHex("x23d33sdgdb")
-            let expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let orderID_3 = stringToHex("3").hex
+            let orderID_4 = stringToHex("4").hex
+            const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs
+
             let refund
-            let balanceBeforeRefund
-            let balanceAfterRefund
+
+            let investorJeffbalanceBeforeRefund
+            let investorJeffbalanceAfterRefund
 
             beforeEach(async()=>{
 
-                await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretHex, classA)
-                await htlcEth.openOrder(orderID4, investor, price, amount, expired, secretHash, secretHex, classA)
+
+                
+
+                await htlcEth.openOrder(orderID_3, investor_Jeff, reitSecurityToken.address, price, amount, expire_10sec, secretHash, secretHex, classA, {from: reitAdministrator})
+                await htlcEth.openOrder(orderID_4, investor_Dami, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
+                
+               
+                //await htlcEth.fundOrder(orderID_4, reitSecurityToken.address, {from: investor_Dami, value: price})
+
+                
                
 
             })
@@ -548,15 +559,24 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 beforeEach(async()=>{
 
-                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
-                    balanceBeforeRefund = await web3.eth.getBalance(investor)
-                    refund = await htlcEth.refund(orderID3, {from: investor})
+                    /**
+                     * Fund order
+                     * Wait for 13 secs for the order to expire so that the investor can place a refund order
+                     */
+
+                    await htlcEth.fundOrder(orderID_3, reitSecurityToken.address, {from: investor_Jeff, value: price})
+
+                    await wait(13)
+
+                    investorJeffbalanceBeforeRefund = await web3.eth.getBalance(investor_Jeff)
+
+                    refund = await htlcEth.refund(orderID_3, reitSecurityToken.address, {from: investor_Jeff})
 
                 })
 
-                it("should declare the order as expired", async()=>{
+                it("should update the order as expired", async()=>{
 
-                    const checkOrder = await htlcEth.checkOrder(orderID3)
+                    const checkOrder = await htlcEth.checkOrder(orderID_3, reitSecurityToken.address)
                     checkOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "order state is updated to EXPIRED after refund")
                     
                 })
@@ -566,9 +586,14 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 })
 
                 it("should increment the investor's balance after refund", async()=>{
-                    balanceAfterRefund = await web3.eth.getBalance(investor)
-                    incremented = Number(balanceAfterRefund.toString()) > Number(balanceBeforeRefund.toString())
-                    incremented.should.be.equal(true, "deposited ether by investor was released to investor")
+
+                    const gasFeeForRefund = refund.receipt.cumulativeGasUsed * gasPrice;
+                    const investorJeffbalanceAfterRefund = await web3.eth.getBalance(investor_Jeff)
+
+                    const amountRefunded = BigInt(investorJeffbalanceAfterRefund) - BigInt(investorJeffbalanceBeforeRefund) + BigInt(gasFeeForRefund)
+
+                    amountRefunded.toString().should.be.equal(price.toString(), "the price associated with the order was refunded to the investor")
+
                 })
 
 
@@ -576,7 +601,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            describe("failed refund", ()=>{
+            /*describe("failed refund", ()=>{
 
                 it("should fail to refund any unfunded order", async()=>{
 
@@ -633,12 +658,12 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-            })
+            })*/
 
 
             
 
-        })*/
+        })
 
         
     })
