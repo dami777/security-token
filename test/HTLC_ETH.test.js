@@ -630,7 +630,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 beforeEach(async()=>{
 
-                    await htlcEth.openOrder(orderID_5, investor_Dami, reitSecurityToken.address, ether(1), amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+                    const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs 
+
+                    await htlcEth.openOrder(orderID_5, investor_Dami, reitSecurityToken.address, ether(1), amount, expire_10sec, secretHash, secretHex, classA, {from: reitAdministrator})
 
                     await htlcEth.fundOrder(orderID_5, reitSecurityToken.address, {from: investor_Dami, value: ether(1)})
                     
@@ -644,6 +646,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                     it("should fail to attack after implementing defence in the contract", async()=>{
 
+                        await wait(13)
+                        
                         const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
                         await refundReEntrancy.attack(orderID_5, reitSecurityToken.address).should.be.rejectedWith("Failed to release Ether")                     //  launch the attack; attack fails
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
