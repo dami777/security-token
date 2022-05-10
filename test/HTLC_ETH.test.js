@@ -359,8 +359,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                      * Withdrawal initiated by the two administrators
                      */
 
-                    reitAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(reitAdministrator))
-                    tanglAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(tanglAdministrator))
+                    reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
+                    tanglAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator)
                     
                     reitAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:reitAdministrator})
                     tanglAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
@@ -442,26 +442,29 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-                /*describe("failed activities on withdrawn orders", ()=>{
+                describe("failed activities on withdrawn orders", ()=>{
 
-                    it("fails to open a closed order", async()=>{
-                        await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA).should.be.rejected
+                    it("fails to reopen a closed order", async()=>{
+
+                        await htlcEth.openOrder(orderID_1, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                    
                     })
 
                     it("fails to fund an order that has been closed", async()=>{
 
-                        await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
+                        await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Jeff, value: price}).should.be.rejectedWith(reverts.NOT_OPENED)
 
                     })
 
                 })
 
-                describe("updated order status", ()=>{
+                /*describe("updated order status", ()=>{
 
                     let checkOrder
+
                     beforeEach(async()=>{
 
-                        checkOrder = await htlcEth.checkOrder(orderID)
+                        checkOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
 
                     })
 
