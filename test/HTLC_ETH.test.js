@@ -482,7 +482,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            /*describe("reentrancy attack", ()=>{*/
+            describe("reentrancy attack", ()=>{
 
                 /// this commented test case is only valid is reEntrancy defence is removed from the withdraw function
 
@@ -503,20 +503,26 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
                 })*/
 
-                /*describe("failed attack", ()=>{
+                describe("failed attack", ()=>{
+
+                    const orderID_4 = stringToHex("4").hex
 
                     beforeEach(async()=>{
-                        await htlcEth.fundOrder(orderID2, {from: investor, value: price})
+
+                        await htlcEth.openOrder(orderID_4, investor_Dami, tanglSecurityToken.address, ether(0.8), amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
+
+                        await htlcEth.fundOrder(orderID_4, tanglSecurityToken.address, {from: investor_Dami, value: ether(0.8)})
+
                     })
 
                     it("fails to execute re-entrancy attack", async()=>{
-                        await withdrawReEntrancy.attack(orderID, secretHex).should.be.rejected
+                        await withdrawReEntrancy.attack(orderID_4, secretHex, tanglSecurityToken.address, {from: tanglAdministrator}).should.be.rejectedWith("Failed to release Ether")
                         const balanceAfterFailedAttack = await withdrawReEntrancy.balance()
                         balanceAfterFailedAttack.toString().should.be.equal("0", "could not withdraw any ether")
                     })
-                })*/
+                })
 
-          /* })*/
+            })
 
         })
 
