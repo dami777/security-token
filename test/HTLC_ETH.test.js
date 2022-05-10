@@ -622,41 +622,30 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            /*describe("reEntrancy attack at refund", ()=>{
+            describe("reEntrancy attack at refund", ()=>{
 
                 // investor funds the orders
 
+                const orderID_5  = stringToHex("5").hex
+
                 beforeEach(async()=>{
-                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
-                    await htlcEth.fundOrder(orderID4, {from: investor, value: price})
-                })
 
-                describe("htlc ether balance", ()=>{
+                    await htlcEth.openOrder(orderID_5, investor_Dami, reitSecurityToken.address, ether(1), amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
 
-                    it("returns the ether balance of the htlc", async()=>{
-                        const balance = await web3.eth.getBalance(htlcEth.address)
-                        balance.toString().should.be.equal((price * 2).toString(), "it returns the balance of the htlc contract")
-                    })
+                    await htlcEth.fundOrder(orderID_5, reitSecurityToken.address, {from: investor_Dami, value: ether(1)})
+                    
 
                 })
 
-                describe("reEntrancy during refund", ()=>{*/
+                
 
-                    ////    this commented test is valid if reEntrancy defense is removed from the refund function
+                describe("reEntrancy during refund", ()=>{
 
-                    /*it("should withdraw all the deposited ether into the investor's wallet", async()=>{
-                        await refundReEntrancy.attack(orderID3, secretHex)
-                        const investorBalanceAfterAttack = await web3.eth.getBalance(investor)
-                        const htlcBalanceAfterAttack = await web3.eth.getBalance(htlcEth.address)
 
-                        //investorBalanceAfterAttack.toString().should.be.equal((price * 2).toString(), "it returns the balance of the htlc contract")
-                        htlcBalanceAfterAttack.toString().should.be.equal("0", "investor withdrew all the ether from the htlc via reEntrancy")
-                    })*/
-
-                    /*it("should fail to attack after implementing defence in the contract", async()=>{
+                    it("should fail to attack after implementing defence in the contract", async()=>{
 
                         const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
-                        await refundReEntrancy.attack(orderID3, secretHex).should.be.rejected                     //  launch the attack; attack fails
+                        await refundReEntrancy.attack(orderID_5, reitSecurityToken.address).should.be.rejectedWith("Failed to release Ether")                     //  launch the attack; attack fails
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
                         htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
                         
@@ -664,7 +653,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-            })*/
+            })
 
 
             
