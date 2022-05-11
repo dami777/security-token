@@ -67,7 +67,7 @@ library Certificate {
     /// @param  _to The struct of the account to be credited
    
 
-    function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount) external pure returns (bytes32) {
+    function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount, uint256 _nonce) external pure returns (bytes32) {
         
         bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount,uint256 nonce)Holder(string firstName,string lastName,string location,address walletAddress)");
         
@@ -79,7 +79,8 @@ library Certificate {
                     TRANSFER_TYPED_HASH,
                     hashHolder(_from),
                     hashHolder(_to),
-                    _amount
+                    _amount,
+                    _nonce
                 ))
 
             ));
@@ -127,8 +128,10 @@ library Certificate {
     /// @param _encodedSignature The encoded data containing the signature and the signature hash 
     /// @return the signature and the hash
 
-    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, bytes32, bool, bool) {
-        return abi.decode(_encodedSignature, (bytes, Holder, Holder, uint256 amount, uint256 nonce));
+    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, Holder memory, Holder memory) {
+        
+        return abi.decode(_encodedSignature, (bytes, Holder, Holder));
+
     }
 
    

@@ -218,12 +218,14 @@ contract ERC1400 {
     }
 
 
-    function _isValidCertificate(bytes memory _data) internal view returns (bool) {
-        (bytes memory _signature, bytes32 _signatureHash, bool _fromIsWhiteListedOrIssuer, bool _toIsWhiteListed) = Certificate.decodeData(_data);
-        require(_fromIsWhiteListedOrIssuer && _toIsWhiteListed, "0x5b");    // require that the from and to accounts are whitelisted
-        address _signer = Certificate.verifySignature(_signature, _signatureHash);
-        require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
-        return true;
+    function _isValidCertificate(bytes memory _data, uint256 _amount) external view returns (address _signer) {
+
+        (bytes memory _signature, Certificate.Holder _from, Certificate.Holder _to) = Certificate.decodeData(_data);
+        bytes32 _prefixedHash = Certificate.hashTransfer((address(this), "1", name, 1337, bytes32("salt")), _from, _to, _amount);
+        address _signer = Certificate.verifySignature(_signature, _prefixedHash);
+        //require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
+        return _signer;
+
     }
 
 
