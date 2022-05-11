@@ -100,7 +100,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
             
         })
 
-        /*describe("opening order", ()=>{
+        describe("opening order", ()=>{
 
             
 
@@ -213,9 +213,9 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             
     
-        })*/
+        })
 
-        /*describe("funding order", ()=>{
+        describe("funding order", ()=>{
 
             let fundTanglOrder
             let fundReitOrder
@@ -293,7 +293,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                      * Attempt funding after expiration
                      */
 
-                    /*const expiration = new Date(moment().add(10, 'seconds').unix()).getTime()
+                    const expiration = new Date(moment().add(10, 'seconds').unix()).getTime()
                     const orderID_2 = stringToHex("2").hex
 
                     await htlcEth.openOrder(orderID_2, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
@@ -305,20 +305,20 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-                it("should fail to fund an unopened order", async()=>{*/
+                it("should fail to fund an unopened order", async()=>{
 
                     /**
                      * This particular order ID isn't a valid opened id 
                      * Funding an unopened id should be reverted
                      */
 
-                    /*const unOpened_ID = stringToHex("4").hex
+                    const unOpened_ID = stringToHex("4").hex
 
                     await htlcEth.fundOrder(unOpened_ID, reitSecurityToken.address, {from: investor_Jeff, value: price}).should.be.rejectedWith(reverts.NOT_OPENED)
 
                 })
 
-                it("should fail if the amount to be deposited to the order doesn't match the set price of the order", async()=>{*/
+                it("should fail if the amount to be deposited to the order doesn't match the set price of the order", async()=>{
 
                     /**
                      * The set price for this order is 0.2 ether as defined in the `price` global variable
@@ -326,7 +326,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                      */
 
                     
-                    /*const orderID_3 = stringToHex("3").hex
+                    const orderID_3 = stringToHex("3").hex
 
                     await htlcEth.openOrder(orderID_3, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
 
@@ -352,14 +352,14 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 const orderID_1 = stringToHex("1").hex
                 
 
-                beforeEach(async()=>{*/
+                beforeEach(async()=>{
 
                     /**
                      * get the ether balances of the two adminstrators / issuers before initiating withdrawal
                      * Withdrawal initiated by the two administrators
                      */
 
-                   /* reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
+                    reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
                     tanglAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator)
                     
                     reitAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:reitAdministrator})
@@ -383,7 +383,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                         
                     })
     
-                    it("releases the ether to the administrator / issuer", async()=>{*/
+                    it("releases the ether to the administrator / issuer", async()=>{
 
                         /**
                          * Get the administrators' balance after withdrawal
@@ -394,7 +394,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                         
                         
-                        /*const tanglAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator)
+                        const tanglAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(tanglAdministrator)
                         const reitAdministratorEthBalanceAfterWithdrawal = await web3.eth.getBalance(reitAdministrator)
 
                         const tanglOrderWithdrawalGasFee = tanglAdministratorWithdrawal.receipt.cumulativeGasUsed * gasPrice;
@@ -480,7 +480,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-            })*/
+            })
 
             describe("reentrancy attack", ()=>{
 
@@ -522,7 +522,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
                 })*/
 
-            //})
+            })
 
         })
 
@@ -622,7 +622,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             })
 
-            describe("reEntrancy attack at refund", ()=>{
+            /*describe("reEntrancy attack at refund", ()=>{
 
                 // investor funds the orders
 
@@ -652,19 +652,19 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                         const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
                         
-                        console.log(htlcBalanceBeforeFailedAttack.toString())
+                        
                         
                         const a = await refundReEntrancy.attack(orderID_5, reitSecurityToken.address).should.be.rejectedWith("Failed to release Ether")                     //  launch the attack; attack fails
-                        console.log(a)
+                        
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
                         htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
-                        console.log(htlcBalanceAfterFailedAttack)
+                        
 
                     })
 
                 })
 
-            })
+            })*/
 
 
             
@@ -682,6 +682,6 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 //  [*]  update the check order return statement with the security token address and tanglAdministrator, reitAdministrator's address
 //  [*]  test open orders with different issuing entities
 //  [*]  test fund order
-//  []  test withdrawal
-//  []  test refund
-//  []  disable opening and funding expired orders
+//  [*]  test withdrawal
+//  [*]  test refund
+//  [*]  disable opening and funding expired orders
