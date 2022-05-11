@@ -20,6 +20,7 @@ library Certificate {
         Holder from;
         Holder to;
         uint256 amount;
+        uint256 nonce;
 
     }
 
@@ -68,7 +69,7 @@ library Certificate {
 
     function hashTransfer(DomainData memory _domainData, Holder memory _from, Holder memory _to, uint256 _amount) external pure returns (bytes32) {
         
-        bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount)Holder(string firstName,string lastName,string location,address walletAddress)");
+        bytes32 TRANSFER_TYPED_HASH = keccak256("TransferData(Holder from,Holder to,uint256 amount,uint256 nonce)Holder(string firstName,string lastName,string location,address walletAddress)");
         
         return keccak256(
             abi.encodePacked(
@@ -126,8 +127,10 @@ library Certificate {
     /// @param _encodedSignature The encoded data containing the signature and the signature hash 
     /// @return the signature and the hash
 
-    function decodeData(bytes memory _encodedSignature) external pure returns (bytes memory, bytes32, bool, bool) {
-        return abi.decode(_encodedSignature, (bytes, bytes32, bool, bool));
+    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, bytes32, bool, bool) {
+        return abi.decode(_encodedSignature, (bytes, Holder, Holder, uint256 amount, uint256 nonce));
     }
+
+   
 
 }

@@ -1,7 +1,7 @@
 const GenerateSig = artifacts.require("./GenerateEthSignature")
 const CertLib = artifacts.require("./Certificate")
 const { ethers } = require('ethers')
-const { TypedDataUtils } = require('ethers-eip712')
+
 
 require("chai")
     .use(require("chai-as-promised"))
@@ -132,6 +132,51 @@ contract("Certificate Data Test", ([issuer])=>{
 
             returnedEthersSigner.should.be.equal(wallet.address, "it verifies the signer")
             returnedMetaSigner.should.be.equal(address, "it verifies the signer")
+        })
+
+    })
+
+    describe("decoding", ()=>{
+
+        it("returns the encoded Parameters", async()=>{
+
+            let _from = {
+                firstName: "Israel",
+                lastName: "Komolehin",
+                location: "University Of Ibadan, Nigeria",
+                walletAddress: "0x292072a24aa02b6b0248C9191d46175E11C86270"
+            } 
+    
+            let _to = {
+                firstName: "Tommy",
+                lastName: "Shelby",
+                location: "Ireland",
+                walletAddress: "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
+            }
+            const encoded = web3.eth.abi.encodeParameters([
+                {
+                    "Holder" : {
+                        "firstName": "string",
+                        "lastName": "string",
+                        "location": "string",
+                        "walletAddress": "address",
+                        }
+            },
+            
+            {
+                "Holder" : {
+                    "firstName": "string",
+                    "lastName": "string",
+                    "location": "string",
+                    "walletAddress": "address",
+                }
+            }], 
+            [_from, _to]);
+
+            const decodedStruct= await certLib.decoded(encoded)
+
+            console.log(decodedStruct)
+            
         })
 
     })
