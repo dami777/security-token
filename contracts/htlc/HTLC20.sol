@@ -88,6 +88,7 @@ contract HTLC20 {
 
     function refund(bytes32 _swapID, address _securityToken) external {
 
+        require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
         require(_orderSwap[_securityToken][_swapID]._funded == true, "not funded");
         require(block.timestamp > _orderSwap[_securityToken][_swapID]._expiration, "not expired");    

@@ -346,7 +346,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 let reitAdministratorEthBalanceBeforeWithDrawal
                 let tanglAdministratorEthBalanceBeforeWithDrawal
 
-                let checkTangleOrder
+                let checkTanglOrder
                 let checkReitOrder
 
                 const orderID_1 = stringToHex("1").hex
@@ -359,8 +359,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                      * Withdrawal initiated by the two administrators
                      */
 
-                    reitAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(reitAdministrator))
-                    tanglAdministratorEthBalanceBeforeWithDrawal = toBN(await web3.eth.getBalance(tanglAdministrator))
+                    reitAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(reitAdministrator)
+                    tanglAdministratorEthBalanceBeforeWithDrawal = await web3.eth.getBalance(tanglAdministrator)
                     
                     reitAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:reitAdministrator})
                     tanglAdministratorWithdrawal = await htlcEth.issuerWithdrawal(orderID_1, secretHex, tanglSecurityToken.address, {from:tanglAdministrator})
@@ -442,15 +442,17 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 })
 
-                /*describe("failed activities on withdrawn orders", ()=>{
+                describe("failed activities on withdrawn orders", ()=>{
 
-                    it("fails to open a closed order", async()=>{
-                        await htlcEth.openOrder(orderID, investor, price, amount, expiration, secretHash, secretHex, classA).should.be.rejected
+                    it("fails to reopen a closed order", async()=>{
+
+                        await htlcEth.openOrder(orderID_1, investor_Jeff, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                    
                     })
 
                     it("fails to fund an order that has been closed", async()=>{
 
-                        await htlcEth.fundOrder(orderID, {from: investor, value: price}).should.be.rejected
+                        await htlcEth.fundOrder(orderID_1, reitSecurityToken.address, {from: investor_Jeff, value: price}).should.be.rejectedWith(reverts.NOT_OPENED)
 
                     })
 
@@ -458,24 +460,29 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 describe("updated order status", ()=>{
 
-                    let checkOrder
+                    let checkTanglOrder
+                    let checkReitOrder
+
                     beforeEach(async()=>{
 
-                        checkOrder = await htlcEth.checkOrder(orderID)
+                        checkTanglOrder = await htlcEth.checkOrder(orderID_1, tanglSecurityToken.address)
+                        checkReitOrder = await htlcEth.checkOrder(orderID_1, reitSecurityToken.address)
 
                     })
 
                     it("should make the secret public", ()=>{
 
-                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkOrder._secretKey), "tanglAdministrator, reitAdministrator made the secret public after withdrawl")   
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkTanglOrder._secretKey), "secret was made public after tangl's administrator's withdrawal")   
+                        secret_phrase.should.be.equal(web3.utils.hexToUtf8(checkReitOrder._secretKey), "secret was made public after tangl's administrator's withdrawal")   
+
 
                     })
 
-                })*/
+                })
 
             })
 
-            /*describe("reentrancy attack", ()=>{*/
+            describe("reentrancy attack", ()=>{
 
                 /// this commented test case is only valid is reEntrancy defence is removed from the withdraw function
 
@@ -498,34 +505,50 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 /*describe("failed attack", ()=>{
 
+                    const orderID_4 = stringToHex("4").hex
+
                     beforeEach(async()=>{
-                        await htlcEth.fundOrder(orderID2, {from: investor, value: price})
+
+                        await htlcEth.openOrder(orderID_4, investor_Dami, tanglSecurityToken.address, ether(0.8), amount, expiration, secretHash, secretHex, classA, {from: tanglAdministrator})
+
+                        await htlcEth.fundOrder(orderID_4, tanglSecurityToken.address, {from: investor_Dami, value: ether(0.8)})
+
                     })
 
                     it("fails to execute re-entrancy attack", async()=>{
-                        await withdrawReEntrancy.attack(orderID, secretHex).should.be.rejected
+                        await withdrawReEntrancy.attack(orderID_4, secretHex, tanglSecurityToken.address, {from: tanglAdministrator}).should.be.rejectedWith("Failed to release Ether")
                         const balanceAfterFailedAttack = await withdrawReEntrancy.balance()
                         balanceAfterFailedAttack.toString().should.be.equal("0", "could not withdraw any ether")
                     })
                 })*/
 
-          /* })*/
+            })
 
         })
 
-        /*describe("refunding expired order", ()=>{
+        describe("refunding expired order", ()=>{
 
-            let orderID3 = web3.utils.asciiToHex("x23d33sdgdp")
-            let orderID4 = web3.utils.asciiToHex("x23d33sdgdb")
-            let expired = new Date(moment().subtract(2, 'days').unix()).getTime()       // set expiration to 2 days before
+            let orderID_3 = stringToHex("3").hex
+            let orderID_4 = stringToHex("4").hex
+            
             let refund
-            let balanceBeforeRefund
-            let balanceAfterRefund
+
+            let investorJeffbalanceBeforeRefund
+            let investorJeffbalanceAfterRefund
 
             beforeEach(async()=>{
 
-                await htlcEth.openOrder(orderID3, investor, price, amount, expired, secretHash, secretHex, classA)
-                await htlcEth.openOrder(orderID4, investor, price, amount, expired, secretHash, secretHex, classA)
+
+                const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+
+                await htlcEth.openOrder(orderID_3, investor_Jeff, reitSecurityToken.address, price, amount, expire_10sec, secretHash, secretHex, classA, {from: reitAdministrator})
+                await htlcEth.openOrder(orderID_4, investor_Dami, reitSecurityToken.address, price, amount, expiration, secretHash, secretHex, classA, {from: reitAdministrator})
+
+                
+               
+                
+
+                
                
 
             })
@@ -535,15 +558,24 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
                 beforeEach(async()=>{
 
-                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
-                    balanceBeforeRefund = await web3.eth.getBalance(investor)
-                    refund = await htlcEth.refund(orderID3, {from: investor})
+                    /**
+                     * Fund order
+                     * Wait for 13 secs for the order to expire so that the investor can place a refund order
+                     */
+
+                    await htlcEth.fundOrder(orderID_3, reitSecurityToken.address, {from: investor_Jeff, value: price})
+
+                    await wait(13)
+
+                    investorJeffbalanceBeforeRefund = await web3.eth.getBalance(investor_Jeff)
+
+                    refund = await htlcEth.refund(orderID_3, reitSecurityToken.address, {from: investor_Jeff})
 
                 })
 
-                it("should declare the order as expired", async()=>{
+                it("should update the order as expired", async()=>{
 
-                    const checkOrder = await htlcEth.checkOrder(orderID3)
+                    const checkOrder = await htlcEth.checkOrder(orderID_3, reitSecurityToken.address)
                     checkOrder._orderState.toString().should.be.equal(swapState.EXPIRED, "order state is updated to EXPIRED after refund")
                     
                 })
@@ -553,9 +585,15 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                 })
 
                 it("should increment the investor's balance after refund", async()=>{
-                    balanceAfterRefund = await web3.eth.getBalance(investor)
-                    incremented = Number(balanceAfterRefund.toString()) > Number(balanceBeforeRefund.toString())
-                    incremented.should.be.equal(true, "deposited ether by investor was released to investor")
+
+                    const gasFeeForRefund = refund.receipt.cumulativeGasUsed * gasPrice;
+                    const investorJeffbalanceAfterRefund = await web3.eth.getBalance(investor_Jeff)
+
+                    const amountRefunded = BigInt(investorJeffbalanceAfterRefund) - BigInt(investorJeffbalanceBeforeRefund) + BigInt(gasFeeForRefund)
+
+                    amountRefunded.toString().should.be.equal(price.toString(), "the price associated with the order was refunded to the investor")
+
+
                 })
 
 
@@ -565,71 +603,76 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 
             describe("failed refund", ()=>{
 
+                it("should fail to refund if call is made by the wrong investor", async()=>{
+                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Jeff}).should.be.rejectedWith(reverts.INVALID_CALLER)
+                })
+
                 it("should fail to refund any unfunded order", async()=>{
 
-                    await htlcEth.refund(orderID3).should.be.rejected
+                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_FUNDED)
 
                 })
 
                 it("should fail to refund any unexpired open order", async()=>{
 
-                    await htlcEth.refund(orderID).should.be.rejected
+                    await htlcEth.fundOrder(orderID_4, reitSecurityToken.address, {from: investor_Dami, value: price})
+                    await htlcEth.refund(orderID_4, reitSecurityToken.address, {from: investor_Dami}).should.be.rejected
 
                 })
+
             })
 
-            describe("reEntrancy attack at refund", ()=>{
+            /*describe("reEntrancy attack at refund", ()=>{
 
                 // investor funds the orders
 
+                const orderID_5  = stringToHex("5").hex
+                const orderID_6  = stringToHex("6").hex
+
                 beforeEach(async()=>{
-                    await htlcEth.fundOrder(orderID3, {from: investor, value: price})
-                    await htlcEth.fundOrder(orderID4, {from: investor, value: price})
-                })
 
-                describe("htlc ether balance", ()=>{
+                    const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs 
 
-                    it("returns the ether balance of the htlc", async()=>{
-                        const balance = await web3.eth.getBalance(htlcEth.address)
-                        balance.toString().should.be.equal((price * 2).toString(), "it returns the balance of the htlc contract")
-                    })
+                    await htlcEth.openOrder(orderID_5, investor_Dami, reitSecurityToken.address, ether(1), amount, expire_10sec, secretHash, secretHex, classA, {from: reitAdministrator})
+                    await htlcEth.openOrder(orderID_6, investor_Dami, reitSecurityToken.address, ether(1), amount, expire_10sec, secretHash, secretHex, classA, {from: reitAdministrator})
+
+                    await htlcEth.fundOrder(orderID_5, reitSecurityToken.address, {from: investor_Dami, value: ether(1)})
+                    await htlcEth.fundOrder(orderID_6, reitSecurityToken.address, {from: investor_Dami, value: ether(1)})
 
                 })
 
-                describe("reEntrancy during refund", ()=>{*/
+                
 
-                    ////    this commented test is valid if reEntrancy defense is removed from the refund function
+                describe("reEntrancy during refund", ()=>{
 
-                    /*it("should withdraw all the deposited ether into the investor's wallet", async()=>{
-                        await refundReEntrancy.attack(orderID3, secretHex)
-                        const investorBalanceAfterAttack = await web3.eth.getBalance(investor)
-                        const htlcBalanceAfterAttack = await web3.eth.getBalance(htlcEth.address)
 
-                        //investorBalanceAfterAttack.toString().should.be.equal((price * 2).toString(), "it returns the balance of the htlc contract")
-                        htlcBalanceAfterAttack.toString().should.be.equal("0", "investor withdrew all the ether from the htlc via reEntrancy")
-                    })*/
+                    it("should fail to attack after implementing defence in the contract", async()=>{
 
-                    /*it("should fail to attack after implementing defence in the contract", async()=>{
+                        await wait(13)
 
                         const htlcBalanceBeforeFailedAttack = await web3.eth.getBalance(htlcEth.address)              //  balance of the htlc contract before the attempted attack
-                        await refundReEntrancy.attack(orderID3, secretHex).should.be.rejected                     //  launch the attack; attack fails
+                        
+                        
+                        
+                        const a = await refundReEntrancy.attack(orderID_5, reitSecurityToken.address).should.be.rejectedWith("Failed to release Ether")                     //  launch the attack; attack fails
+                        
                         const htlcBalanceAfterFailedAttack = await web3.eth.getBalance(htlcEth.address)               //  balance after the failed attack
                         htlcBalanceAfterFailedAttack.toString().should.be.equal(htlcBalanceBeforeFailedAttack.toString(), "the ether in the htlc contract remain intact before and after the failed attack")
                         
+
                     })
 
                 })
 
-            })
+            })*/
 
 
             
 
-        })*/
+        })
 
         
     })
-
 
 
 })
@@ -639,6 +682,6 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
 //  [*]  update the check order return statement with the security token address and tanglAdministrator, reitAdministrator's address
 //  [*]  test open orders with different issuing entities
 //  [*]  test fund order
-//  []  test withdrawal
-//  []  test refund
-//  []  disable opening and funding expired orders
+//  [*]  test withdrawal
+//  [*]  test refund
+//  [*]  disable opening and funding expired orders
