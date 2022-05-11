@@ -218,10 +218,11 @@ contract ERC1400 {
     }
 
 
-    function _isValidCertificate(bytes memory _data, uint256 _amount) external view returns (address _signer) {
+    function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (address _signer) {
 
-        (bytes memory _signature, Certificate.Holder _from, Certificate.Holder _to) = Certificate.decodeData(_data);
-        bytes32 _prefixedHash = Certificate.hashTransfer((address(this), "1", name, 1337, bytes32("salt")), _from, _to, _amount);
+        uint256 nonce = 1;
+        (bytes memory _signature, bytes32 _salt, Certificate.Holder _from, Certificate.Holder _to) = Certificate.decodeData(_data);
+        bytes32 _prefixedHash = Certificate.hashTransfer((address(this), "1", name, 1337, _salt), _from, _to, _amount, nonce);
         address _signer = Certificate.verifySignature(_signature, _prefixedHash);
         //require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
         return _signer;
@@ -340,7 +341,7 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        require(_isValidCertificate(_data));
+        require(_isValidCertificate(_data, _value));
         _transfer(msg.sender, _to, _value);
     }
     
@@ -363,7 +364,7 @@ contract ERC1400 {
 
         if (_data.length != 1) {
 
-            require(_isValidCertificate(_data));
+            require(_isValidCertificate(_data, _value));
 
         }
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
@@ -374,7 +375,7 @@ contract ERC1400 {
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       require(_isValidCertificate(_operatorData), "cant verify data");
+       require(_isValidCertificate(_operatorData, _value), "cant verify data");
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
@@ -520,14 +521,14 @@ contract ERC1400 {
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       require(_isValidCertificate(_data));
+       require(_isValidCertificate(_data, _value));
        _redeem(msg.sender, _value, _data);
 
    }
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data));
+        require(_isValidCertificate(_data, _value));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
         _redeem(_tokenHolder, _value, _data);
 
@@ -538,7 +539,7 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data));  //  verify signer
+        require(_isValidCertificate(_data, _value));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
@@ -547,7 +548,7 @@ contract ERC1400 {
 
    function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _operatorData) external {
 
-       require(_isValidCertificate(_operatorData));           //  verify signer
+       require(_isValidCertificate(_operatorData, _value));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
@@ -578,7 +579,7 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        if( _isValidCertificate(_data) != true) {
+        if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
         }
 
@@ -604,7 +605,7 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
-        if( _isValidCertificate(_data) != true) {
+        if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
         }
 
@@ -624,7 +625,7 @@ contract ERC1400 {
            return (hex"55", "insufficient balance", _partition);
        }
 
-       if( _isValidCertificate(_data) != true) {
+       if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer", _partition);
         }
 

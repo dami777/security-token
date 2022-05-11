@@ -128,9 +128,9 @@ library Certificate {
     /// @param _encodedSignature The encoded data containing the signature and the signature hash 
     /// @return the signature and the hash
 
-    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, Holder memory, Holder memory) {
+    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, bytes32, Holder memory, Holder memory) {
         
-        return abi.decode(_encodedSignature, (bytes, Holder, Holder));
+        return abi.decode(_encodedDataWithSignature, (bytes, bytes32, Holder, Holder));
 
     }
 
