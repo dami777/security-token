@@ -221,7 +221,7 @@ contract ERC1400 {
     function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (address _signer) {
 
         uint256 nonce = 1;
-        (bytes memory _signature, bytes32 _salt, Certificate.Holder _from, Certificate.Holder _to) = Certificate.decodeData(_data);
+        (bytes memory _signature, bytes32 _salt, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
         bytes32 _prefixedHash = Certificate.hashTransfer((address(this), "1", name, 1337, _salt), _from, _to, _amount, nonce);
         address _signer = Certificate.verifySignature(_signature, _prefixedHash);
         //require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
