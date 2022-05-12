@@ -77,7 +77,7 @@ contract ERC1400 {
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
     mapping (bytes32 => bool) private _usedSignatures;
 
-    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
+    constructor (string calldata _name, string calldata _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] calldata defaultPartitions) {
 
         name = _name;
         symbol = _symbol;

@@ -138,7 +138,7 @@ library Certificate {
 
     function returnSigner(bytes calldata _data, uint256 _amount, address _verifyingAddress, uint256 _nonce, string calldata _name) external view returns (address) {
 
-        (bytes calldata _signature, bytes32 _salt, Holder calldata _from, Holder calldata _to) = decodeData(_data);
+        (bytes memory _signature, bytes32 _salt, Holder memory _from, Holder memory _to) = decodeData(_data);
          
         bytes32 _prefixedHash = hashTransfer(DomainData(_verifyingAddress, "1", _name, 1337, _salt), _from, _to, _amount, _nonce);
         address _signer = verifySignature(_signature, _prefixedHash);
