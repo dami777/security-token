@@ -617,6 +617,10 @@ contract ERC1400 {
     }
 
 
+    function getNonce() {
+        return nonce;
+    }
+
      // *************************************** Events ********************************************************* //
 
     event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
