@@ -10,8 +10,6 @@ contract ERC1400 {
     /************************************************ Variable Declarations and Initaalizations ************************************/
 
 
-    //Certificate certificate;
-
 
      // *************************************** Strings ********************************************************* //
 
@@ -24,7 +22,7 @@ contract ERC1400 {
 
     uint256 public granularity;                     // token granularity
     uint256 public totalSupply;                     // token total supply
-    uint256 public decimals;                        //token decimals
+    uint256 public nonce;                           //token decimals
 
 
     // *************************************** Addresses ********************************************************* //
@@ -45,12 +43,13 @@ contract ERC1400 {
     bytes32[] internal _totalPartitions;
     bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
-    //bytes32[] internal _allDocuments;    // an array to store all the documents stored onchain
+    
 
 
      // *************************************** Structs ********************************************************* //
 
     struct Doc {
+
         bytes32 _name;
         bytes32 _documentHash;
         string _uri;
@@ -59,61 +58,30 @@ contract ERC1400 {
 
 
 
-     // *************************************** Events ********************************************************* //
-
-    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
-    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
-    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
-    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
-    event TransferByPartition (
-
-        bytes32 indexed _fromPartition,
-        address _operator,
-        address indexed _from,
-        address indexed _to,
-        uint256 _value,
-        bytes _data,
-        bytes _operatorData
-
-
-    );                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
-
-    event AuthorizedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized
-    event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
-    event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
-    event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
-    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
-    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
-    event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
-    event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
-    event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
+    
 
      // *************************************** Mappings ********************************************************* //
 
     mapping (address => bool) private whitelist;                                     //  whitelist map
     mapping (address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
     mapping (address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
-    //mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
     mapping (bytes32 => Doc) internal _documents;                                    // map to store the documents
     mapping (address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping (address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
     mapping (address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
-    //mapping(bytes32 => uint256) internal _indexOfDocument;                          // map to store thei index position of a document
     mapping (bytes32 => uint256) internal _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
     mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
     mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
+    mapping (bytes32 => bool) private _usedSignatures;
 
-
-    constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
         name = _name;
         symbol = _symbol;
-        decimals = _decimals;
-        granularity = 10 ** decimals; // for token decimals 
+        granularity = 10 ** _granularity; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
         _defaultPartitions = defaultPartitions;
@@ -217,17 +185,18 @@ contract ERC1400 {
 
     }
 
+    
+    
 
-    function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (address _signer) {
 
-        uint256 nonce = 1;
-        (bytes memory _signature, bytes32 _salt, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
-        bytes32 _prefixedHash = Certificate.hashTransfer((address(this), "1", name, 1337, _salt), _from, _to, _amount, nonce);
-        address _signer = Certificate.verifySignature(_signature, _prefixedHash);
-        //require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
-        return _signer;
+    function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (bool) {
+
+        return true;
 
     }
+
+
+   
 
 
 
@@ -646,6 +615,37 @@ contract ERC1400 {
     function setTotalPartitions(bytes32[] memory _newTotalPartitions) external {
         _totalPartitions = _newTotalPartitions;
     }
+
+
+     // *************************************** Events ********************************************************* //
+
+    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
+    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
+    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
+    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
+    event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
+    event TransferByPartition (
+
+        bytes32 indexed _fromPartition,
+        address _operator,
+        address indexed _from,
+        address indexed _to,
+        uint256 _value,
+        bytes _data,
+        bytes _operatorData
+
+
+    );                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
+
+    event AuthorizedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized
+    event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
+    event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
+    event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
+    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
+    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
+    event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
+    event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
+    event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
 
 
 }
