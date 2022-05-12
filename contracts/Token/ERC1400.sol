@@ -617,7 +617,7 @@ contract ERC1400 {
     }
 
 
-    function getNonce() {
+    function getNonce() external view returns(uint256) {
         return nonce;
     }
 
