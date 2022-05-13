@@ -195,7 +195,7 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
 
 
                     //  attempt to use the signature again
-                    
+
                     await tanglSecurityToken._useCert(encoded, 100).should.be.rejectedWith("used sig")
                     
                     
@@ -203,6 +203,46 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
 
                 it("should revert if signature cannot be verified", async()=>{
                     await tanglSecurityToken._useCert(encoded, 1000).should.be.rejectedWith("invalid signer")
+                })
+
+                it("should revert if the signer is not a regulator", ()=>{
+
+                    //  this private key is not a regulator for tangl security token
+
+                    wallet = new ethers.Wallet("04759018d45930362594505f5a79734a88660b73f7831012e812311dbb486b5a")        // get the address using private key
+                    signature = await wallet._signTypedData(domainData, types, message) 
+                    encoded = web3.eth.abi.encodeParameters([
+                        "bytes", "bytes32", "uint256",
+                        {
+                            "Holder" : {
+                                "firstName" : "string",
+                                "lastName" : "string",
+                                "location" : "string",
+                                "walletAddress" : "address",
+                            }
+                        },
+        
+                        {
+                            "Holder" : {
+                                "firstName" : "string",
+                                "lastName" : "string",
+                                "location" : "string",
+                                "walletAddress" : "address",
+                            }
+                        }
+                    ],
+        
+                    [signature, salt, 1, _from, _to]
+                    )
+
+
+                    //  it will revert as an invalid signer
+
+                    await tanglSecurityToken._useCert(encoded, 100).should.be.rejectedWith("invalid signer")
+
+
+                    
+
                 })
 
             })
