@@ -154,7 +154,7 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
             signature = await wallet._signTypedData(domainData, types, message)         // generate signature using ethers js
             
             const encoded = web3.eth.abi.encodeParameters([
-                "bytes", "bytes32",
+                "bytes", "bytes32", "uint256",
                 {
                     "Holder" : {
                         "firstName" : "string",
@@ -174,14 +174,14 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
                 }
             ],
 
-            [signature, salt, _from, _to]
+            [signature, salt, 1, _from, _to]
             )
 
             const decoded = await certLib.decodeData(encoded)
 
             console.log(decoded)
             
-            const returnedSigner = await certLib.returnSigner(encoded, 100, tanglSecurityToken.address, 1, tanglTokenDetails.name)
+            const returnedSigner = await certLib.returnSigner(encoded, 100, tanglSecurityToken.address, tanglTokenDetails.name)
             
             console.log(returnedSigner)
             

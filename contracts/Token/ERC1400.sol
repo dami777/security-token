@@ -22,7 +22,7 @@ contract ERC1400 {
 
     uint256 public granularity;                     // token granularity
     uint256 public totalSupply;                     // token total supply
-    uint256 public nonce;                           //token decimals
+   
 
 
     // *************************************** Addresses ********************************************************* //
@@ -75,7 +75,7 @@ contract ERC1400 {
     mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
     mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
-    mapping (bytes32 => bool) private _usedSignatures;
+    mapping (bytes => bool) private _usedSignatures;
 
     constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
@@ -91,6 +91,17 @@ contract ERC1400 {
     modifier restricted {
         require(msg.sender == owner, "0x56");
         _;
+    }
+
+
+    function _useCert(bytes memory _data, uint256 _amount) public {
+
+        (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
+        require(!_usedSignatures[_signature], "used sig");
+        address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
+        require(_signer == owner || _isController[_signer], "invalid signer");
+        _usedSignatures[_signature];
+
     }
 
 
@@ -189,11 +200,11 @@ contract ERC1400 {
     
 
 
-    function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (bool) {
+    /*function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (bool) {
 
         return true;
 
-    }
+    }*/
 
 
    
@@ -310,7 +321,7 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        require(_isValidCertificate(_data, _value));
+        //require(_isValidCertificate(_data, _value));
         _transfer(msg.sender, _to, _value);
     }
     
@@ -331,11 +342,11 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        if (_data.length != 1) {
+       /* if (_data.length != 1) {
 
             require(_isValidCertificate(_data, _value));
 
-        }
+        }*/
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
  
    }    
@@ -344,7 +355,7 @@ contract ERC1400 {
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       require(_isValidCertificate(_operatorData, _value), "cant verify data");
+       //require(_isValidCertificate(_operatorData, _value), "cant verify data");
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
@@ -490,14 +501,14 @@ contract ERC1400 {
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       require(_isValidCertificate(_data, _value));
+       //require(_isValidCertificate(_data, _value));
        _redeem(msg.sender, _value, _data);
 
    }
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data, _value));
+        //require(_isValidCertificate(_data, _value));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
         _redeem(_tokenHolder, _value, _data);
 
@@ -508,7 +519,7 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data, _value));  //  verify signer
+        //require(_isValidCertificate(_data, _value));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
@@ -517,7 +528,7 @@ contract ERC1400 {
 
    function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _operatorData) external {
 
-       require(_isValidCertificate(_operatorData, _value));           //  verify signer
+       //require(_isValidCertificate(_operatorData, _value));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
@@ -548,9 +559,9 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        if( _isValidCertificate(_data, _value) != true) {
+        /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
-        }
+        }*/
 
         return (hex"51", "transfer success");
 
@@ -574,9 +585,9 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
-        if( _isValidCertificate(_data, _value) != true) {
+        /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
-        }
+        }*/
 
         return (hex"51", "transfer success");
 
@@ -594,9 +605,9 @@ contract ERC1400 {
            return (hex"55", "insufficient balance", _partition);
        }
 
-       if( _isValidCertificate(_data, _value) != true) {
+       /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer", _partition);
-        }
+        }*/
 
         return (hex"51", "transfer success", _partition);
 
@@ -617,9 +628,7 @@ contract ERC1400 {
     }
 
 
-    function getNonce() external view returns(uint256) {
-        return nonce;
-    }
+   
 
      // *************************************** Events ********************************************************* //
 
