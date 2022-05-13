@@ -205,7 +205,7 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
                     await tanglSecurityToken._useCert(encoded, 1000).should.be.rejectedWith("invalid signer")
                 })
 
-                it("should revert if the signer is not a regulator", ()=>{
+                it("should revert if the signer is not a regulator", async()=>{
 
                     //  this private key is not a regulator for tangl security token
 
