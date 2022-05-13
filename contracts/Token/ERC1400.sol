@@ -100,7 +100,7 @@ contract ERC1400 {
         require(!_usedSignatures[_signature], "used sig");
         address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
         require(_signer == owner || _isController[_signer], "invalid signer");
-        _usedSignatures[_signature];
+        _usedSignatures[_signature] = true;
 
     }
 

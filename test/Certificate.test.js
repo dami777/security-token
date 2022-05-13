@@ -147,46 +147,60 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
             prefixed.should.not.be.equal("", "it returns a prefixed hash")
         })
 
-        it("generate signature", async()=>{
 
+        describe("it generates signature", ()=>{
 
-            wallet = new ethers.Wallet("7e7155b289175223b18db53475a3d31e81a47af6c906ae1b2a79610de79b8665")        // get the address using private key
-            signature = await wallet._signTypedData(domainData, types, message)         // generate signature using ethers js
-            
-            const encoded = web3.eth.abi.encodeParameters([
-                "bytes", "bytes32", "uint256",
-                {
-                    "Holder" : {
-                        "firstName" : "string",
-                        "lastName" : "string",
-                        "location" : "string",
-                        "walletAddress" : "address",
+            let encoded
+
+            beforeEach(async()=>{
+
+                wallet = new ethers.Wallet("7e7155b289175223b18db53475a3d31e81a47af6c906ae1b2a79610de79b8665")        // get the address using private key
+                signature = await wallet._signTypedData(domainData, types, message)         // generate signature using ethers js
+                
+                encoded = web3.eth.abi.encodeParameters([
+                    "bytes", "bytes32", "uint256",
+                    {
+                        "Holder" : {
+                            "firstName" : "string",
+                            "lastName" : "string",
+                            "location" : "string",
+                            "walletAddress" : "address",
+                        }
+                    },
+    
+                    {
+                        "Holder" : {
+                            "firstName" : "string",
+                            "lastName" : "string",
+                            "location" : "string",
+                            "walletAddress" : "address",
+                        }
                     }
-                },
+                ],
+    
+                [signature, salt, 1, _from, _to]
+                )
 
-                {
-                    "Holder" : {
-                        "firstName" : "string",
-                        "lastName" : "string",
-                        "location" : "string",
-                        "walletAddress" : "address",
-                    }
-                }
-            ],
+                //  use signature
 
-            [signature, salt, 1, _from, _to]
-            )
+                await tanglSecurityToken._useCert(encoded, 100)
+    
+            })
 
-            const decoded = await certLib.decodeData(encoded)
 
-            console.log(decoded)
-            
-            const returnedSigner = await certLib.returnSigner(encoded, 100, tanglSecurityToken.address, tanglTokenDetails.name)
-            
-            console.log(returnedSigner)
-            
+            it("should revert for replay attack", async()=>{
+
+    
+                await tanglSecurityToken._useCert(encoded, 100)
+                
+                
+                
+            })
+    
+
         })
 
+       
         /*it("verifies the signer of the data", async()=>{
     
             const sigFromMetaMask = "0x112ec2161fb45d6c51ee3235b889a3d416e6c14236321bd1f133e0ec31454de176a313a7de9e939bd9f4370b3445e870dbbe46aa38859ed2a0111db79da97e061c"
