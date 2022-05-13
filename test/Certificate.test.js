@@ -257,21 +257,8 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
 
         })
 
-       
-        /*it("verifies the signer of the data", async()=>{
     
-            const sigFromMetaMask = "0x112ec2161fb45d6c51ee3235b889a3d416e6c14236321bd1f133e0ec31454de176a313a7de9e939bd9f4370b3445e870dbbe46aa38859ed2a0111db79da97e061c"
-            
-            const returnedEthersSigner = await certLib.verifySignature(signature, prefixed)
-            const returnedMetaSigner = await certLib.verifySignature(sigFromMetaMask, prefixed)
-
-            returnedEthersSigner.should.be.equal(wallet.address, "it verifies the signer")
-            returnedMetaSigner.should.be.equal(address, "it verifies the signer")
-        })*/
-
     })
 
 
 })
-
-//  [*] test for invalid signer

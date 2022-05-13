@@ -1,5 +1,7 @@
 pragma solidity 0.8.10;
 
+//  SPDX-License-Identifier: UNLICENSED
+
 
 library Certificate {
 
@@ -128,7 +130,7 @@ library Certificate {
     /// @param _encodedDataWithSignature The encoded data containing the signature and the signature hash 
     /// @return the signature and the hash
 
-    function decodeData(bytes memory _encodedDataWithSignature) public pure returns (bytes memory, bytes32, uint256, Holder memory, Holder memory) {
+    function decodeData(bytes memory _encodedDataWithSignature) external pure returns (bytes memory, bytes32, uint256, Holder memory, Holder memory) {
         
         return abi.decode(_encodedDataWithSignature, (bytes, bytes32, uint256, Holder, Holder));
 
@@ -136,9 +138,8 @@ library Certificate {
 
 
 
-    function returnSigner(bytes calldata _signature, bytes32 _salt, uint256 _nonce, Holder memory _from, Holder memory _to , uint256 _amount, address _verifyingAddress, string calldata _name) external view returns (address) {
+    function returnSigner(bytes calldata _signature, bytes32 _salt, uint256 _nonce, Holder memory _from, Holder memory _to , uint256 _amount, address _verifyingAddress, string calldata _name) external pure returns (address) {
 
-         
         bytes32 _prefixedHash = hashTransfer(DomainData(_verifyingAddress, "1", _name, 1337, _salt), _from, _to, _amount, _nonce);
         address _signer = verifySignature(_signature, _prefixedHash);
         

@@ -3,6 +3,8 @@ pragma solidity 0.8.10;
 
 import "../utils/CertificateLibrary.sol";
 
+//  SPDX-License-Identifier: UNLICENSED
+
 
 contract ERC1400 {
 
