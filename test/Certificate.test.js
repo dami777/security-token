@@ -187,15 +187,24 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
     
             })
 
+            describe("failed signature usage", ()=>{
 
-            it("should revert for replay attack", async()=>{
+                it("should revert for replay attack", async()=>{
 
     
-                await tanglSecurityToken._useCert(encoded, 100)
-                
-                
-                
+                    await tanglSecurityToken._useCert(encoded, 100).should.be.rejectedWith("used sig")
+                    
+                    
+                })
+
+                it("should revert if signature cannot be verified", async()=>{
+                    await tanglSecurityToken._useCert(encoded, 1000).should.be.rejectedWith("invalid signer")
+                })
+
             })
+
+
+            
     
 
         })
