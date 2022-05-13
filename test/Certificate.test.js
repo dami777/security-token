@@ -245,6 +245,10 @@ contract("Certificate Data Test", ([tanglAdministrator, reitAdministrator])=>{
 
                 })
 
+                it("should revert if signature is attempted to be used on another security token contract", async()=>{
+                    await reitSecurityToken._useCert(encoded, 100).should.be.rejectedWith("invalid signer")
+                })
+
             })
 
 
