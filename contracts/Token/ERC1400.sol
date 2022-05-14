@@ -262,7 +262,8 @@ contract ERC1400 {
     // *********************    TOKEN INFORMATION
 
 
-    // function that returns balance
+    /// @dev    function to fetch the balance of the holder across all partitions
+    /// @param _tokenHolder is the holder's address to be queried
     
     function balanceOf(address _tokenHolder) external view returns (uint256) {
         return _balanceOf[_tokenHolder];
