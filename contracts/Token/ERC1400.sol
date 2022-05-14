@@ -268,6 +268,16 @@ contract ERC1400 {
         return _balanceOf[_tokenHolder];
     }
 
+
+    /**
+        @dev    function to return the partition balance of an holder
+        The function returns the amount owned by the holder in the specified partition / class
+
+        @param  _partition is the partition to query the balance from
+        @param  _tokenHolder is the address of the holder to whose balance if to be checked and returned 
+        @return the balance from the queried partition / class   
+     */
+
     function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
        return _balanceOfByPartition[_tokenHolder][_partition];
    }
