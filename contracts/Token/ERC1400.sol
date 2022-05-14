@@ -95,8 +95,19 @@ contract ERC1400 {
         _;
     }
 
+    /**
+        @dev    `_useCert` function verifies the signature sent.
+        If the signature is valid, it registers it onchain to avoid replay attack
 
-    function _useCert(bytes memory _data, uint256 _amount) public {
+        @param _data is the encoded data containing the signature and the parameters to be used to generate prefixed hashed.
+        The prefixed hash will be used to verify the signature
+
+        @param _amount is the quantity of token to be sent in the transaction
+        
+     */
+
+
+    function _useCert(bytes memory _data, uint256 _amount) internal {
 
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
         require(!_usedSignatures[_signature], "used sig");
@@ -199,19 +210,6 @@ contract ERC1400 {
     }
 
     
-    
-
-
-    /*function _isValidCertificate(bytes memory _data, uint256 _amount) public view returns (bool) {
-
-        return true;
-
-    }*/
-
-
-   
-
-
 
     // **************************       ERC1400 FEATURES  ******************************************************//
 
@@ -220,12 +218,24 @@ contract ERC1400 {
 
 
     function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+
         _defaultPartitions = newDefaultPartitions;
+
     }
      
-    // *********************    DOCUMENT MANAGEMENT  ---------- ERC 1643
+    
+    /**
+        *   @dev    Document management
+        *   @notice setDocument function
+        *   @notice getDocument
+    
+    */
 
-    //  set document
+
+    /// @dev    function to set document onchain using the document hash from an IPFS
+    /// @param  _name is the name of the document is bytes32
+    /// @param  _uri is the uri of the document's location in the IPFS
+    /// @param  _documentHash is the hash of the document saved returned from the IPFS     
 
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
@@ -503,7 +513,6 @@ contract ERC1400 {
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       //require(_isValidCertificate(_data, _value));
        _redeem(msg.sender, _value, _data);
 
    }
@@ -664,3 +673,11 @@ contract ERC1400 {
 
 
 }
+
+
+/**
+    @refactoring 
+
+    1.  refactor redeem by partition
+    2.  use the signature in the tranfer internal functions
+ */
