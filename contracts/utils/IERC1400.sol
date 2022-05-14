@@ -3,6 +3,9 @@
 
 pragma solidity 0.8.10;
 
+//  SPDX-License-Identifier: UNLICENSED
+
+
 import "./IERC20.sol";
 
 interface IERC1400 is IERC20 {

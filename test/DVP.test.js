@@ -20,7 +20,7 @@ const HTLC20 = artifacts.require("./HTLC20")
 const ERC20_USDT = artifacts.require("./ERC20")     // this erc20 token will be represented as usdt
 
 
-contract ("DVP", ([issuer, investor, USDT_MARKET])=>{
+contract ("Integration test for DVP", ([issuer, investor, USDT_MARKET])=>{
 
     let htlc20 
     let htlc1400

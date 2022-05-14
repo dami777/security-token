@@ -3,14 +3,14 @@ pragma solidity 0.8.10;
 
 import "../utils/CertificateLibrary.sol";
 
+//  SPDX-License-Identifier: UNLICENSED
+
 
 contract ERC1400 {
 
 
     /************************************************ Variable Declarations and Initaalizations ************************************/
 
-
-    //Certificate certificate;
 
 
      // *************************************** Strings ********************************************************* //
@@ -24,7 +24,7 @@ contract ERC1400 {
 
     uint256 public granularity;                     // token granularity
     uint256 public totalSupply;                     // token total supply
-    uint256 public decimals;                        //token decimals
+   
 
 
     // *************************************** Addresses ********************************************************* //
@@ -45,12 +45,13 @@ contract ERC1400 {
     bytes32[] internal _totalPartitions;
     bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
-    //bytes32[] internal _allDocuments;    // an array to store all the documents stored onchain
+    
 
 
      // *************************************** Structs ********************************************************* //
 
     struct Doc {
+
         bytes32 _name;
         bytes32 _documentHash;
         string _uri;
@@ -59,61 +60,30 @@ contract ERC1400 {
 
 
 
-     // *************************************** Events ********************************************************* //
-
-    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
-    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
-    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
-    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
-    event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
-    event TransferByPartition (
-
-        bytes32 indexed _fromPartition,
-        address _operator,
-        address indexed _from,
-        address indexed _to,
-        uint256 _value,
-        bytes _data,
-        bytes _operatorData
-
-
-    );                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
-
-    event AuthorizedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized
-    event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
-    event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
-    event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
-    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
-    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
-    event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
-    event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
-    event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
+    
 
      // *************************************** Mappings ********************************************************* //
 
     mapping (address => bool) private whitelist;                                     //  whitelist map
     mapping (address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
     mapping (address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
-    //mapping(bytes32 => uint256) public partitions;                                  // map to store the total supply of each partitions partitions
     mapping (bytes32 => Doc) internal _documents;                                    // map to store the documents
     mapping (address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping (address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
     mapping (address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
-    //mapping(bytes32 => uint256) internal _indexOfDocument;                          // map to store thei index position of a document
     mapping (bytes32 => uint256) internal _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
     mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
     mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
+    mapping (bytes => bool) private _usedSignatures;
 
-
-    constructor (string memory _name, string memory _symbol, uint256 _decimals, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
         name = _name;
         symbol = _symbol;
-        decimals = _decimals;
-        granularity = 10 ** decimals; // for token decimals 
+        granularity = 10 ** _granularity; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
         _defaultPartitions = defaultPartitions;
@@ -123,6 +93,28 @@ contract ERC1400 {
     modifier restricted {
         require(msg.sender == owner, "0x56");
         _;
+    }
+
+    /**
+        @dev    `_useCert` function verifies the signature sent.
+        If the signature is valid, it registers it onchain to avoid replay attack
+
+        @param _data is the encoded data containing the signature and the parameters to be used to generate prefixed hashed.
+        The prefixed hash will be used to verify the signature
+
+        @param _amount is the quantity of token to be sent in the transaction
+        
+     */
+
+
+    function _useCert(bytes memory _data, uint256 _amount) internal {
+
+        (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
+        require(!_usedSignatures[_signature], "used sig");
+        address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
+        require(_signer == owner || _isController[_signer], "invalid signer");
+        _usedSignatures[_signature] = true;
+
     }
 
 
@@ -217,16 +209,7 @@ contract ERC1400 {
 
     }
 
-
-    function _isValidCertificate(bytes memory _data) internal view returns (bool) {
-        (bytes memory _signature, bytes32 _signatureHash, bool _fromIsWhiteListedOrIssuer, bool _toIsWhiteListed) = Certificate.decodeData(_data);
-        require(_fromIsWhiteListedOrIssuer && _toIsWhiteListed, "0x5b");    // require that the from and to accounts are whitelisted
-        address _signer = Certificate.verifySignature(_signature, _signatureHash);
-        require (owner == _signer || _isController[_signer], "0x59");   // invalid signer
-        return true;
-    }
-
-
+    
 
     // **************************       ERC1400 FEATURES  ******************************************************//
 
@@ -235,23 +218,36 @@ contract ERC1400 {
 
 
     function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+
         _defaultPartitions = newDefaultPartitions;
+
     }
      
-    // *********************    DOCUMENT MANAGEMENT  ---------- ERC 1643
+    
+    /**
+        *   @dev    Document management
+        *   @notice setDocument function
+        *   @notice getDocument
+    
+    */
 
-    //  set document
+
+    /// @dev    function to set document onchain using the document hash from an IPFS
+    /// @param  _name is the name of the document is bytes32
+    /// @param  _uri is the uri of the document's location in the IPFS
+    /// @param  _documentHash is the hash of the document saved returned from the IPFS     
 
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
-        //_allDocuments.push(_name);
-        //_indexOfDocument[_name] = _allDocuments.length;
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
 
-    // get document
+    /// @dev    function to fetch the document details
+    /// @param  _name is the name of the of document to be fetched
+    /// @return uri is saved uri to be returned
+    /// @return docHash is the hash of the document to be returned
     
     function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 docHash) {
 
@@ -266,11 +262,22 @@ contract ERC1400 {
     // *********************    TOKEN INFORMATION
 
 
-    // function that returns balance
+    /// @dev    function to fetch the balance of the holder across all partitions
+    /// @param _tokenHolder is the holder's address to be queried
     
     function balanceOf(address _tokenHolder) external view returns (uint256) {
         return _balanceOf[_tokenHolder];
     }
+
+
+    /**
+        @dev    function to return the partition balance of an holder
+        The function returns the amount owned by the holder in the specified partition / class
+
+        @param  _partition is the partition to query the balance from
+        @param  _tokenHolder is the address of the holder to whose balance if to be checked and returned 
+        @return the balance from the queried partition / class   
+     */
 
     function balanceOfByPartition(bytes32 _partition, address _tokenHolder) external view returns (uint256) {
        return _balanceOfByPartition[_tokenHolder][_partition];
@@ -338,7 +345,7 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        require(_isValidCertificate(_data));
+        //require(_isValidCertificate(_data, _value));
         _transfer(msg.sender, _to, _value);
     }
     
@@ -359,11 +366,11 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        if (_data.length != 1) {
+       /* if (_data.length != 1) {
 
-            require(_isValidCertificate(_data));
+            require(_isValidCertificate(_data, _value));
 
-        }
+        }*/
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
  
    }    
@@ -372,7 +379,7 @@ contract ERC1400 {
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       require(_isValidCertificate(_operatorData), "cant verify data");
+       //require(_isValidCertificate(_operatorData, _value), "cant verify data");
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
@@ -518,14 +525,13 @@ contract ERC1400 {
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       require(_isValidCertificate(_data));
        _redeem(msg.sender, _value, _data);
 
    }
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data));
+        //require(_isValidCertificate(_data, _value));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
         _redeem(_tokenHolder, _value, _data);
 
@@ -536,7 +542,7 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        require(_isValidCertificate(_data));  //  verify signer
+        //require(_isValidCertificate(_data, _value));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
 
    }
@@ -545,7 +551,7 @@ contract ERC1400 {
 
    function operatorRedeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _operatorData) external {
 
-       require(_isValidCertificate(_operatorData));           //  verify signer
+       //require(_isValidCertificate(_operatorData, _value));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
@@ -576,9 +582,9 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        if( _isValidCertificate(_data) != true) {
+        /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
-        }
+        }*/
 
         return (hex"51", "transfer success");
 
@@ -602,9 +608,9 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
-        if( _isValidCertificate(_data) != true) {
+        /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer");
-        }
+        }*/
 
         return (hex"51", "transfer success");
 
@@ -622,9 +628,9 @@ contract ERC1400 {
            return (hex"55", "insufficient balance", _partition);
        }
 
-       if( _isValidCertificate(_data) != true) {
+       /*if( _isValidCertificate(_data, _value) != true) {
             return (hex"59", "invalid signer", _partition);
-        }
+        }*/
 
         return (hex"51", "transfer success", _partition);
 
@@ -645,4 +651,45 @@ contract ERC1400 {
     }
 
 
+   
+
+     // *************************************** Events ********************************************************* //
+
+    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
+    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
+    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
+    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
+    event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
+    event TransferByPartition (
+
+        bytes32 indexed _fromPartition,
+        address _operator,
+        address indexed _from,
+        address indexed _to,
+        uint256 _value,
+        bytes _data,
+        bytes _operatorData
+
+
+    );                                                                           // event to be emitted whenever tokens are transfered from an address partition to another addres of same partition
+
+    event AuthorizedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized
+    event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
+    event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
+    event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
+    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
+    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
+    event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
+    event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
+    event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
+
+
 }
+
+
+/**
+    @refactoring 
+
+    1.  refactor redeem by partition
+    2.  use the signature in the tranfer internal functions
+ */

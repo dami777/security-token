@@ -1,5 +1,7 @@
 pragma solidity 0.8.10;
 
+//  SPDX-License-Identifier: UNLICENSED
+
 import "./IERC1400.sol";
 
 
