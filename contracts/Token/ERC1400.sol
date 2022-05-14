@@ -240,13 +240,14 @@ contract ERC1400 {
     function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
-        //_allDocuments.push(_name);
-        //_indexOfDocument[_name] = _allDocuments.length;
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
 
-    // get document
+    /// @dev    function to fetch the document details
+    /// @param  _name is the name of the of document to be fetched
+    /// @return uri is saved uri to be returned
+    /// @return docHash is the hash of the document to be returned
     
     function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 docHash) {
 
