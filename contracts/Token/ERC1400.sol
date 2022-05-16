@@ -80,12 +80,11 @@ contract ERC1400 {
     mapping (bytes => bool) private _usedSignatures;
     mapping (address => uint256) private _balanceOfByDefault;                        // default balance with no partitions
 
-    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity) {
 
         name = _name;
         symbol = _symbol;
         granularity = 10 ** _granularity; // for token decimals 
-        totalSupply = _totalSupply;
         owner = msg.sender;
         //_defaultPartitions = defaultPartitions;
 
