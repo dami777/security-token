@@ -134,7 +134,7 @@ contract ERC1400 {
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         require(_to != address(0),  "0x57");        
-        require(_balanceOfByPartition[_from] >= _amount, "0x52");      
+        require(_balanceOfByDefault[_from] >= _amount, "0x52");      
 
         _balanceOf[_from] = _balanceOf[_from] - _amount;                  
         _balanceOf[_to] = _balanceOf[_to] + _amount;                      
