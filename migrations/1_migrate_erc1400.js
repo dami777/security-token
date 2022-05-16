@@ -30,7 +30,7 @@ module.exports = async function (deployer) {
       //  deploy the contracts
 
       await deployer.deploy(GenerateEthSignature)
-      await deployer.deploy(ERC1400, "TANGLE", "TAN", 18, 0, [classA, classB])
+      await deployer.deploy(ERC1400, "TANGLE", "TAN", 18)
       await deployer.deploy(HTLC1400, ERC1400.address)
       await deployer.deploy(ERC20, "US Dollar Tether", "USDT")
       await deployer.deploy(HTLC20, ERC20.address)

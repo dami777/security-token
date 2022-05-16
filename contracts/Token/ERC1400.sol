@@ -43,8 +43,9 @@ contract ERC1400 {
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
-    bytes32[] internal _defaultPartitions;
+    //bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
+    bytes32 _classless = "classless";
     
 
 
@@ -66,27 +67,27 @@ contract ERC1400 {
 
     mapping (address => bool) private whitelist;                                     //  whitelist map
     mapping (address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
-    mapping (address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
-    mapping (bytes32 => Doc) internal _documents;                                    // map to store the documents
-    mapping (address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
-    mapping (address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
-    mapping (address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
-    mapping (bytes32 => uint256) internal _indexOfPartitions;
+    mapping (address => uint256) private _balanceOf;                                // map to store the token balances of token holders
+    mapping (bytes32 => Doc) private _documents;                                    // map to store the documents
+    mapping (address => mapping(bytes32 => uint256)) private _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
+    mapping (address => bytes32[]) private _partitionsOf;                           // map that stores the partitions of a token holder
+    mapping (address => mapping(address => bool)) private _isOperator;              // map to approve or revoke operators for a token holder
+    mapping (bytes32 => uint256) private _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
-    mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
+    mapping (address => mapping(address => mapping (bytes32 => bool))) private _isOperatorForPartition;                  // map to approve or revoke operators by partition
     mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
     mapping (bytes => bool) private _usedSignatures;
+    mapping (address => uint256) private _balanceOfByDefault;                        // default balance with no partitions
 
-    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity) {
 
         name = _name;
         symbol = _symbol;
         granularity = 10 ** _granularity; // for token decimals 
-        totalSupply = _totalSupply;
         owner = msg.sender;
-        _defaultPartitions = defaultPartitions;
+        //_defaultPartitions = defaultPartitions;
 
     }
 
@@ -120,7 +121,7 @@ contract ERC1400 {
 
     // *************************************** Internal functions ********************************************************* //
 
-    /// @dev    internal funtion to transfer tokens from an address to another address
+    /// @dev    internal funtion to transfer partitionless tokens from an address to another address
     /// @notice `0x57` revert message if receiver is address 0
     /// @notice `0x52` insufficient balance
     /// @notice balance must be more or equal to the value to be transferred
@@ -134,7 +135,7 @@ contract ERC1400 {
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         require(_to != address(0),  "0x57");        
-        require(_balanceOf[_from] >= _amount, "0x52");      
+        require(_balanceOfByDefault[_from] >= _amount, "0x52");      
 
         _balanceOf[_from] = _balanceOf[_from] - _amount;                  
         _balanceOf[_to] = _balanceOf[_to] + _amount;                      
@@ -175,9 +176,7 @@ contract ERC1400 {
 
 
         require(_balanceOf[_from] >= _value, "0x52");        
-        for (uint256 index = 0; index < _defaultPartitions.length; index++) {
-            _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
-        }
+        
 
     }
 
@@ -217,11 +216,11 @@ contract ERC1400 {
     //  Default Partitions
 
 
-    function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+    /*function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
 
         _defaultPartitions = newDefaultPartitions;
 
-    }
+    }*/
      
     
     /**
@@ -243,6 +242,7 @@ contract ERC1400 {
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
 
     }
+
 
     /// @dev    function to fetch the document details
     /// @param  _name is the name of the of document to be fetched
@@ -283,7 +283,11 @@ contract ERC1400 {
        return _balanceOfByPartition[_tokenHolder][_partition];
    }
 
-   // function to return the partitions of a token holder
+   
+
+   ///  @dev    Function to return the partitions that an holder is having
+   ///  @param _tokenHolder is the address of the holder to be queried
+   ///  @return an array of the partitions of an holder
 
     function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
@@ -494,12 +498,14 @@ contract ERC1400 {
     
     function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
-        require(_isIssuable, "0x55");     // can't issue tokens for now
-        require(_tokenHolder != address(0), "0x57");        // invalid receiver
-        uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
-        _balanceOf[_tokenHolder] += amount;                              
-        totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        require(_isIssuable, "0x55");                                       // can't issue tokens for now
+        require(_tokenHolder != address(0), "0x57");                        // invalid receiver
+        _useCert(_data, _value);                                            // verify the certificate
+        uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
+        _balanceOfByPartition[_tokenHolder][_classless] += amount;                       // update the classless token reserve balance of the holder
+        _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
+        totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }
