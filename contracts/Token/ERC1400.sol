@@ -43,7 +43,7 @@ contract ERC1400 {
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
-    bytes32[] internal _defaultPartitions;
+    //bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
     
 
@@ -80,14 +80,14 @@ contract ERC1400 {
     mapping (bytes => bool) private _usedSignatures;
     mapping (address => uint256) private _balanceOfByDefault;                        // default balance with no partitions
 
-    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
+    constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply) {
 
         name = _name;
         symbol = _symbol;
         granularity = 10 ** _granularity; // for token decimals 
         totalSupply = _totalSupply;
         owner = msg.sender;
-        _defaultPartitions = defaultPartitions;
+        //_defaultPartitions = defaultPartitions;
 
     }
 
@@ -121,7 +121,7 @@ contract ERC1400 {
 
     // *************************************** Internal functions ********************************************************* //
 
-    /// @dev    internal funtion to transfer tokens from an address to another address
+    /// @dev    internal funtion to transfer partitionless tokens from an address to another address
     /// @notice `0x57` revert message if receiver is address 0
     /// @notice `0x52` insufficient balance
     /// @notice balance must be more or equal to the value to be transferred
@@ -135,7 +135,7 @@ contract ERC1400 {
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
         require(_to != address(0),  "0x57");        
-        require(_balanceOf[_from] >= _amount, "0x52");      
+        require(_balanceOfByPartition[_from] >= _amount, "0x52");      
 
         _balanceOf[_from] = _balanceOf[_from] - _amount;                  
         _balanceOf[_to] = _balanceOf[_to] + _amount;                      
@@ -176,9 +176,7 @@ contract ERC1400 {
 
 
         require(_balanceOf[_from] >= _value, "0x52");        
-        for (uint256 index = 0; index < _defaultPartitions.length; index++) {
-            _transferByPartiton(_defaultPartitions[index], _from, _to, _value, "", "");
-        }
+        
 
     }
 
@@ -218,11 +216,11 @@ contract ERC1400 {
     //  Default Partitions
 
 
-    function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+    /*function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
 
         _defaultPartitions = newDefaultPartitions;
 
-    }
+    }*/
      
     
     /**
