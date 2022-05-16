@@ -66,18 +66,19 @@ contract ERC1400 {
 
     mapping (address => bool) private whitelist;                                     //  whitelist map
     mapping (address => mapping(address => uint256)) private allowance;              // set the address of the allowed external operator
-    mapping (address => uint256) internal _balanceOf;                                // map to store the token balances of token holders
-    mapping (bytes32 => Doc) internal _documents;                                    // map to store the documents
-    mapping (address => mapping(bytes32 => uint256)) internal _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
-    mapping (address => bytes32[]) internal _partitionsOf;                           // map that stores the partitions of a token holder
-    mapping (address => mapping(address => bool)) internal _isOperator;              // map to approve or revoke operators for a token holder
-    mapping (bytes32 => uint256) internal _indexOfPartitions;
+    mapping (address => uint256) private _balanceOf;                                // map to store the token balances of token holders
+    mapping (bytes32 => Doc) private _documents;                                    // map to store the documents
+    mapping (address => mapping(bytes32 => uint256)) private _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
+    mapping (address => bytes32[]) private _partitionsOf;                           // map that stores the partitions of a token holder
+    mapping (address => mapping(address => bool)) private _isOperator;              // map to approve or revoke operators for a token holder
+    mapping (bytes32 => uint256) private _indexOfPartitions;
 
     // holder's address -> operator  address -> partition -> true/false
-    mapping (address => mapping(address => mapping (bytes32 => bool))) internal _isOperatorForPartition;                  // map to approve or revoke operators by partition
+    mapping (address => mapping(address => mapping (bytes32 => bool))) private _isOperatorForPartition;                  // map to approve or revoke operators by partition
     mapping (address => bool) private _isController;                                 // map to store the addresses of approved controllers
     mapping (address => uint256) private _indexOfController;                         // map to store the index position of controllers
     mapping (bytes => bool) private _usedSignatures;
+    mapping (address => uint256) private _balanceOfByDefault;                        // default balance with no partitions
 
     constructor (string memory _name, string memory _symbol, uint256 _granularity, uint256 _totalSupply, bytes32[] memory defaultPartitions) {
 
@@ -244,6 +245,7 @@ contract ERC1400 {
 
     }
 
+
     /// @dev    function to fetch the document details
     /// @param  _name is the name of the of document to be fetched
     /// @return uri is saved uri to be returned
@@ -283,7 +285,11 @@ contract ERC1400 {
        return _balanceOfByPartition[_tokenHolder][_partition];
    }
 
-   // function to return the partitions of a token holder
+   
+
+   ///  @dev    Function to return the partitions that an holder is having
+   ///  @param _tokenHolder is the address of the holder to be queried
+   ///  @return an array of the partitions of an holder
 
     function partitionsOf(address _tokenHolder) external view returns (bytes32[] memory) {
 
