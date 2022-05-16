@@ -1,4 +1,4 @@
-const { stringToHex, setToken, certificate } = require("./helper")
+const { stringToHex, setToken, certificate, tokens } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -17,6 +17,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     let classA = stringToHex("CLASS A")
     let classB = stringToHex("CLASS B")
+    let classless = stringToHex("classless").hex
 
     
     
@@ -141,7 +142,12 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
         
         it("isssues token to the classess/default partition of the recipient", async()=>{
 
+            const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const investorDamiClasslessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
             issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+            Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+            Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
 
         })
         
