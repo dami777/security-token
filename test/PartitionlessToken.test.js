@@ -24,8 +24,18 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator])=>{
 
     beforeEach(async()=>{
 
-        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, {from: tanglAdministrator})
-        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, {from: reitAdministrator})
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
+
+    })
+
+    describe("contract deployment", ()=>{
+
+        it("should have contract address", ()=>{
+            tanglSecurityToken.address.should.not.be.equal("", "it has a contract contract")
+            reitSecurityToken.address.should.not.be.equal("", "it has a contract contract")
+            
+        })
 
     })
 })

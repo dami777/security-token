@@ -497,12 +497,13 @@ contract ERC1400 {
     
     function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
-        require(_isIssuable, "0x55");     // can't issue tokens for now
-        require(_tokenHolder != address(0), "0x57");        // invalid receiver
-        uint256 amount =  _value * granularity;                         // the destinaton address should not be an empty address
-        _balanceOf[_tokenHolder] += amount;                              
-        totalSupply += amount;                                          // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);        // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        require(_isIssuable, "0x55");                                       // can't issue tokens for now
+        require(_tokenHolder != address(0), "0x57");                        // invalid receiver
+        uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
+        _balanceOfByDefault[_tokenHolder] += amount;                        // update the default token reserve balance of the holder
+        _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
+        totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
         
 
     }
