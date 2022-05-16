@@ -119,8 +119,88 @@ const reverts = {
 }
 
 
+let domain = [
+    {name: "name", type: "string"},
+    {name: "version", type: "string"},
+    {name: "chainId", type: "uint256"},
+    {name: "verifyingContract", type: "address"},
+    {name: "salt", type: "bytes32"}
+]
+
+
+let holder = [
+    
+    {name: "firstName", type: "string"},
+    {name: "lastName", type: "string"},
+    {name: "location", type: "string"},
+    {name: "walletAddress", type: "address"}
+]
+
+
+let transfer = [
+    
+    {name: "from", type: "Holder"},
+    {name: "to", type: "Holder"},
+    {name: "amount", type: "uint256"},
+    {name: "nonce", type: "uint256"}
+]
+
+
+let types = {
+
+    TransferData: transfer,
+    Holder: holder
+
+}
+
+
+const generateHolder = (firstName, lastName, location, walletAddress) => {
+
+    return {firstName, lastName, location, walletAddress}
+
+}
+
+
+const certificate= async (from, to, amount, nonce, domainData, signerPrivateKey)=>{
+
+    const message = { from, to, amount, nonce }
+    wallet = new ethers.Wallet(signerPrivateKey)
+    const signature = await wallet._signTypedData(domainData, types, message)
+
+    const encodedCertificate = web3.eth.abi.encodeParameters([
+
+        "bytes", "bytes32", "uint256",
+        {
+            "Holder" : {
+                "firstName" : "string",
+                "lastName" : "string",
+                "location" : "string",
+                "walletAddress" : "address",
+            }
+        },
+
+        {
+            "Holder" : {
+                "firstName" : "string",
+                "lastName" : "string",
+                "location" : "string",
+                "walletAddress" : "address",
+            }
+        }
+    ],
+
+    [signature, domainData.salt, 1, from, to]
+
+    )
+
+    return encodedCertificate
+
+
+}
+
+
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
         wait, swapState, ether, BYTES_0, setToken, hashSecret, 
-        stringToHex, expire, expired, reverts, toBN }
+        stringToHex, expire, expired, reverts, toBN, certificate }
 

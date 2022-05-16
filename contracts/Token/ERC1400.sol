@@ -45,6 +45,7 @@ contract ERC1400 {
     bytes32[] internal _totalPartitions;
     //bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
+    bytes32 _classless = "classless";
     
 
 
@@ -501,7 +502,7 @@ contract ERC1400 {
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
-        _balanceOfByPartition["classless"] += amount;                       // update the classless token reserve balance of the holder
+        _balanceOfByPartition[_tokenHolder][_classless] += amount;                       // update the classless token reserve balance of the holder
         _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
         totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
