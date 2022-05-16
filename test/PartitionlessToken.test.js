@@ -12,6 +12,9 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
     let tanglSecurityToken
     let reitSecurityToken
 
+    let tanglDomainData 
+    let reitDomainData
+
     let classA = stringToHex("CLASS A")
     let classB = stringToHex("CLASS B")
 
@@ -48,10 +51,12 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
     }
 
     let investorDamiData = {
+
         firstName: "Dami",
         lastName: "Ogunkeye",
         location: "New Yoke, London",
         walletAddress: investor_Dami
+
     }
 
 
@@ -64,10 +69,40 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     }
 
+    const tanglAdministratorPrivkey = "30890afa462d7fc0b7797ee9ce74d46d6e8153bf5fff8664479355d50f05acd5"
+    //const salt = stringToHex("random").hex
+    const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
+
+
+
+    
+
     beforeEach(async()=>{
 
+        
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
+
+        reitDomainData = {
+        
+            name: reitTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: reitSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
+
+        tanglDomainData = {
+
+            name: tanglTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: tanglSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
+
 
     })
 
@@ -83,7 +118,32 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     describe("issuance to partitionless token", ()=>{
 
-       
+        let issue
 
+        beforeEach(async()=>{
+
+            tanglDomainData = {
+
+                name: tanglTokenDetails.name,
+                version: "1",
+                chainId: 1337,
+                verifyingContract: tanglSecurityToken.address,
+                salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+        
+            }
+
+
+            const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
+            issue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator})
+
+        })
+
+        
+        it("isssues token to the classess/default partition of the recipient", async()=>{
+
+            issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+
+        })
+        
     })
 })
