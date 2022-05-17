@@ -522,14 +522,19 @@ contract ERC1400 {
     }
 
 
-     // function to issue new tokens by partition
+    /**
+        @dev    function to mint and issue new tokens to the specified partition of an holder. 
+        
+        This function is restricted to other addresses except the owner of the contract
 
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
+     */ 
+
+    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
 
         _issue(_partition, _tokenHolder, _value, _data);
     
 
-   }
+    }
 
 
    // *********************    TOKEN REDEMPTION
