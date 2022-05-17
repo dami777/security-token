@@ -499,16 +499,20 @@ contract ERC1400 {
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
-        _balanceOfByPartition[_tokenHolder][_partition] += amount;                       // update the classless token reserve balance of the holder
+        _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder
         _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
         totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        emit Issued(msg.sender, _tokenHolder, _value, _data);               // emit the issued event
         emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
 
     }
 
 
-    // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+    /**
+        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+
+        The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
+     */ 
     
     function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
@@ -520,14 +524,9 @@ contract ERC1400 {
 
      // function to issue new tokens by partition
 
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) public restricted {
+   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
 
-        require(_isIssuable, "0x55"); // can't issue tokens for now
-        uint256 amount =  _value * granularity; 
-        _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
-        _balanceOf[_tokenHolder] += amount; // increment the total balance of this token holder 
-        totalSupply += amount; // increase the total supply
-        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
+        _issue(_partition, _tokenHolder, _value, _data);
     
 
    }
@@ -669,7 +668,7 @@ contract ERC1400 {
      // *************************************** Events ********************************************************* //
 
     event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
-    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
+    event Issued (address indexed _operator, uint256 _to, uint256 _value, bytes _data);            // event to be emitted whenever new tokens are minted
     event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
     event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
     event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
