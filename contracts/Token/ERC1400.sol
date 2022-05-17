@@ -531,7 +531,7 @@ contract ERC1400 {
 
     function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
 
-        //_issue(_partition, _tokenHolder, _value, _data);
+        _issue(_partition, _tokenHolder, _value, _data);
     
 
     }
