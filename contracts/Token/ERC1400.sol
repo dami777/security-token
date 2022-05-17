@@ -180,33 +180,7 @@ contract ERC1400 {
 
     }
 
-    // internal redeem by partition function
-
-
-    function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
-
-       require(msg.sender != address(0), "0x56");
-       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");  // insufficient balance
-       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
-       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
-       
-       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
-       _balanceOf[address(0)] = _balanceOf[address(0)] + _value; // the value should reflect in the global token balance of the receiver
-       totalSupply -= _value;
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
-
-    }
-
-    // internal redeem function
-
-    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
-
-       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
-       _transfer(_tokenHolder, address(0), _value);
-       totalSupply -= _value;
-       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
-
-    }
+    
 
     
 
@@ -266,7 +240,9 @@ contract ERC1400 {
     /// @param _tokenHolder is the holder's address to be queried
     
     function balanceOf(address _tokenHolder) external view returns (uint256) {
+
         return _balanceOf[_tokenHolder];
+
     }
 
 
@@ -489,10 +465,20 @@ contract ERC1400 {
 
     // *********************    TOKEN ISSUANCE
 
+    /**
+        @dev    function to know the issuance status of a token; if it is issuable or not
+     */
+
     function isIssuable() external view returns (bool) {
+
         return _isIssuable;
+
     }
 
+    /** 
+        @dev    internal function to execute issuance to investors
+    
+     */
     function _issue(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
@@ -538,6 +524,36 @@ contract ERC1400 {
 
 
    // *********************    TOKEN REDEMPTION
+
+
+   // internal redeem by partition function
+
+
+    function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
+
+       require(_tokenHolder != address(0), "0x56");
+       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");              // insufficient balance
+       _useCert(_data, _value);
+       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
+       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+       
+       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;  //  keep track of the number of redeemed tokens in a partition
+       _balanceOf[address(0)] = _balanceOf[address(0)] + _value;                                                //  keep track of the number of redeemed tokens across all partitions
+       totalSupply -= _value;
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
+
+    }
+
+    // internal redeem function
+
+    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
+
+       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
+       _transfer(_tokenHolder, address(0), _value);
+       totalSupply -= _value;
+       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
+
+    }
 
 
    function redeem(uint256 _value, bytes memory _data) external {
