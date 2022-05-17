@@ -148,6 +148,9 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             const totalSupply = await tanglSecurityToken.totalSupply()
 
             issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+            issue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+            Number(issue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+            
             Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
             Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
             Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
@@ -197,7 +200,11 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
                 issueByPartition.logs[0].event.should.be.equal("Issued", "it emitted the Issued event")
                 issueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emitted the IssuedByPartition event")
-                
+                web3.utils.hexToUtf8(issueByPartition.logs[1].args._partition).should.be.equal("CLASS A", "it emitted the issued partition")
+                issueByPartition.logs[1].args._operator.should.be.equal(reitAdministrator, "it emitted the operator of the issuance")
+                Number(issueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                issueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+
 
             })
 
