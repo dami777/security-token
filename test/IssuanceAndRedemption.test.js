@@ -228,3 +228,14 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     })
 })
+
+
+
+/**
+ * Reconduct unit test for the following using the certificate:
+ * 
+ * []   redemption by partition
+ * []   redemption function ( for default / classless tokens)
+ * []   redeemFrom
+ * []   operatorRedeem by partiton
+ */
