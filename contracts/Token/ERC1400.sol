@@ -493,19 +493,26 @@ contract ERC1400 {
         return _isIssuable;
     }
 
+    function _issue(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) internal {
+
+        require(_isIssuable, "0x55");                                       // can't issue tokens for now
+        require(_tokenHolder != address(0), "0x57");                        // invalid receiver
+        _useCert(_data, _value);                                            // verify the certificate
+        uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
+        _balanceOfByPartition[_tokenHolder][_partition] += amount;                       // update the classless token reserve balance of the holder
+        _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
+        totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
+
+    }
+
 
     // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
     
     function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
         
-        require(_isIssuable, "0x55");                                       // can't issue tokens for now
-        require(_tokenHolder != address(0), "0x57");                        // invalid receiver
-        _useCert(_data, _value);                                            // verify the certificate
-        uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
-        _balanceOfByPartition[_tokenHolder][_classless] += amount;                       // update the classless token reserve balance of the holder
-        _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
-        totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        _issue(_classless, _tokenHolder, _value, _data);
         
 
     }
