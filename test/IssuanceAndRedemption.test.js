@@ -1,4 +1,4 @@
-const { stringToHex, setToken, certificate, tokens } = require("./helper")
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -205,6 +205,22 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 Number(issueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
                 issueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
 
+
+            })
+
+        })
+
+        describe("failed issuance", ()=>{
+
+            let cert
+
+            beforeEach(async()=>{
+                cert = await certificate(reitAdministratorData, investorDamiData, 1, 1, reitDomainData, reitAdministratorPrivKey)
+            })
+
+            it("should revert for issueing to ether zero", async()=>{
+
+                await reitSecurityToken.issueByPartition(classA.hex, ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
 
             })
 
