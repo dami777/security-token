@@ -317,11 +317,14 @@ contract ERC1400 {
     /**
         @dev transfer the classless token with data
         The function uses the _transferByPartition internal function
+
+        @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
      */ 
 
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
+        require(_data.length > 1, "data can't be empty");               
         _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
         
     }
@@ -331,10 +334,12 @@ contract ERC1400 {
         The function uses the _transferByPartition internal function
 
         @notice the allowance value was resetted to 0
+        @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
      */ 
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
          
+        require(_data.length > 1, "data can't be empty");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
         _transferByPartiton(_classless, _from, _to, _value, _data, "");
         allowance[_from][msg.sender] =  0;   

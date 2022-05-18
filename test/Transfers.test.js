@@ -4,6 +4,7 @@ require("chai")
     .should()
 
 
+const { asciiToHex } = require("web3-utils")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -258,7 +259,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     describe("transfer with data", ()=>{
 
-        
+       
 
     })
 
