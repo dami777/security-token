@@ -687,8 +687,8 @@ contract ERC1400 {
 
     event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
     event Issued (address indexed _operator, address indexed _to, uint256 _value, bytes _data);            // event to be emitted whenever new tokens are minted
-    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
-    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
+    event Transfer (address indexed _from, address indexed _to, uint256 _value);                                            // event to be emitted whenever token is been transferred
+    event Approval (address indexed _tokenHolder, address indexed _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
     event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
     event TransferByPartition (
 

@@ -121,6 +121,8 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     describe("transfer", ()=>{
 
+        let transfer
+
         beforeEach(async()=>{
             await tanglSecurityToken.transfer(investor_Jeff, tokens(2), {from: investor_Dami}) 
         })
@@ -143,6 +145,17 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             Number(totalBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
             Number(partitionlessBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
         
+        })
+
+        it("emits the Transfer and TransferByPartition events", ()=>{
+            transfer.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transfer.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+            
+
+            transfer.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transfer.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transfer.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
         })
 
     })
