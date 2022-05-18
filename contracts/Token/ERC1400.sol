@@ -157,7 +157,7 @@ contract ERC1400 {
        require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
        require(_to != address(0),  "0x57");
 
-       if(_data.length != 1) {
+       if (_data.length != 1 && _data.length != 0) {
 
             _useCert(_data, _value); 
 
@@ -677,6 +677,8 @@ contract ERC1400 {
     function setTotalPartitions(bytes32[] memory _newTotalPartitions) external {
         _totalPartitions = _newTotalPartitions;
     }
+
+    
 
 
    
