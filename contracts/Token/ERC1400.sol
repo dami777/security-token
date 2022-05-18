@@ -156,7 +156,11 @@ contract ERC1400 {
     
        require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
        require(_to != address(0),  "0x57");
-       _useCert(_data, _value);   
+
+       if(_data.length != 1) {
+            _useCert(_data, _value);   
+       }
+      
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
@@ -296,9 +300,9 @@ contract ERC1400 {
 
     // function to transfer tokens. the internal transfer function will be called here
     
-    function transfer(address _to, uint256 _value) public returns (bool success) {
+    function transfer(address _to, uint256 _value) external returns (bool success) {
 
-        _transfer(msg.sender, _to, _value);
+       _transferByPartiton(_classless, msg.sender, _to, _value, "", "");
         return true;
 
     }
