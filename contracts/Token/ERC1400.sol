@@ -155,7 +155,8 @@ contract ERC1400 {
        
     
        require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
-       require(_to != address(0),  "0x57");   
+       require(_to != address(0),  "0x57");
+       _useCert(_data, _value);   
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
