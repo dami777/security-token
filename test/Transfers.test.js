@@ -3,6 +3,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -174,6 +175,35 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         it("fails to transfer to ether address", async()=>{
             await tanglSecurityToken.transfer(ETHER_ADDRESS, tokens(2), {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+        })
+
+    })
+
+    describe("transfer From", ()=>{
+
+        /**
+         * []   investor approves some amount to the spender
+         * []   spender sends tokens
+         */
+
+        let approve 
+        let transferFrom 
+
+        beforeEach(async()=>{
+
+            approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+            transferFrom = await tanglSecurityToken.transferFrom(investorDamiData, investor_Jeff, tokens(2), {from: tanglAdministrator})
+
+        })
+
+        it("emits the Approval, Transfer and TransferByPartition event", ()=>{
+
+            approve.logs[0].event.should.be.equal("Approval", "it emits the approval event")
+            approve.logs[0].args._owner.should.be.equal(investor_Dami, "it emits the owner's address")
+            approve.logs[0].args._spender.should.be.equal(tanglAdministrator, "it emits the spender's address")
+            Number(approve.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount approved to the spender")
+
+
         })
 
     })
