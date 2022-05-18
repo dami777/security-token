@@ -134,13 +134,7 @@ contract ERC1400 {
     
     function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
 
-        require(_to != address(0),  "0x57");        
-        require(_balanceOfByDefault[_from] >= _amount, "0x52");      
-
-        _balanceOf[_from] = _balanceOf[_from] - _amount;                  
-        _balanceOf[_to] = _balanceOf[_to] + _amount;                      
-        emit Transfer (_from, _to, _amount);                            
-        return true;
+        
      }
 
 
@@ -322,7 +316,7 @@ contract ERC1400 {
      */ 
 
 
-    function transferWithData(address _to, uint256 _value, bytes memory _data) external {
+    function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
         
         require(_data.length > 1, "data can't be empty");               
         _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
@@ -337,7 +331,7 @@ contract ERC1400 {
         @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
      */ 
 
-    function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
+    function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
          
         require(_data.length > 1, "data can't be empty");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
