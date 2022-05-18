@@ -259,7 +259,27 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     describe("transfer with data", ()=>{
 
-       
+        let transferWithData
+
+       beforeEach(async()=>{
+
+        /**
+         * Administrator provides certificate 
+         * Investor uses the certificate to authorize and validate transaction
+         */
+
+        const cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
+        transferWithData = await tanglSecurityToken.transferWithData(investor_Jeff, tokens(3), cert, {from: investor_Dami})
+
+       })
+
+
+       it("emits the Transfer and TransferByPartition event", ()=>{
+
+            transferWithData.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
+            transferWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the TransferByPartition event")
+
+       })
 
     })
 
