@@ -219,7 +219,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transferFrom.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
             
             Number(transferFrom.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -240,6 +240,18 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             Number(totalToBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
             Number(partitionlessToBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
         
+        })
+
+        it("should revert if spender attempts to spend beyond the allowed amount", async()=>{
+            
+            await tanglSecurityToken.transferFrom(investor_Dami, investor_Jeff, tokens(3), {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+        })
+
+        it("should revert if the owner does not have sufficient amount to be sent", async()=>{
+            await tanglSecurityToken.approve(escrow, tokens(20), {from: investor_Dami})
+            await tanglSecurityToken.transferFrom(investor_Dami, investor_Jeff, tokens(20), {from: escrow}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
         })
 
     })
