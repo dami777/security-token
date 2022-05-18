@@ -1,55 +1,118 @@
-const { sign } = require("crypto")
 
 require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-const tokens=(n)=>{
-    return new web3.utils.BN(
-        web3.utils.toWei(n.toString(), 'ether')
-    )
-    
-}
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
 
-contract("Transfer With Data", ([deployer, holder1, holder2])=>{
+contract("Transfers", ([tanglAdministrator, investor_Dami, investor_Jeff, escrow])=>{
 
-    let token
-    let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
-    let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
-    let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
-    let fromIsWhiteListedOrIssuer = true
-    let toIsWhiteListed = true
-    let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
-    let name = "Tangl"
-    let symbol = "TAN"
-    let decimal = 18
-    let totalSupply = 0
-    let classA = web3.utils.asciiToHex("CLASS A")
-    let classB = web3.utils.asciiToHex("CLASS B")
+    let tanglSecurityToken
+    let reitSecurityToken
+
+    let tanglDomainData 
+    let reitDomainData
+
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+    let classless = stringToHex("classless").hex
+
+    
+    
+    
+    let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
+    let reitTokenDetails = setToken("Real Estate Investment Trust", "REIT", 18, 0, [classA.hex,classB.hex])
 
 
+    /**
+     * Define the data of the issuers and onboarded investors
+     * These data will be used to generate certificate for issuance, transfer and redemption of tokens
+     */
+
+    let tanglAdministratorData = {
+            
+        firstName: "tangl administrator",
+        lastName: "tangl administrator",
+        location: "New Yoke, London",
+        walletAddress: tanglAdministrator
+
+    }
+
+
+
+    let reitAdministratorData = {
+            
+        firstName: "reit administrator",
+        lastName: "reit administrator",
+        location: "New Yoke, London",
+        walletAddress: reitAdministrator
+
+    }
+
+    let investorDamiData = {
+
+        firstName: "Dami",
+        lastName: "Ogunkeye",
+        location: "New Yoke, London",
+        walletAddress: investor_Dami
+
+    }
+
+
+    let investorJeffData = {
+
+        firstName: "Jeff",
+        lastName: "Chuka",
+        location: "New Yoke, London",
+        walletAddress: investor_Jeff
+
+    }
+
+    const tanglAdministratorPrivkey = "30890afa462d7fc0b7797ee9ce74d46d6e8153bf5fff8664479355d50f05acd5"
+    const reitAdministratorPrivKey = "1f81c78ea6017f3fa79accbe40450f373a02af61763cdb7f082284ee8716b40d"
+    const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
+    
 
     beforeEach( async()=>{
-        token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB] ) //, {gas: 200000000000000000})
-        
 
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
+
+        reitDomainData = {
+        
+            name: reitTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: reitSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
+
+        tanglDomainData = {
+
+            name: tanglTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: tanglSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
     })
 
     describe("deployment", ()=>{
 
         it("has a contract address", async()=>{
             
-            token.address.should.not.be.equal("", "it has a contract address")
+            tanglSecurityToken.address.should.not.be.equal("", "it has a contract address")
         })
 
     })
 
-    describe("transfer with signature", ()=>{
+    /*describe("transfer with signature", ()=>{
 
         beforeEach(async()=>{
             await token.issue(holder1, 5, web3.utils.toHex(""))
@@ -130,7 +193,18 @@ contract("Transfer With Data", ([deployer, holder1, holder2])=>{
         })
 
 
-    })
+    })*/
 
 
 })
+
+
+
+/**
+ * Reconduct unit test for the following using the certificate:
+ * 
+ * []   Transfer
+ * []   TransferFrom
+ * []   TransferWithData
+ * 
+ */
