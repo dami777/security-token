@@ -279,7 +279,8 @@ contract ERC1400 {
 
     // *********************    TRANSFERS
 
-    // approve tokens to external operators
+    /// @dev    approve spenders to send tokens on the holder's behalf; such as escrows
+    /// @dev    the function should be called before calling the transferFrom function
     
     function approve(address _externalAddress, uint256 _value) external returns (bool success) {
 

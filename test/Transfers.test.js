@@ -151,17 +151,32 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             transfer.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
             transfer.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
             
+            //  test the data emitted with the `Transfer` event
 
             transfer.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transfer.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
             Number(transfer.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
+            //  test the data emitted with the `TransferByPartition` event
+
+            transfer.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transfer.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            
+            Number(transfer.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            
+        })
+
+        it("fails to transfer due to insufficient balance", async()=>{
+            await tanglSecurityToken.transfer(investor_Jeff, tokens(20), {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+        })
+
+        it("fails to transfer to ether address", async()=>{
+            await tanglSecurityToken.transfer(ETHER_ADDRESS, tokens(2), {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
         })
 
     })
-
-
-   
 
 
     describe("transfer with data", ()=>{
@@ -181,7 +196,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 /**
  * Reconduct unit test for the following using the certificate:
  * 
- * []   Transfer
+ * [-]   Transfer
  * []   TransferFrom
  * []   TransferWithData
  * 

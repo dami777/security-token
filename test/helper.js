@@ -116,7 +116,8 @@ const reverts = {
     EXPIRATION_TIME_LESS_THAN_NOW: "expiration time is less than present time",
     FAILED_TO_RELEASE_ETHER: "Failed to release Ether",
     NOT_ISSUABLE: "0x55",
-    INVALID_RECEIVER: "0x57"
+    INVALID_RECEIVER: "0x57",
+    INSUFFICIENT_BALANCE: "0x52"
 
 }
 
