@@ -154,8 +154,15 @@ contract ERC1400 {
     function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
        
     
-       require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
-       require(_to != address(0),  "0x57");   
+        require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
+        require(_to != address(0),  "0x57");
+
+        if (_data.length != 1 && _data.length != 0) {
+
+            _useCert(_data, _value); 
+
+        }
+      
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
        _balanceOf[_from] = _balanceOf[_from] - _value; // the value should reflect in the global token balance of the sender
@@ -163,52 +170,17 @@ contract ERC1400 {
        _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
        _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
-       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, _data, _operatorData);
-       emit Transfer(_from, _to, _value);
-
-       return _partition;
-
-    }
-
-    // function to transfer by default Partitions
-
-    function _transferByDefaultPartitions(address _from, address _to, uint256 _value) internal {
-
-
-        require(_balanceOf[_from] >= _value, "0x52");        
-        
-
-    }
-
-    // internal redeem by partition function
-
-
-    function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
-
-       require(msg.sender != address(0), "0x56");
-       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");  // insufficient balance
-       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
-       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+        emit Transfer(_from, _to, _value);
+        emit TransferByPartition(_partition, msg.sender, _from, _to, _value, _data, _operatorData);
        
-       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;
-       _balanceOf[address(0)] = _balanceOf[address(0)] + _value; // the value should reflect in the global token balance of the receiver
-       totalSupply -= _value;
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
+
+        return _partition;
 
     }
 
-    // internal redeem function
+   
 
-    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
-
-       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
-       _transfer(_tokenHolder, address(0), _value);
-       totalSupply -= _value;
-       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
-
-    }
-
-    
+ 
 
     // **************************       ERC1400 FEATURES  ******************************************************//
 
@@ -266,7 +238,9 @@ contract ERC1400 {
     /// @param _tokenHolder is the holder's address to be queried
     
     function balanceOf(address _tokenHolder) external view returns (uint256) {
+
         return _balanceOf[_tokenHolder];
+
     }
 
 
@@ -305,7 +279,8 @@ contract ERC1400 {
 
     // *********************    TRANSFERS
 
-    // approve tokens to external operators
+    /// @dev    approve spenders to send tokens on the holder's behalf; such as escrows
+    /// @dev    the function should be called before calling the transferFrom function
     
     function approve(address _externalAddress, uint256 _value) external returns (bool success) {
 
@@ -317,49 +292,51 @@ contract ERC1400 {
     }
 
 
-    // function to transfer tokens. the internal transfer function will be called here
+    /// @dev function to transfer tokens from the classless partition. The internal transferByPartition function will be called here
     
-    function transfer(address _to, uint256 _value) public returns (bool success) {
+    function transfer(address _to, uint256 _value) external returns (bool success) {
 
-        _transfer(msg.sender, _to, _value);
+       _transferByPartiton(_classless, msg.sender, _to, _value, "", "");
         return true;
 
     }
 
-    // function transferFrom. The function for external addresses such as escrows to move tokens on behalf of the token holder
+    /// @dev    The function for external addresses such as escrows to move the classless tokens on behalf of the token holder
     
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
 
-        // _from is the current token holder
-        // _to is the destinantion address
-        //  msg.sender is the external address calling this function
-        // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
 
-        require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
-        _transfer(_from, _to, _value);                             // transfer the tokens
-
-        // reset the allowance value
-
-        allowance[_from][msg.sender] =  0;   
+        require(allowance[_from][msg.sender] >= _value, "0x53");                        /// @dev the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
+        _transferByPartiton(_classless, _from, _to, _value, "", "");                    /// @dev transfer the tokens from the classless partition
+        allowance[_from][msg.sender] =  0;                                             ///  @dev reset the allowance value
         return true;           
 
     }  
 
-    // tranfer with data
+
+    /**
+        @dev transfer the classless token with data
+        The function uses the _transferByPartition internal function
+     */ 
+
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        //require(_isValidCertificate(_data, _value));
-        _transfer(msg.sender, _to, _value);
+        _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
+        
     }
     
+     /**
+        @dev external spender such as escrows transfer the classless token with data
+        The function uses the _transferByPartition internal function
+
+        @notice the allowance value was resetted to 0
+     */ 
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
-         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
-        _transfer(_from, _to, _value);                              // transfer the tokens
-
-        //  reset the allowance value
-
+         
+        require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
+        _transferByPartiton(_classless, _from, _to, _value, _data, "");
         allowance[_from][msg.sender] =  0;   
         
     }
@@ -370,20 +347,16 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-       /* if (_data.length != 1) {
-
-            require(_isValidCertificate(_data, _value));
-
-        }*/
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
- 
+        return _partition;
+
    }    
 
    // operator transfer by partition
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       //require(_isValidCertificate(_operatorData, _value), "cant verify data");
+      
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
@@ -489,44 +462,95 @@ contract ERC1400 {
 
     // *********************    TOKEN ISSUANCE
 
+    /**
+        @dev    function to know the issuance status of a token; if it is issuable or not
+     */
+
     function isIssuable() external view returns (bool) {
+
         return _isIssuable;
+
     }
 
-
-    // function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+    /** 
+        @dev    internal function to execute issuance to investors
     
-    function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
-        
+     */
+    function _issue(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) internal {
+
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
-        _balanceOfByPartition[_tokenHolder][_classless] += amount;                       // update the classless token reserve balance of the holder
+        _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder
         _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
         totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
-        emit Issued(_tokenHolder, amount, totalSupply, block.timestamp);    // emit the issued event --> it emits the destination address, amount minted, updated total supply and the time issued
+        emit Issued(msg.sender, _tokenHolder, amount, _data);               // emit the issued event
+        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
+
+    }
+
+
+    /**
+        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+
+        The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
+     */ 
+    
+    function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+        
+        _issue(_classless, _tokenHolder, _value, _data);
         
 
     }
 
 
-     // function to issue new tokens by partition
+    /**
+        @dev    function to mint and issue new tokens to the specified partition of an holder. 
+        
+        This function is restricted to other addresses except the owner of the contract
 
-   function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) public restricted {
+     */ 
 
-        require(_isIssuable, "0x55"); // can't issue tokens for now
-        uint256 amount =  _value * granularity; 
-        _balanceOfByPartition[_tokenHolder][_partition] += amount;   // increment the partition's token balance of this token holder
-        _balanceOf[_tokenHolder] += amount; // increment the total balance of this token holder 
-        totalSupply += amount; // increase the total supply
-        emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
+    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+
+        _issue(_partition, _tokenHolder, _value, _data);
     
 
-   }
+    }
 
 
    // *********************    TOKEN REDEMPTION
+
+
+   // internal redeem by partition function
+
+
+    function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
+
+       require(_tokenHolder != address(0), "0x56");
+       require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");              // insufficient balance
+       _useCert(_data, _value);
+       _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
+       _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+       
+       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;  //  keep track of the number of redeemed tokens in a partition
+       _balanceOf[address(0)] = _balanceOf[address(0)] + _value;                                                //  keep track of the number of redeemed tokens across all partitions
+       totalSupply -= _value;
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
+
+    }
+
+    // internal redeem function
+
+    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
+
+       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
+       _transfer(_tokenHolder, address(0), _value);
+       totalSupply -= _value;
+       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
+
+    }
 
 
    function redeem(uint256 _value, bytes memory _data) external {
@@ -656,15 +680,17 @@ contract ERC1400 {
         _totalPartitions = _newTotalPartitions;
     }
 
+    
+
 
    
 
      // *************************************** Events ********************************************************* //
 
     event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
-    event Issued (address _to, uint256 _amountIssued, uint256 _totalSupply, uint256 _timeIssued);            // event to be emitted whenever new tokens are minted
-    event Transfer (address _from, address _to, uint256 _amount);                                            // event to be emitted whenever token is been transferred
-    event Approval (address _tokenHolder, address _externalAddress, uint256 _amount);                        // event to be emitted whenever an external address is approved such as escrows
+    event Issued (address indexed _operator, address indexed _to, uint256 _value, bytes _data);            // event to be emitted whenever new tokens are minted
+    event Transfer (address indexed _from, address indexed _to, uint256 _value);                                            // event to be emitted whenever token is been transferred
+    event Approval (address indexed _owner, address indexed _spender, uint256 _value);                        // event to be emitted whenever an external address is approved such as escrows
     event Document (bytes32 indexed _name, string _uri, bytes32 _documentHash);                       // event to be emitted whenever a document is put on-chain
     event TransferByPartition (
 
@@ -683,7 +709,7 @@ contract ERC1400 {
     event RevokedOperator (address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked
     event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
     event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
-    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _amount, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
+    event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _value, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
     event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
