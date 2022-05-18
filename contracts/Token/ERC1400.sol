@@ -158,7 +158,9 @@ contract ERC1400 {
        require(_to != address(0),  "0x57");
 
        if(_data.length != 1) {
-            _useCert(_data, _value);   
+
+            _useCert(_data, _value); 
+
        }
       
 
@@ -343,11 +345,6 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-       /* if (_data.length != 1) {
-
-            require(_isValidCertificate(_data, _value));
-
-        }*/
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
  
    }    
@@ -356,7 +353,7 @@ contract ERC1400 {
    
    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-       //require(_isValidCertificate(_operatorData, _value), "cant verify data");
+      
        if(_isControllable == true && _isController[msg.sender]) {
 
            _transferByPartiton(_partition, _from, _to, _value, "", "");
