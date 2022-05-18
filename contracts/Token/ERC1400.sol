@@ -171,7 +171,7 @@ contract ERC1400 {
        _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
         emit Transfer(_from, _to, _value);
-        emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, _data, _operatorData);
+        emit TransferByPartition(_partition, msg.sender, from, _to, _value, _data, _operatorData);
        
 
         return _partition;
