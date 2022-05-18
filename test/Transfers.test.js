@@ -137,6 +137,12 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         it("updates the receiver's balance", async()=>{
 
+            const totalBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const partitionlessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Jeff)
+
+            Number(totalBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
+            Number(partitionlessBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
+        
         })
 
     })
