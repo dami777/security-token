@@ -154,14 +154,14 @@ contract ERC1400 {
     function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
        
     
-       require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
-       require(_to != address(0),  "0x57");
+        require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
+        require(_to != address(0),  "0x57");
 
-       if (_data.length != 1 && _data.length != 0) {
+        if (_data.length != 1 && _data.length != 0) {
 
             _useCert(_data, _value); 
 
-       }
+        }
       
 
        _balanceOfByPartition[_from][_partition] = _balanceOfByPartition[_from][_partition] - _value;
@@ -170,10 +170,11 @@ contract ERC1400 {
        _balanceOfByPartition[_to][_partition] = _balanceOfByPartition[_to][_partition] + _value;
        _balanceOf[_to] = _balanceOf[_to] + _value; // the value should reflect in the global token balance of the receiver
 
-       emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, _data, _operatorData);
-       emit Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
+        emit TransferByPartition(_partition, msg.sender, msg.sender, _to, _value, _data, _operatorData);
+       
 
-       return _partition;
+        return _partition;
 
     }
 

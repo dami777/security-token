@@ -124,7 +124,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
         let transfer
 
         beforeEach(async()=>{
-            await tanglSecurityToken.transfer(investor_Jeff, tokens(2), {from: investor_Dami}) 
+            transfer = await tanglSecurityToken.transfer(investor_Jeff, tokens(2), {from: investor_Dami}) 
         })
 
         it("updates the sender's balance", async()=>{
