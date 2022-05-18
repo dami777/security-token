@@ -175,19 +175,9 @@ contract ERC1400 {
 
     }
 
-    // function to transfer by default Partitions
+   
 
-    function _transferByDefaultPartitions(address _from, address _to, uint256 _value) internal {
-
-
-        require(_balanceOf[_from] >= _value, "0x52");        
-        
-
-    }
-
-    
-
-    
+ 
 
     // **************************       ERC1400 FEATURES  ******************************************************//
 
@@ -298,7 +288,7 @@ contract ERC1400 {
     }
 
 
-    // function to transfer tokens. the internal transfer function will be called here
+    /// @dev function to transfer tokens from the classless partition. The internal transferByPartition function will be called here
     
     function transfer(address _to, uint256 _value) external returns (bool success) {
 
@@ -307,31 +297,25 @@ contract ERC1400 {
 
     }
 
-    // function transferFrom. The function for external addresses such as escrows to move tokens on behalf of the token holder
+    /// @dev    The function for external addresses such as escrows to move the classless tokens on behalf of the token holder
     
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
 
-        // _from is the current token holder
-        // _to is the destinantion address
-        //  msg.sender is the external address calling this function
-        // the token holder should have at least the amount of tokens to be transferred ----> this check has been implemented in the internal _transfer function
 
-        require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
-        _transfer(_from, _to, _value);                             // transfer the tokens
-
-        // reset the allowance value
-
-        allowance[_from][msg.sender] =  0;   
+        require(allowance[_from][msg.sender] >= _value, "0x53");                        /// @dev the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
+        _transferByPartiton(_classless, _from, _to, _value, "", "");                    /// @dev transfer the tokens from the classless partition
+        allowance[_from][msg.sender] =  0;                                             ///  @dev reset the allowance value
         return true;           
 
     }  
 
-    // tranfer with data
+
+    /// @dev transfer the classless token with data
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        //require(_isValidCertificate(_data, _value));
-        _transfer(msg.sender, _to, _value);
+        _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
+        
     }
     
 
