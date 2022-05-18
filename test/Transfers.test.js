@@ -3,13 +3,12 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
 
-contract("Transfers", ([tanglAdministrator, investor_Dami, investor_Jeff, escrow])=>{
+contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, investor_Jeff, escrow])=>{
 
     let tanglSecurityToken
     let reitSecurityToken
@@ -101,6 +100,14 @@ contract("Transfers", ([tanglAdministrator, investor_Dami, investor_Jeff, escrow
             salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
     
         }
+
+        /**
+         * issue classless tokens with certificate
+         */
+
+        const cert = await certificate(tanglAdministratorData, investorDamiData, 10, 1, tanglDomainData, tanglAdministratorPrivkey)
+        issue = await tanglSecurityToken.issue(investor_Dami, 10, cert, {from: tanglAdministrator})
+    
     })
 
     describe("deployment", ()=>{
@@ -112,88 +119,42 @@ contract("Transfers", ([tanglAdministrator, investor_Dami, investor_Jeff, escrow
 
     })
 
-    /*describe("transfer with signature", ()=>{
+    describe("transfer", ()=>{
 
         beforeEach(async()=>{
-            await token.issue(holder1, 5, web3.utils.toHex(""))
+            await tanglSecurityToken.transfer(investor_Jeff, tokens(2), {from: investor_Dami}) 
         })
 
-        describe("balances", ()=>{
+        it("updates the sender's balance", async()=>{
+
+            const totalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const partitionlessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+            Number(totalBalance).should.be.equal(Number(tokens(8)), "the sender released the tokens successfully")
+            Number(partitionlessBalance).should.be.equal(Number(tokens(8)), "the token was moved from the partitionless balance")
             
-            it("issued token", async()=>{
-                const balance = await token.balanceOf(holder1)
-                balance.toString().should.be.equal(tokens(5).toString(), "it updated the balance of the recipient")
-            })
-            
         })
 
-        describe("transfer with data", ()=>{
-
-            beforeEach(async()=>{
-                await token.setController(signer)
-            })
-
-            let transfer
-            
-            //let data = abi.encode(signature, ethHash)
-
-            beforeEach(async()=>{
-                transfer = await token.transferWithData(holder2, tokens(2), data, {from: holder1})
-            })
-
-            it("transfers the token with the certificate", ()=>{
-                transfer.logs[0].args._from.should.be.equal(holder1, "it emits the sender")
-            })
+        it("updates the receiver's balance", async()=>{
 
         })
 
-        describe("failure to transfer with data", ()=>{
-
-            it("fails to transfer with data because the signer isn't recognized as a regulator", async()=>{
-                await token.transferWithData(holder2, tokens(2), data, {from: holder1}).should.be.rejected
-            })
-
-            it("fails because either or neither of the accounts are whitelisted", async()=>{
-                const data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, false, toIsWhiteListed])
-                await token.transferWithData(holder2, tokens(2), data, {from: holder1}).should.be.rejected
-
-            })
-
-        })
-
-        describe("transfer by partition with data", ()=>{
-
-            let transferByPartition
-            let issue
-
-            beforeEach(async()=>{
-                await token.setController(signer)
-                issue = await token.issueByPartition(classA, holder1, 5, web3.utils.toHex(""))
-                transferByPartition = await token.transferByPartition(classA, holder2, tokens(2), data, {from: holder1})
-            })
-
-            it("emits the data with the event", ()=>{
-                transferByPartition.logs[0].args._data.should.be.equal(data, "it emitted the injected certificate")
-            })
-
-        })
-
-        describe("transfer by partition without data", ()=>{
-            let transferByPartition
-            let issue
-
-            beforeEach(async()=>{
-                issue = await token.issueByPartition(classA, holder1, 5, web3.utils.toHex(""))
-                transferByPartition = await token.transferByPartition(classA, holder2, tokens(2), web3.utils.toHex(""), {from: holder1})
-            })
-
-            it("emits the data with the event", ()=>{
-                transferByPartition.logs[0].args._data.should.be.equal("0x00", "it emitted an emptyn data")
-            })  
-        })
+    })
 
 
-    })*/
+    describe("transfer from", ()=>{
+
+    })
+
+
+    describe("transfer with data", ()=>{
+
+    })
+
+
+    describe("transfer by partition", ()=>{
+
+    })
 
 
 })
