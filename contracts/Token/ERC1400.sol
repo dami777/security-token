@@ -346,7 +346,8 @@ contract ERC1400 {
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
- 
+        return _partition;
+
    }    
 
    // operator transfer by partition
