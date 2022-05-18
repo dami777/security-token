@@ -310,7 +310,11 @@ contract ERC1400 {
     }  
 
 
-    /// @dev transfer the classless token with data
+    /**
+        @dev transfer the classless token with data
+        The function uses the _transferByPartition internal function
+     */ 
+
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
@@ -318,13 +322,17 @@ contract ERC1400 {
         
     }
     
+     /**
+        @dev external spender such as escrows transfer the classless token with data
+        The function uses the _transferByPartition internal function
+
+        @notice the allowance value was resetted to 0
+     */ 
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
-         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
-        _transfer(_from, _to, _value);                              // transfer the tokens
-
-        //  reset the allowance value
-
+         
+        require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
+        _transferByPartiton(_classless, _from, _to, _value, _data, "");
         allowance[_from][msg.sender] =  0;   
         
     }
