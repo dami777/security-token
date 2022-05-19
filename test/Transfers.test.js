@@ -384,6 +384,24 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
         })
+        
+
+        it("updates the balances of the `from` and `to` ", async()=>{
+
+            const totalFromBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const partitionlessFromBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+            Number(totalFromBalance).should.be.equal(Number(tokens(8)), "the sender released the tokens successfully")
+            Number(partitionlessFromBalance).should.be.equal(Number(tokens(8)), "the token was moved from the partitionless balance")
+
+            
+            const totalToBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const partitionlessToBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Jeff)
+
+            Number(totalToBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
+            Number(partitionlessToBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
+        
+        })
 
 
 
