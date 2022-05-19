@@ -531,7 +531,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
         it("reverts if transfer is attempted with insufficient balance", async()=>{
 
             cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(20)), 5, tanglDomainData, tanglAdministratorPrivkey) 
-            await tanglSecurityToken.transferByPartition(classA.hex, ETHER_ADDRESS, tokens(5), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+            await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(5), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
 
 
         })
