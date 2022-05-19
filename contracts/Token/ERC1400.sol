@@ -346,6 +346,7 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
+        require(_data.length > 1, "data can't be empty");
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
         return _partition;
 

@@ -443,6 +443,8 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     describe("transfer by partition", ()=>{
 
+        
+
     })
 
 
