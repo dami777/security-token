@@ -161,7 +161,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transfer.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transfer.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transfer.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -218,7 +218,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferFrom.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -299,7 +299,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transferWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
 
@@ -386,7 +386,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferFromWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFromWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -471,8 +471,25 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
         })
 
         it("emits the Transfer and TransferByPartition event", ()=>{
+
             transferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
-            transferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer event")
+            transferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferByPartition.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferByPartition.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferByPartition.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferByPartition.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emitted the transferred partition")
+            
+            Number(transferByPartition.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
             
         })
 
