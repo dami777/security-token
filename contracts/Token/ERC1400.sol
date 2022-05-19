@@ -346,6 +346,7 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
+        require(_data.length > 1, "data can't be empty");
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
         return _partition;
 
@@ -479,6 +480,7 @@ contract ERC1400 {
 
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
+        require(_data.length > 1, "data can't be empty");                   //  data must not be empty
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
         _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder

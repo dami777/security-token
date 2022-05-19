@@ -119,7 +119,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     })
 
-    /*describe("transfer", ()=>{
+    describe("transfer", ()=>{
 
         let transfer
 
@@ -161,7 +161,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transfer.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transfer.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transfer.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -176,7 +176,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             await tanglSecurityToken.transfer(ETHER_ADDRESS, tokens(2), {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
         })
 
-    })*/
+    })
 
     describe("transfer From", ()=>{
 
@@ -218,7 +218,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferFrom.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -299,7 +299,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transferWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
 
@@ -386,7 +386,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferFromWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFromWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the transferred partition")
             
             Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -443,6 +443,103 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     describe("transfer by partition", ()=>{
 
+        let issueByPartition
+        let issuanceCert
+        let transferCert
+        let transferByPartition
+
+        beforeEach(async()=>{
+
+            
+
+            issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 10, 2, tanglDomainData, tanglAdministratorPrivkey)
+            issueByPartition = await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 10, issuanceCert, {from: tanglAdministrator})
+
+            transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+            transferByPartition = await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(2), transferCert, {from: investor_Dami})
+        })
+
+        it("emits the Issued and IssuedByPartition event", ()=>{
+
+            /**
+             * A separate test will be conducted for issuance in another test script
+             */
+
+            issueByPartition.logs[0].event.should.be.equal("Issued", "it emits the Issued event")
+            issueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emits the IssuedByPartition event")
+
+        })
+
+        it("emits the Transfer and TransferByPartition event", ()=>{
+
+            transferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferByPartition.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferByPartition.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferByPartition.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferByPartition.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emitted the transferred partition")
+            
+            Number(transferByPartition.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            
+        })
+
+        it("updates the balance of the of the sender and receiver after transfer", async()=>{
+
+            const totalFromBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const classAFromBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+            Number(totalFromBalance).should.be.equal(Number(tokens(18)), "the sender released the tokens successfully")
+            Number(classAFromBalance).should.be.equal(Number(tokens(8)), "the token was moved from the partitionless balance")
+
+            
+            const totalToBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const classAToBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+
+            Number(totalToBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
+            Number(classAToBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
+
+        })
+
+        it("reverts if certificate is not used in the transfer", async()=>{
+
+            const cert = stringToHex("").hex 
+            await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.EMPTY_DATA)
+
+
+        })
+
+
+        it("reverts if transfer is attempted to be sent to ether address", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 4, tanglDomainData, tanglAdministratorPrivkey) 
+            await tanglSecurityToken.transferByPartition(classA.hex, ETHER_ADDRESS, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+
+        })
+
+
+        it("reverts if transfer is attempted with insufficient balance", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(20)), 5, tanglDomainData, tanglAdministratorPrivkey) 
+            await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(20), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+
+        })
+
+
+        
+    
+
     })
 
 
@@ -454,8 +551,9 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
  * Reconduct unit test for the following using the certificate:
  * 
  * [-]   Transfer
- * []   TransferFrom
- * []   TransferWithData
- * []   TransferFromWithData
+ * [-]   TransferFrom
+ * [-]   TransferWithData
+ * [-]   TransferFromWithData
+ * []   TransferByPartition
  * 
  */

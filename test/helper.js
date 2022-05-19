@@ -194,7 +194,7 @@ const certificate= async (from, to, amount, nonce, domainData, signerPrivateKey)
         }
     ],
 
-    [signature, domainData.salt, 1, from, to]
+    [signature, domainData.salt, nonce, from, to]
 
     )
 
