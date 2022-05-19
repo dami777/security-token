@@ -3,8 +3,6 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-
-const { asciiToHex } = require("web3-utils")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -260,6 +258,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
     describe("transfer with data", ()=>{
 
         let transferWithData
+        let cert
 
        beforeEach(async()=>{
 
@@ -268,7 +267,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
          * Investor uses the certificate to authorize and validate transaction
          */
 
-        const cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
+        cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
         transferWithData = await tanglSecurityToken.transferWithData(investor_Jeff, tokens(3), cert, {from: investor_Dami})
 
        })
@@ -287,7 +286,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             transferWithData.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
             transferWithData.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            Number(transferWithData.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+            Number(transferWithData.logs[0].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
 
             //  test the data emitted with the `TransferByPartition` event
 
@@ -295,7 +294,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             transferWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
             web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
             
-            Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+            Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
 
        })
 
@@ -317,6 +316,36 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
        
         })
 
+
+        it("should revert if the sender does not have sufficient amount to be sent", async()=>{
+            
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+        })
+
+
+        it("should revert if the sender tries to use an empty data", async()=>{
+            
+            const cert = stringToHex("").hex
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.EMPTY_DATA)
+
+        })
+
+        it("fails to transfer to ether address", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+        })
+
+
+
+
+    })
+
+    describe("transferFrom with data", ()=>{
 
     })
 

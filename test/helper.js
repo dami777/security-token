@@ -118,7 +118,8 @@ const reverts = {
     NOT_ISSUABLE: "0x55",
     INVALID_RECEIVER: "0x57",
     INSUFFICIENT_BALANCE: "0x52",
-    INSUFFICIENT_ALLOWANCE: "0x53"
+    INSUFFICIENT_ALLOWANCE: "0x53",
+    EMPTY_DATA:"data can't be empty"
 
 }
 
