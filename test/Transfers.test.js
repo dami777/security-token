@@ -178,14 +178,14 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     })*/
 
-    /*describe("transfer From", ()=>{*/
+    describe("transfer From", ()=>{
 
         /**
          * []   investor approves some amount to the spender
          * []   spender sends tokens
          */
 
-        /*let approve 
+        let approve 
         let transferFrom 
 
         beforeEach(async()=>{
@@ -249,6 +249,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         it("should revert if spender attempts to send to ether address", async()=>{
             
+            approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
             await tanglSecurityToken.transferFrom(investor_Dami, ETHER_ADDRESS, tokens(2), {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
 
         })
@@ -259,7 +260,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         })
 
-    })*/
+    })
 
     describe("transfer with data", ()=>{
 
