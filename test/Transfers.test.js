@@ -247,6 +247,12 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         })
 
+        it("should revert if spender attempts to send to ether address", async()=>{
+            
+            await tanglSecurityToken.transferFrom(investor_Dami, ETHER_ADDRESS, tokens(2), {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+        })
+
         it("should revert if the owner does not have sufficient amount to be sent", async()=>{
             await tanglSecurityToken.approve(escrow, tokens(20), {from: investor_Dami})
             await tanglSecurityToken.transferFrom(investor_Dami, investor_Jeff, tokens(20), {from: escrow}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
@@ -384,7 +390,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
         })
-        
+
 
         it("updates the balances of the `from` and `to` ", async()=>{
 
@@ -402,6 +408,30 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             Number(partitionlessToBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
         
         })
+
+        it("should revert if spender attempts to spend beyond the allowed amount", async()=>{
+            
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 2, tanglDomainData, tanglAdministratorPrivkey)
+            await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(3), cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+        })
+
+        it("should revert if the owner does not have sufficient amount to be sent by the spender", async()=>{
+
+            await tanglSecurityToken.approve(escrow, tokens(20), {from: investor_Dami})
+            await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(20), cert, {from: escrow}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+        })
+
+
+        it("should revert if spender attempts to send to ether address", async()=>{
+
+            await tanglSecurityToken.approve(escrow, tokens(2), {from: investor_Dami})
+            await tanglSecurityToken.transferFromWithData(investor_Dami, ETHER_ADDRESS, tokens(2), cert, {from: escrow}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+        })
+
+        
 
 
 
