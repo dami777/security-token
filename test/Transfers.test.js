@@ -178,14 +178,14 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     })*/
 
-    describe("transfer From", ()=>{
+    /*describe("transfer From", ()=>{*/
 
         /**
          * []   investor approves some amount to the spender
          * []   spender sends tokens
          */
 
-        let approve 
+        /*let approve 
         let transferFrom 
 
         beforeEach(async()=>{
@@ -260,21 +260,21 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         })
 
-    })
+    })*/
 
-    describe("transfer with data", ()=>{
+    /*describe("transfer with data", ()=>{
 
         let transferWithData
         let cert
 
-       beforeEach(async()=>{
+       beforeEach(async()=>{*/
 
         /**
          * Administrator provides certificate 
          * Investor uses the certificate to authorize and validate transaction
          */
 
-        cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
+        /*cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
         transferWithData = await tanglSecurityToken.transferWithData(investor_Jeff, tokens(3), cert, {from: investor_Dami})
 
        })
@@ -350,21 +350,21 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
 
 
-    })
+    })*/
 
-    describe("transferFrom with data", ()=>{
+    /*describe("transferFrom with data", ()=>{
 
         let cert
         let transferFromWithData
 
-        beforeEach(async()=>{
+        beforeEach(async()=>{*/
 
             /**
              * Approve spender
              * Spender sends token with certificate
              */
 
-             approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+             /*approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
              cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
              transferFromWithData = await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(2), cert, {from: tanglAdministrator})
 
@@ -438,12 +438,31 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
 
 
-    })
+    })*/
 
 
     describe("transfer by partition", ()=>{
 
+        let issueByPartition
+        let cert
+
+        beforeEach(async()=>{
+
+            cert = await certificate(tanglAdministratorData, investorDamiData, 10, 1, tanglDomainData, tanglAdministratorPrivkey)
+            issueByPartition = await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 10, cert, {from: tanglAdministrator})
+
+        })
+
+        it("emits the Issued and IssuedByPartition event", ()=>{
+
+            issueByPartition.logs[0].event.should.be.equal("Issued", "it emits the Issued event")
+            issueByPartition.logs[0].event.should.be.equal("IssuedByPartition", "it emits the IssuedByPartition event")
+
+        })
+
+
         
+    
 
     })
 
