@@ -210,13 +210,13 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             
             //  test the data emitted with the `Transfer` event
 
-            transferFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
             Number(transferFrom.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
             //  test the data emitted with the `TransferByPartition` event
 
-            transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
             web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
             
@@ -346,6 +346,48 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
     })
 
     describe("transferFrom with data", ()=>{
+
+        let cert
+        let transferFromWithData
+
+        beforeEach(async()=>{
+
+            /**
+             * Approve spender
+             * Spender sends token with certificate
+             */
+
+             approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+             cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+             transferFromWithData = await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(2), cert, {from: tanglAdministrator})
+
+        })
+
+
+        it("emits the transfer and transfer by partition event", async()=>{
+
+            transferFromWithData.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferFromWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferFromWithData.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferFromWithData.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferFromWithData.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferFromWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferFromWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            
+            Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+        })
+
+
+
+
 
     })
 
