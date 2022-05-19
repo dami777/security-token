@@ -279,7 +279,44 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             transferWithData.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
             transferWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the TransferByPartition event")
 
+
+            transferWithData.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferWithData.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferWithData.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferWithData.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            
+            Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
        })
+
+       it("updates the balances of the sender and receiver" , async()=>{
+
+            const totalFromBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const partitionlessFromBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+            Number(totalFromBalance).should.be.equal(Number(tokens(7)), "the sender released the tokens successfully")
+            Number(partitionlessFromBalance).should.be.equal(Number(tokens(7)), "the token was moved from the partitionless balance")
+
+            
+            const totalToBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const partitionlessToBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Jeff)
+
+            Number(totalToBalance).should.be.equal(Number(tokens(3)), "the recipient received the token")
+            Number(partitionlessToBalance).should.be.equal(Number(tokens(3)), "the token was moved to the partitionless balance")
+       
+       
+        })
+
 
     })
 
@@ -299,5 +336,6 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
  * [-]   Transfer
  * []   TransferFrom
  * []   TransferWithData
+ * []   TransferFromWithData
  * 
  */
