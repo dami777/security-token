@@ -105,7 +105,9 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
          * issue classless tokens with certificate
          */
 
-        const cert = await certificate(tanglAdministratorData, investorDamiData, 10, 1, tanglDomainData, tanglAdministratorPrivkey)
+        const cert = await certificate(tanglAdministratorData, investorDamiData, 10, 3, tanglDomainData, tanglAdministratorPrivkey)
+        //const cert = await certificate(tanglAdministratorData, investorDamiData, 10, 1, tanglDomainData, tanglAdministratorPrivkey)
+        
         issue = await tanglSecurityToken.issue(investor_Dami, 10, cert, {from: tanglAdministrator})
     
     })
@@ -444,19 +446,40 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
     describe("transfer by partition", ()=>{
 
         let issueByPartition
-        let cert
+        let transferCert
+        let transferByPartition
 
         beforeEach(async()=>{
 
-            cert = await certificate(tanglAdministratorData, investorDamiData, 10, 1, tanglDomainData, tanglAdministratorPrivkey)
-            issueByPartition = await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 10, cert, {from: tanglAdministrator})
+            
 
+            //const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 10, 4, tanglDomainData, tanglAdministratorPrivkey)
+            //issueByPartition = await tanglSecurityToken.issue(investor_Dami, 10, issuanceCert, {from: tanglAdministrator})
+
+            //transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+            //transferByPartition = await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(2), transferCert, {from: investor_Dami})
         })
 
         it("emits the Issued and IssuedByPartition event", ()=>{
 
-            issueByPartition.logs[0].event.should.be.equal("Issued", "it emits the Issued event")
-            issueByPartition.logs[0].event.should.be.equal("IssuedByPartition", "it emits the IssuedByPartition event")
+            /**
+             * A separate test will be conducted for issuance in another test script
+             */
+
+            //issueByPartition.logs[0].event.should.be.equal("Issued", "it emits the Issued event")
+            //issueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emits the IssuedByPartition event")
+
+            
+
+        })
+
+        it("emits the Transfer and TransferByPartition event", ()=>{
+            //transferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            //transferByPartition.logs[1].event.should.be.equal("TransferByParitition", "it emits the transfer event")
+            
+        })
+
+        it("updates the balance of the recipient", async()=>{
 
         })
 
@@ -475,8 +498,8 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
  * Reconduct unit test for the following using the certificate:
  * 
  * [-]   Transfer
- * []   TransferFrom
- * []   TransferWithData
- * []   TransferFromWithData
+ * [-]   TransferFrom
+ * [-]   TransferWithData
+ * [-]   TransferFromWithData
  * 
  */
