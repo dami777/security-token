@@ -3,7 +3,6 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -120,7 +119,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
     })
 
-    describe("transfer", ()=>{
+    /*describe("transfer", ()=>{
 
         let transfer
 
@@ -177,7 +176,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             await tanglSecurityToken.transfer(ETHER_ADDRESS, tokens(2), {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
         })
 
-    })
+    })*/
 
     describe("transfer From", ()=>{
 
@@ -211,15 +210,15 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
             
             //  test the data emitted with the `Transfer` event
 
-            transferFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
             Number(transferFrom.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
             //  test the data emitted with the `TransferByPartition` event
 
-            transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferFrom.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
             transferFrom.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
-            web3.utils.hexToUtf8(transfer.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            web3.utils.hexToUtf8(transferFrom.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
             
             Number(transferFrom.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
 
@@ -242,10 +241,202 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
         
         })
 
+        it("should revert if spender attempts to spend beyond the allowed amount", async()=>{
+            
+            await tanglSecurityToken.transferFrom(investor_Dami, investor_Jeff, tokens(3), {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+        })
+
+        it("should revert if spender attempts to send to ether address", async()=>{
+            
+            approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+            await tanglSecurityToken.transferFrom(investor_Dami, ETHER_ADDRESS, tokens(2), {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+        })
+
+        it("should revert if the owner does not have sufficient amount to be sent", async()=>{
+            await tanglSecurityToken.approve(escrow, tokens(20), {from: investor_Dami})
+            await tanglSecurityToken.transferFrom(investor_Dami, investor_Jeff, tokens(20), {from: escrow}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+        })
+
     })
 
-
     describe("transfer with data", ()=>{
+
+        let transferWithData
+        let cert
+
+       beforeEach(async()=>{
+
+        /**
+         * Administrator provides certificate 
+         * Investor uses the certificate to authorize and validate transaction
+         */
+
+        cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 1, tanglDomainData, tanglAdministratorPrivkey)
+        transferWithData = await tanglSecurityToken.transferWithData(investor_Jeff, tokens(3), cert, {from: investor_Dami})
+
+       })
+
+
+       it("emits the Transfer and TransferByPartition event", ()=>{
+
+            transferWithData.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
+            transferWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the TransferByPartition event")
+
+
+            transferWithData.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferWithData.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferWithData.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferWithData.logs[0].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the sender's address")
+            transferWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            
+            Number(transferWithData.logs[1].args._value).should.be.equal(Number(tokens(3)), "it emitted the value transferred")
+
+       })
+
+       it("updates the balances of the sender and receiver" , async()=>{
+
+            const totalFromBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const partitionlessFromBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+            Number(totalFromBalance).should.be.equal(Number(tokens(7)), "the sender released the tokens successfully")
+            Number(partitionlessFromBalance).should.be.equal(Number(tokens(7)), "the token was moved from the partitionless balance")
+
+            
+            const totalToBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const partitionlessToBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Jeff)
+
+            Number(totalToBalance).should.be.equal(Number(tokens(3)), "the recipient received the token")
+            Number(partitionlessToBalance).should.be.equal(Number(tokens(3)), "the token was moved to the partitionless balance")
+       
+       
+        })
+
+
+        it("should revert if the sender does not have sufficient amount to be sent", async()=>{
+            
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(30)), 2, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(30), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+        })
+
+
+        it("should revert if the sender tries to use an empty data", async()=>{
+            
+            const cert = stringToHex("").hex
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.EMPTY_DATA)
+
+        })
+
+        it("fails to transfer to ether address", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.transferWithData(ETHER_ADDRESS, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+        })
+
+
+
+
+    })
+
+    describe("transferFrom with data", ()=>{
+
+        let cert
+        let transferFromWithData
+
+        beforeEach(async()=>{
+
+            /**
+             * Approve spender
+             * Spender sends token with certificate
+             */
+
+             approve = await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+             cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+             transferFromWithData = await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(2), cert, {from: tanglAdministrator})
+
+        })
+
+
+        it("emits the transfer and transfer by partition event", async()=>{
+
+            transferFromWithData.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+            transferFromWithData.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+            
+            //  test the data emitted with the `Transfer` event
+
+            transferFromWithData.logs[0].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferFromWithData.logs[0].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            Number(transferFromWithData.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+            //  test the data emitted with the `TransferByPartition` event
+
+            transferFromWithData.logs[1].args._from.should.be.equal(investor_Dami, "it emitted the owner's address")
+            transferFromWithData.logs[1].args._to.should.be.equal(investor_Jeff, "it emitted the receiver's address")
+            web3.utils.hexToUtf8(transferFromWithData.logs[1].args._fromPartition).should.be.equal("classless", "it emitted the issued partition")
+            
+            Number(transferFromWithData.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emitted the value transferred")
+
+        })
+
+
+        it("updates the balances of the `from` and `to` ", async()=>{
+
+            const totalFromBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+            const partitionlessFromBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+            Number(totalFromBalance).should.be.equal(Number(tokens(8)), "the sender released the tokens successfully")
+            Number(partitionlessFromBalance).should.be.equal(Number(tokens(8)), "the token was moved from the partitionless balance")
+
+            
+            const totalToBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+            const partitionlessToBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Jeff)
+
+            Number(totalToBalance).should.be.equal(Number(tokens(2)), "the recipient received the token")
+            Number(partitionlessToBalance).should.be.equal(Number(tokens(2)), "the token was moved to the partitionless balance")
+        
+        })
+
+        it("should revert if spender attempts to spend beyond the allowed amount", async()=>{
+            
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(3)), 2, tanglDomainData, tanglAdministratorPrivkey)
+            await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(3), cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+        })
+
+        it("should revert if the owner does not have sufficient amount to be sent by the spender", async()=>{
+
+            await tanglSecurityToken.approve(escrow, tokens(20), {from: investor_Dami})
+            await tanglSecurityToken.transferFromWithData(investor_Dami, investor_Jeff, tokens(20), cert, {from: escrow}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+        })
+
+
+        it("should revert if spender attempts to send to ether address", async()=>{
+
+            await tanglSecurityToken.approve(escrow, tokens(2), {from: investor_Dami})
+            await tanglSecurityToken.transferFromWithData(investor_Dami, ETHER_ADDRESS, tokens(2), cert, {from: escrow}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+        })
+
+        
+
+
+
+
 
     })
 
@@ -265,5 +456,6 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
  * [-]   Transfer
  * []   TransferFrom
  * []   TransferWithData
+ * []   TransferFromWithData
  * 
  */
