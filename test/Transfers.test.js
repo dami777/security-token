@@ -510,6 +510,32 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         })
 
+        it("reverts if certificate is not used in the transfer", async()=>{
+
+            const cert = stringToHex("").hex 
+            await tanglSecurityToken.transferByPartition(classA.hex, investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.EMPTY_DATA)
+
+
+        })
+
+
+        it("reverts if transfer is attempted to be sent to ether address", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 4, tanglDomainData, tanglAdministratorPrivkey) 
+            await tanglSecurityToken.transferByPartition(classA.hex, ETHER_ADDRESS, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+
+        })
+
+
+        it("reverts if transfer is attempted with insufficient balance", async()=>{
+
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(20)), 5, tanglDomainData, tanglAdministratorPrivkey) 
+            await tanglSecurityToken.transferByPartition(classA.hex, ETHER_ADDRESS, tokens(5), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+
+        })
+
 
         
     
@@ -528,5 +554,6 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
  * [-]   TransferFrom
  * [-]   TransferWithData
  * [-]   TransferFromWithData
+ * []   TransferByPartition
  * 
  */
