@@ -319,9 +319,9 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
         it("should revert if the sender does not have sufficient amount to be sent", async()=>{
             
-            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
+            cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(30)), 2, tanglDomainData, tanglAdministratorPrivkey)
 
-            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(30), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
 
         })
 
@@ -337,7 +337,7 @@ contract("Transfers", ([tanglAdministrator, reitAdministrator, investor_Dami, in
 
             cert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
 
-            await tanglSecurityToken.transferWithData(investor_Jeff, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+            await tanglSecurityToken.transferWithData(ETHER_ADDRESS, tokens(2), cert, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
         })
 
 
