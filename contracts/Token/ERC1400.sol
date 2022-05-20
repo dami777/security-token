@@ -415,12 +415,12 @@ contract ERC1400 {
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-        _transfer(_from, _to, _value);
+        _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
    function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-        _redeem(_tokenHolder,  _value, _data);
+       _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
