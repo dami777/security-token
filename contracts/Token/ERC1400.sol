@@ -655,22 +655,29 @@ contract ERC1400 {
     }
 
 
+    /**
+        @dev    Functions to set the control, lockup and issuable status of the token.
 
-    function setControl(bool _controllable) external {
+        If setControl is false, the token can't be controlled forcefully
+        If setLockUp is true, all transfers will be disabled until the lockup is set to false
+        If setIssuable is false, tokens can't be issued until set to true 
+     */
+
+    function setControl(bool _controllable) external restricted {
 
         _isControllable = _controllable;
         emit SetControl(_controllable);
 
     }
 
-    function setLockUp(bool _lockUp) external {
+    function setLockUp(bool _lockUp) external restricted {
 
         _lockUpTokens = _lockUp;
         emit LockedUp(_lockUp);
 
     }
 
-    function setIssuable(bool _issuable) external {
+    function setIssuable(bool _issuable) external restricted {
 
         _isIssuable = _issuable;
         emit SetIssuable(_issuable);
