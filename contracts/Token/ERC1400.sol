@@ -91,13 +91,9 @@ contract ERC1400 {
 
     }
 
-    /**
-        @dev    function modifier to restrict access to addresses other than contract owner and controllers
-     */
-
     modifier restricted {
 
-        require(msg.sender == owner || _isController[msg.sender], "0x56");
+        require(msg.sender == owner, "0x56");
         _;
     }
 
@@ -323,7 +319,7 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
         
-        require(_data.length > 1, "data can't be empty");               
+        require(_data.length > 1, "DCBE");               
         _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
         
     }
@@ -338,7 +334,7 @@ contract ERC1400 {
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
          
-        require(_data.length > 1, "data can't be empty");
+        require(_data.length > 1, "DCBE");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
         _transferByPartiton(_classless, _from, _to, _value, _data, "");
         allowance[_from][msg.sender] =  0;   
@@ -351,7 +347,7 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        require(_data.length > 1, "data can't be empty");
+        require(_data.length > 1, "DCBE");
        _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
         return _partition;
 
@@ -485,7 +481,7 @@ contract ERC1400 {
 
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
-        require(_data.length > 1, "data can't be empty");                   //  data must not be empty
+        require(_data.length > 1, "DCBE");                   //  data must not be empty
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
         _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder
