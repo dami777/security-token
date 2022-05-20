@@ -345,7 +345,5 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
  * []   redemption function ( for default / classless tokens)
  * []   redeemFrom
  * []   operatorRedeem by partiton
- * []   Transfer
- * []   TransferFrom
- * []   TransferWithData
+ 
  */

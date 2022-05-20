@@ -35,15 +35,14 @@ contract ERC1400 {
 
      // *************************************** Booleans ********************************************************* //
 
-    bool private _lockUpTokens = false; // token lockup indicator
-    bool private _isIssuable = true;    //  indicates when a token can be issued
-    bool private _isControllable = true;   // private variable that indicates the controllability of the tokens
+    bool private _lockUpTokens = false;     // token lockup indicator
+    bool private _isIssuable = true;        //  indicates when a token can be issued
+    bool private _isControllable = true;    // private variable that indicates the controllability of the tokens
     
 
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
-    //bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
     bytes32 _classless = "classless";
     
@@ -480,7 +479,8 @@ contract ERC1400 {
     /** 
         @dev    internal function to execute issuance to investors
     
-     */
+    */
+
     function _issue(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
@@ -675,6 +675,28 @@ contract ERC1400 {
         _totalPartitions = _newTotalPartitions;
     }
 
+
+
+    function canControl(bool _controllable) external {
+
+        _isControllable = _controllable;
+        emit CanControl(_controllable);
+
+    }
+
+    function setLockUp(bool _lockUp) external {
+
+        _lockUpTokens = _lockUp;
+        emit LockedUp(_lockUp);
+
+    }
+
+    function canIssue(bool _canIssue) external {
+
+        _isIssuable = _canIssue;
+        emit CanIssue(_canIssue);
+
+    }
     
 
 
@@ -709,7 +731,9 @@ contract ERC1400 {
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-
+    event CanControl (bool _canControl);
+    event LockedUp (bool _lockedUp);
+    event CanIssue (bool _canIssue);
 
 }
 
