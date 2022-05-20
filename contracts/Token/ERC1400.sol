@@ -543,33 +543,24 @@ contract ERC1400 {
        _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;  //  keep track of the number of redeemed tokens in a partition
        _balanceOf[address(0)] = _balanceOf[address(0)] + _value;                                                //  keep track of the number of redeemed tokens across all partitions
        totalSupply -= _value;
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
+       
 
     }
 
-    // internal redeem function
-
-    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
-
-       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
-       _transfer(_tokenHolder, address(0), _value);
-       totalSupply -= _value;
-       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
-
-    }
-
+   
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       _redeem(msg.sender, _value, _data);
+        _redeemByPartition(_classless, msg.sender, _value, _data, "");
+        emit Redeemed(msg.sender, msg.sender, _value, _data);
 
    }
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
-        //require(_isValidCertificate(_data, _value));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
-        _redeem(_tokenHolder, _value, _data);
+        _redeemByPartition(_classless, _tokenHolder, _value, _data, "");
+         emit Redeemed(msg.sender, _tokenHolder, _value, _data);
 
    }
 
@@ -578,8 +569,8 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        //require(_isValidCertificate(_data, _value));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _data);
 
    }
 
@@ -595,6 +586,8 @@ contract ERC1400 {
             require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
        }
+
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 
    }
 
