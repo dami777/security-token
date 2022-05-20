@@ -93,7 +93,7 @@ contract ERC1400 {
 
     modifier restricted {
 
-        require(msg.sender == owner, "0x56");
+        require(msg.sender == owner || _isController[msg.sender], "0x56");
         _;
     }
 
@@ -187,7 +187,7 @@ contract ERC1400 {
     //  Default Partitions
 
 
-    /*function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
+    /*function setDefaultPartitions(bytes32[] memory newDefaultPartitions) external  {
 
         _defaultPartitions = newDefaultPartitions;
 
@@ -207,7 +207,7 @@ contract ERC1400 {
     /// @param  _uri is the uri of the document's location in the IPFS
     /// @param  _documentHash is the hash of the document saved returned from the IPFS     
 
-    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
+    function setDocument (bytes32 _name, string memory _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
@@ -321,7 +321,7 @@ contract ERC1400 {
      */ 
 
 
-    function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
+    function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
         //require(_data.length > 1, "DCBE");               
         _transferByPartition(_classless, msg.sender, _to, _value, _data, "", true);
@@ -336,7 +336,7 @@ contract ERC1400 {
         @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
      */ 
 
-    function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
+    function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
          
         //require(_data.length > 1, "DCBE");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
@@ -414,12 +414,12 @@ contract ERC1400 {
        
    }
 
-   function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
+   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
         _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
-   function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
        _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
@@ -503,7 +503,7 @@ contract ERC1400 {
         The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
      */ 
     
-    function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+    function issue(address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
         
         _issue(_classless, _tokenHolder, _value, _data);
         
@@ -518,7 +518,7 @@ contract ERC1400 {
 
      */ 
 
-    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
 
         _issue(_partition, _tokenHolder, _value, _data);
     
@@ -539,12 +539,8 @@ contract ERC1400 {
        _useCert(_data, _value);
        _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
        _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
-       
-       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;  //  keep track of the number of redeemed tokens in a partition
-       _balanceOf[address(0)] = _balanceOf[address(0)] + _value;                                                //  keep track of the number of redeemed tokens across all partitions
        totalSupply -= _value;
        
-
     }
 
    
