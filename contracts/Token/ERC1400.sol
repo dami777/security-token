@@ -93,7 +93,7 @@ contract ERC1400 {
 
     modifier restricted {
 
-        require(msg.sender == owner || _isController[msg.sender], "0x56");
+        require(msg.sender == owner, "0x56");
         _;
     }
 
@@ -146,15 +146,19 @@ contract ERC1400 {
      /// @notice the global balance of the sender and receiver is adjusted respectively
      /// @notice the emission of TransferByPartition and Transfer events
 
-    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
+    function _transferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData, bool _dataRequired) internal returns(bytes32) {
        
     
         require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
         require(_to != address(0),  "0x57");
 
-        if (_data.length != 1 && _data.length != 0) {
+        if (_dataRequired == true && _data.length > 1) {
 
             _useCert(_data, _value); 
+
+        } else if (_dataRequired == true && _data.length <= 1) {
+
+            revert("DCBE");
 
         }
       
@@ -291,7 +295,7 @@ contract ERC1400 {
     
     function transfer(address _to, uint256 _value) external returns (bool success) {
 
-       _transferByPartiton(_classless, msg.sender, _to, _value, "", "");
+       _transferByPartition(_classless, msg.sender, _to, _value, "", "", false);
         return true;
 
     }
@@ -302,7 +306,7 @@ contract ERC1400 {
 
 
         require(allowance[_from][msg.sender] >= _value, "0x53");                        /// @dev the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
-        _transferByPartiton(_classless, _from, _to, _value, "", "");                    /// @dev transfer the tokens from the classless partition
+        _transferByPartition(_classless, _from, _to, _value, "", "", false);                    /// @dev transfer the tokens from the classless partition
         allowance[_from][msg.sender] =  0;                                             ///  @dev reset the allowance value
         return true;           
 
@@ -319,8 +323,8 @@ contract ERC1400 {
 
     function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
         
-        require(_data.length > 1, "DCBE");               
-        _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
+        //require(_data.length > 1, "DCBE");               
+        _transferByPartition(_classless, msg.sender, _to, _value, _data, "", true);
         
     }
     
@@ -334,9 +338,9 @@ contract ERC1400 {
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
          
-        require(_data.length > 1, "DCBE");
+        //require(_data.length > 1, "DCBE");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
-        _transferByPartiton(_classless, _from, _to, _value, _data, "");
+        _transferByPartition(_classless, _from, _to, _value, _data, "", true);
         allowance[_from][msg.sender] =  0;   
         
     }
@@ -347,8 +351,8 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        require(_data.length > 1, "DCBE");
-       _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
+        //require(_data.length > 1, "DCBE");
+       _transferByPartition(_partition, msg.sender, _to, _value, _data , "", true);
         return _partition;
 
    }    
@@ -360,12 +364,12 @@ contract ERC1400 {
       
        if(_isControllable == true && _isController[msg.sender]) {
 
-           _transferByPartiton(_partition, _from, _to, _value, "", "");
+           _transferByPartition(_partition, _from, _to, _value, "", "", true);
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
        } else {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
-            _transferByPartiton(_partition, _from, _to, _value, "", "");
+            _transferByPartition(_partition, _from, _to, _value, "", "", true);
        }
       
        
