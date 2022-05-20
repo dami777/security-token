@@ -149,8 +149,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
             issue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
-            issue.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emitted the operator of the issuance")
-            
+            issue.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emitted the operator of the issuance") 
             Number(issue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
             
             Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
@@ -158,6 +157,8 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
 
         })
+
+       
         
     })
 
@@ -224,6 +225,14 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
                 await reitSecurityToken.issueByPartition(classA.hex, ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
 
+            })
+
+            it("it reverts if issuance is attempted by addresses other than the contract owner or controllers", async()=>{
+            
+                const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 2, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+    
             })
 
         })

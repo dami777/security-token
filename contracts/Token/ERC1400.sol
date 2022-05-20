@@ -91,8 +91,13 @@ contract ERC1400 {
 
     }
 
+    /**
+        @dev    function modifier to restrict access to addresses other than contract owner and controllers
+     */
+
     modifier restricted {
-        require(msg.sender == owner, "0x56");
+
+        require(msg.sender == owner || _isController[msg.sender], "0x56");
         _;
     }
 
