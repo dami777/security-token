@@ -1,3 +1,5 @@
+
+const { before } = require("lodash")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -6,7 +8,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, investor_Dami, investor_Jeff])=>{
+contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, investor_Dami, investor_Jeff, tanglRegulator])=>{
 
 
     let tanglSecurityToken
@@ -123,16 +125,6 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
         beforeEach(async()=>{
 
-            tanglDomainData = {
-
-                name: tanglTokenDetails.name,
-                version: "1",
-                chainId: 1337,
-                verifyingContract: tanglSecurityToken.address,
-                salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
-        
-            }
-
 
             const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
             issue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator})
@@ -245,6 +237,100 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 
             })
 
+        })
+
+    })
+
+    describe("issuance by set controller", ()=>{
+
+       
+
+        beforeEach(async()=>{
+
+            /**
+             * set a regulator / controller onchain
+             */
+
+            await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
+
+        })
+ 
+        describe("controller issues to default partition", ()=>{
+
+            let controllerIssue
+
+            beforeEach(async()=>{
+
+                const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
+                
+                controllerIssue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglRegulator})
+
+
+            })
+
+
+            it("isssues token to the classess/default partition of the recipient", async()=>{
+
+                const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                const investorDamiClasslessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+                const totalSupply = await tanglSecurityToken.totalSupply()
+    
+                controllerIssue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+                controllerIssue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+                controllerIssue.logs[0].args._operator.should.be.equal(tanglRegulator, "it emitted the operator of the issuance") 
+                Number(controllerIssue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                
+                Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
+                Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+    
+            })
+
+
+
+            
+
+
+            
+
+        })
+
+
+        describe("controller issues to specified partition", ()=>{
+
+            let controllerIssueByPartition
+
+            beforeEach(async()=>{
+
+                const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 2, tanglDomainData, tanglAdministratorPrivkey)
+                
+                controllerIssueByPartition = await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: tanglRegulator})
+
+
+            })
+
+
+
+            it("emitted event, event data and updated the partition balance of the recipient", async()=>{
+
+                const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                const investorDamiClassABalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                const totalSupply = await tanglSecurityToken.totalSupply()
+
+                Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                Number(investorDamiClassABalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's partition balance")
+                Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+
+
+                controllerIssueByPartition.logs[0].event.should.be.equal("Issued", "it emitted the Issued event")
+                controllerIssueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emitted the IssuedByPartition event")
+                web3.utils.hexToUtf8(controllerIssueByPartition.logs[1].args._partition).should.be.equal("CLASS A", "it emitted the issued partition")
+                controllerIssueByPartition.logs[1].args._operator.should.be.equal(tanglRegulator, "it emitted the operator of the issuance")
+                Number(controllerIssueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                controllerIssueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+
+
+            })
         })
 
     })
