@@ -93,7 +93,7 @@ contract ERC1400 {
 
     modifier restricted {
 
-        require(msg.sender == owner, "0x56");
+        require(msg.sender == owner || _isController[msg.sender], "0x56");
         _;
     }
 
@@ -112,9 +112,9 @@ contract ERC1400 {
     function _useCert(bytes memory _data, uint256 _amount) internal {
 
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
-        require(!_usedSignatures[_signature], "used sig");
+        require(!_usedSignatures[_signature], "US");    // used signature
         address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
-        require(_signer == owner || _isController[_signer], "invalid signer");
+        require(_signer == owner || _isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
     }

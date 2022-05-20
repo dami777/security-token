@@ -120,7 +120,9 @@ const reverts = {
     INVALID_RECEIVER: "0x57",
     INSUFFICIENT_BALANCE: "0x52",
     INSUFFICIENT_ALLOWANCE: "0x53",
-    EMPTY_DATA:"data can't be empty"
+    EMPTY_DATA:"DCBE",       //  DCBE : Data Can't Be Empty
+    INVALID_SIGNER: "IS",
+    USED_SIGNATURE: "US"
 
 }
 
