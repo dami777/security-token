@@ -35,9 +35,9 @@ contract ERC1400 {
 
      // *************************************** Booleans ********************************************************* //
 
-    bool private _lockUpTokens = false;     // token lockup indicator
-    bool private _isIssuable = true;        //  indicates when a token can be issued
-    bool private _isControllable = true;    // private variable that indicates the controllability of the tokens
+    bool private _lockUpTokens;     // token lockup indicator
+    bool private _isIssuable;        //  indicates when a token can be issued
+    bool private _isControllable;    // private variable that indicates the controllability of the tokens
     
 
     // ************************ Array ******************************//
@@ -121,23 +121,7 @@ contract ERC1400 {
 
     // *************************************** Internal functions ********************************************************* //
 
-    /// @dev    internal funtion to transfer partitionless tokens from an address to another address
-    /// @notice `0x57` revert message if receiver is address 0
-    /// @notice `0x52` insufficient balance
-    /// @notice balance must be more or equal to the value to be transferred
-    /// @dev    this version of solidity handles the underflow and overflow error
-    /// @notice the emission of Transfer event
-    /// @param  _from is the address the token is sent from
-    /// @param  _to is the address the token is sent to
-    /// @param  _amount is the value of tokens to be sent
-
     
-    function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
-
-        
-     }
-
-
      /// @dev   internal funtion to transfer tokens by partitions from an address to another address
      /// @notice `0x57` revert message if receiver is address 0
      /// @notice `0x52` insufficient balance
@@ -147,7 +131,8 @@ contract ERC1400 {
 
     function _transferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData, bool _dataRequired) internal returns(bytes32) {
        
-    
+
+        require(!_lockUpTokens, "LUP");
         require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
         require(_to != address(0),  "0x57");
 
@@ -183,15 +168,7 @@ contract ERC1400 {
     // **************************       ERC1400 FEATURES  ******************************************************//
 
 
-    //  Default Partitions
 
-
-    /*function setDefaultPartitions(bytes32[] memory newDefaultPartitions) external  {
-
-        _defaultPartitions = newDefaultPartitions;
-
-    }*/
-     
     
     /**
         *   @dev    Document management
@@ -370,6 +347,8 @@ contract ERC1400 {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
             _transferByPartition(_partition, _from, _to, _value, "", "", true);
        }
+
+       return _partition;
       
        
    }
