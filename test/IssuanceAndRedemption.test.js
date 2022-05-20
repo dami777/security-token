@@ -149,6 +149,8 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
             issue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+            issue.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emitted the operator of the issuance")
+            
             Number(issue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
             
             Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
