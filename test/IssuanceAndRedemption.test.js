@@ -222,6 +222,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             it("should revert for issueing to ether zero", async()=>{
 
+                await reitSecurityToken.issue(ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
                 await reitSecurityToken.issueByPartition(classA.hex, ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
 
             })
@@ -230,8 +231,18 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             
                 const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 2, tanglDomainData, tanglAdministratorPrivkey)
                 await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+                await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+
+                
     
-    
+            })
+
+            it("reverts if the certificate is empty", async()=>{
+
+                const cert = stringToHex("").hex
+                await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EMPTY_DATA)
+                await reitSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.EMPTY_DATA)
+                
             })
 
         })
