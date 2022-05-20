@@ -570,7 +570,7 @@ contract ERC1400 {
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _data);
+       emit RedeemedByPartition(_partition, msg.sender, msg.sender, _value, _data);
 
    }
 

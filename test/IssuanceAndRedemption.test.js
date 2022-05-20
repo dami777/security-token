@@ -1,4 +1,4 @@
-const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -70,8 +70,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     }
 
-    const tanglAdministratorPrivkey = "30890afa462d7fc0b7797ee9ce74d46d6e8153bf5fff8664479355d50f05acd5"
-    const reitAdministratorPrivKey = "1f81c78ea6017f3fa79accbe40450f373a02af61763cdb7f082284ee8716b40d"
+    
     //const salt = stringToHex("random").hex
     const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
 

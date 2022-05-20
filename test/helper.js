@@ -207,8 +207,14 @@ const certificate= async (from, to, amount, nonce, domainData, signerPrivateKey)
 }
 
 
+const tanglAdministratorPrivkey = "6a491c0f99bbe6b8b39f5ab5cccc44d4e450ae531449a7f87a2283c7ffa7c3f0"
+const reitAdministratorPrivKey = "314f1930b72db07a230a86abe897d436fc22cb93f8db6439cbb57c44495d3c48"
+
+
 module.exports = { 
         ETHER_ADDRESS, tokens, signer, data, signature, ethHash, 
         wait, swapState, ether, BYTES_0, setToken, hashSecret, 
-        stringToHex, expire, expired, reverts, toBN, certificate }
+        stringToHex, expire, expired, reverts, toBN, certificate,
+        tanglAdministratorPrivkey, reitAdministratorPrivKey
+     }
 
