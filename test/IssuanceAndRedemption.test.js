@@ -406,7 +406,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             })
 
-            it("redeems the token", ()=>{
+            it("emits the redeem event", ()=>{
 
                 redemption.logs[0].event.should.be.equal("Redeemed", "it emits the Redeemed event")
                 redemption.logs[0].args._from.should.be.equal(investor_Dami, "it emits the redeemer's address")
@@ -437,11 +437,57 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
 
         describe("redemption of a specific partition", ()=>{
-            
-            /*const cert2 = await certificate(tanglAdministratorData, investorDamiData, 1, 8, tanglDomainData, tanglAdministratorPrivkey)
-             
-            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert2, {from: tanglAdministrator})*/
 
+            let balanceBeforeRedemption
+            let partitionBalanceBeforeRedemption
+
+            let redemption
+
+            beforeEach(async()=>{
+
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 9, tanglDomainData, tanglAdministratorPrivkey)
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 10, tanglDomainData, tanglAdministratorPrivkey)
+
+                await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+                
+                balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+
+                redemption = await tanglSecurityToken.redeemByPartition(classA.hex, investor_Dami, tokens(1), redemptionCert, {from: investor_Dami})
+
+            })
+
+
+            it("emits the redeem by partition event", ()=>{
+
+                redemption.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the RedeemedByPartition event")
+                redemption.logs[0].args._from.should.be.equal(investor_Dami, "it emits the redeemer's address")
+                redemption.logs[0].args._operator.should.be.equal(investor_Dami, "it emits the operator's address")
+                Number(redemption.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emits the amount redeemed")
+                web3.utils.hexToUtf8(redemption.logs[0].args._partition).should.be.equal("CLASS A", "it emits the redeemed partition")
+
+            })
+
+            it("updates the balance of the token holder after redemption", async()=>{
+
+                
+
+                const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+                Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the partition balance of the token holder after issuance")
+
+                Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the partition balance of the token holder after redemption")
+
+
+            })
+
+
+            
+           
         })
 
     })
