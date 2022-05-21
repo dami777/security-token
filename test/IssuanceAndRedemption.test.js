@@ -1,4 +1,5 @@
-const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
+
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
 
@@ -6,7 +7,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, investor_Dami, investor_Jeff])=>{
+contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, investor_Dami, investor_Jeff, tanglRegulator])=>{
 
 
     let tanglSecurityToken
@@ -70,8 +71,16 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     }
 
-    const tanglAdministratorPrivkey = "30890afa462d7fc0b7797ee9ce74d46d6e8153bf5fff8664479355d50f05acd5"
-    const reitAdministratorPrivKey = "1f81c78ea6017f3fa79accbe40450f373a02af61763cdb7f082284ee8716b40d"
+    let redemptionData = {
+
+        firstName: "address zero",
+        lastName: "address zero",
+        location: "address zero",
+        walletAddress: ETHER_ADDRESS
+
+    }
+
+    
     //const salt = stringToHex("random").hex
     const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
 
@@ -81,9 +90,15 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     beforeEach(async()=>{
 
+        /**
+         * set the issuable status to true after contract deployment
+         */
         
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
+
+        await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator})
+        await reitSecurityToken.setIssuable(true, {from: reitAdministrator})
 
         reitDomainData = {
         
@@ -118,111 +133,365 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     })
 
-    describe("issuance to partitionless token", ()=>{
+    describe("issuance", ()=>{
 
-        let issue
+        describe("issuance to partitionless token", ()=>{
 
-        beforeEach(async()=>{
-
-            tanglDomainData = {
-
-                name: tanglTokenDetails.name,
-                version: "1",
-                chainId: 1337,
-                verifyingContract: tanglSecurityToken.address,
-                salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
-        
-            }
-
-
-            const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
-            issue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator})
-
-        })
-
-        
-        it("isssues token to the classess/default partition of the recipient", async()=>{
-
-            const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
-            const investorDamiClasslessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
-            const totalSupply = await tanglSecurityToken.totalSupply()
-
-            issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
-            issue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
-            Number(issue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+            let issue
+    
+            beforeEach(async()=>{
+    
+    
+                const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
+                issue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator})
+    
+            })
+    
             
-            Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
-            Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
-            Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
-
+            it("isssues token to the classess/default partition of the recipient", async()=>{
+    
+                const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                const investorDamiClasslessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+                const totalSupply = await tanglSecurityToken.totalSupply()
+    
+                issue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+                issue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+                issue.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emitted the operator of the issuance") 
+                Number(issue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                
+                Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
+                Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+    
+            })
+    
+           
+            
         })
+    
+        describe("issuance to specified partitions", ()=>{
+    
+            
+    
+            beforeEach(async()=>{
+    
+                reitDomainData = {
+    
+                    name: reitTokenDetails.name,
+                    version: "1",
+                    chainId: 1337,
+                    verifyingContract: reitSecurityToken.address,
+                    salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+            
+                }
+    
+            })
+    
+            describe("successful issuance", async()=>{
+    
+                let issueByPartition
+    
+                beforeEach(async()=>{
+                    const cert = await certificate(reitAdministratorData, investorDamiData, 1, 1, reitDomainData, reitAdministratorPrivKey)
+                    issueByPartition = await reitSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator})
+                })
+    
+    
+                it("emitted event, event data and updated the partition balance of the recipient", async()=>{
+    
+                    const investorDamiTotalBalance = await reitSecurityToken.balanceOf(investor_Dami)
+                    const investorDamiClassABalance = await reitSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const totalSupply = await reitSecurityToken.totalSupply()
+    
+                    Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                    Number(investorDamiClassABalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's partition balance")
+                    Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+    
+    
+                    issueByPartition.logs[0].event.should.be.equal("Issued", "it emitted the Issued event")
+                    issueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emitted the IssuedByPartition event")
+                    web3.utils.hexToUtf8(issueByPartition.logs[1].args._partition).should.be.equal("CLASS A", "it emitted the issued partition")
+                    issueByPartition.logs[1].args._operator.should.be.equal(reitAdministrator, "it emitted the operator of the issuance")
+                    Number(issueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                    issueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+    
+    
+                })
+    
+            })
+    
+            describe("failed issuance", ()=>{
+    
+                let cert
+    
+                beforeEach(async()=>{
+                    cert = await certificate(reitAdministratorData, investorDamiData, 1, 1, reitDomainData, reitAdministratorPrivKey)
+                })
+    
+                it("should revert for issueing to ether zero", async()=>{
+    
+                    await reitSecurityToken.issue(ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+                    await reitSecurityToken.issueByPartition(classA.hex, ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+    
+                })
+    
+                it("it reverts if issuance is attempted by addresses other than the contract owner or controllers", async()=>{
+                
+                    const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 2, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+                    await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                    
         
+                })
+    
+                it("reverts if the certificate is empty", async()=>{
+    
+                    const cert = stringToHex("").hex
+                    await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EMPTY_DATA)
+                    await reitSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.EMPTY_DATA)
+                    
+                })
+    
+            })
+    
+        })
+    
+        describe("issuance by set controller", ()=>{
+    
+           
+    
+            beforeEach(async()=>{
+    
+                /**
+                 * set a regulator / controller onchain
+                 */
+    
+                await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
+    
+            })
+     
+            describe("controller issues to default partition", ()=>{
+    
+                let controllerIssue
+    
+                beforeEach(async()=>{
+    
+                    const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 1, tanglDomainData, tanglAdministratorPrivkey)
+                    
+                    controllerIssue = await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglRegulator})
+    
+    
+                })
+    
+    
+                it("isssues token to the classess/default partition of the recipient", async()=>{
+    
+                    const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const investorDamiClasslessBalance = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+                    const totalSupply = await tanglSecurityToken.totalSupply()
+        
+                    controllerIssue.logs[0].event.should.be.equal("Issued", "it emitted the issued event")
+                    controllerIssue.logs[0].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+                    controllerIssue.logs[0].args._operator.should.be.equal(tanglRegulator, "it emitted the operator of the issuance") 
+                    Number(controllerIssue.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                    
+                    Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                    Number(investorDamiClasslessBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's classless/partitionless balance")
+                    Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+        
+                })
+    
+    
+    
+                
+    
+    
+                
+    
+            })
+    
+    
+            describe("controller issues to specified partition", ()=>{
+    
+                let controllerIssueByPartition
+    
+                beforeEach(async()=>{
+    
+                    const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 2, tanglDomainData, tanglAdministratorPrivkey)
+                    
+                    controllerIssueByPartition = await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: tanglRegulator})
+    
+    
+                })
+    
+    
+    
+                it("emitted event, event data and updated the partition balance of the recipient", async()=>{
+    
+                    const investorDamiTotalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const investorDamiClassABalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const totalSupply = await tanglSecurityToken.totalSupply()
+    
+                    Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
+                    Number(investorDamiClassABalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's partition balance")
+                    Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
+    
+    
+                    controllerIssueByPartition.logs[0].event.should.be.equal("Issued", "it emitted the Issued event")
+                    controllerIssueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emitted the IssuedByPartition event")
+                    web3.utils.hexToUtf8(controllerIssueByPartition.logs[1].args._partition).should.be.equal("CLASS A", "it emitted the issued partition")
+                    controllerIssueByPartition.logs[1].args._operator.should.be.equal(tanglRegulator, "it emitted the operator of the issuance")
+                    Number(controllerIssueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
+                    controllerIssueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
+    
+    
+                })
+            })
+    
+        })
+    
+        describe("disabled issuance", ()=>{
+    
+            let disabled 
+    
+            beforeEach(async()=>{
+                disabled = await tanglSecurityToken.setIssuable(false)
+            })
+    
+    
+            it("reverts if issuance is attempted when issuance is disabled", async()=>{
+                const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 5, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.NOT_ISSUABLE)
+            })
+    
+        })
     })
 
-    describe("issuance to specified partitions", ()=>{
-
-        
+    
+    describe("redemption", ()=>{
 
         beforeEach(async()=>{
 
-            reitDomainData = {
+            /**
+             * set Issuance to true
+             * Issue tokens
+             * Redeem tokens
+             */
 
-                name: reitTokenDetails.name,
-                version: "1",
-                chainId: 1337,
-                verifyingContract: reitSecurityToken.address,
-                salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
-        
-            }
+            await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator})
+
 
         })
 
-        describe("successful issuance", async()=>{
+        describe("redemption of the default partition", ()=>{
 
-            let issueByPartition
+            let balanceBeforeRedemption
+            let partitionBalanceBeforeRedemption
+
+            let redemption
 
             beforeEach(async()=>{
-                const cert = await certificate(reitAdministratorData, investorDamiData, 1, 1, reitDomainData, reitAdministratorPrivKey)
-                issueByPartition = await reitSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert, {from: reitAdministrator})
+
+               
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 7, tanglDomainData, tanglAdministratorPrivkey)
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 6, tanglDomainData, tanglAdministratorPrivkey)
+
+                await tanglSecurityToken.issue(investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+                
+                balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+
+                redemption = await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami})
+
+            })
+
+            it("emits the redeem event", ()=>{
+
+                redemption.logs[0].event.should.be.equal("Redeemed", "it emits the Redeemed event")
+                redemption.logs[0].args._from.should.be.equal(investor_Dami, "it emits the redeemer's address")
+                redemption.logs[0].args._operator.should.be.equal(investor_Dami, "it emits the operator's address")
+                Number(redemption.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emits the amount redeemed")
+                
+            })
+
+            it("updates the balance of the token holder after redemption", async()=>{
+
+                
+
+                const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+                Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the classless partition balance of the token holder after issuance")
+
+                Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the classless partition balance of the token holder after redemption")
+
+
             })
 
 
-            it("emitted event, event data and updated the partition balance of the recipient", async()=>{
-
-                const investorDamiTotalBalance = await reitSecurityToken.balanceOf(investor_Dami)
-                const investorDamiClassABalance = await reitSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-                const totalSupply = await reitSecurityToken.totalSupply()
-
-                Number(investorDamiTotalBalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor")
-                Number(investorDamiClassABalance).should.be.equal(Number(tokens(1)), "1 tangl token was issued to the investor's partition balance")
-                Number(totalSupply).should.be.equal(Number(tokens(1)), "total supply was updated")
-
-
-                issueByPartition.logs[0].event.should.be.equal("Issued", "it emitted the Issued event")
-                issueByPartition.logs[1].event.should.be.equal("IssuedByPartition", "it emitted the IssuedByPartition event")
-                web3.utils.hexToUtf8(issueByPartition.logs[1].args._partition).should.be.equal("CLASS A", "it emitted the issued partition")
-                issueByPartition.logs[1].args._operator.should.be.equal(reitAdministrator, "it emitted the operator of the issuance")
-                Number(issueByPartition.logs[1].args._value).should.be.equal(Number(tokens(1)), "it emitted the amount issued")
-                issueByPartition.logs[1].args._to.should.be.equal(investor_Dami, "it emitted the recipient of the issuance")
-
-
-            })
 
         })
 
-        describe("failed issuance", ()=>{
 
-            let cert
+        describe("redemption of a specific partition", ()=>{
+
+            let balanceBeforeRedemption
+            let partitionBalanceBeforeRedemption
+
+            let redemption
 
             beforeEach(async()=>{
-                cert = await certificate(reitAdministratorData, investorDamiData, 1, 1, reitDomainData, reitAdministratorPrivKey)
+
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 9, tanglDomainData, tanglAdministratorPrivkey)
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 10, tanglDomainData, tanglAdministratorPrivkey)
+
+                await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+                
+                balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+
+                redemption = await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami})
+
             })
 
-            it("should revert for issueing to ether zero", async()=>{
 
-                await reitSecurityToken.issueByPartition(classA.hex, ETHER_ADDRESS, 1, cert, {from: reitAdministrator}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+            it("emits the redeem by partition event", ()=>{
+
+                redemption.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the RedeemedByPartition event")
+                redemption.logs[0].args._from.should.be.equal(investor_Dami, "it emits the redeemer's address")
+                redemption.logs[0].args._operator.should.be.equal(investor_Dami, "it emits the operator's address")
+                Number(redemption.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emits the amount redeemed")
+                web3.utils.hexToUtf8(redemption.logs[0].args._partition).should.be.equal("CLASS A", "it emits the redeemed partition")
 
             })
+
+            it("updates the balance of the token holder after redemption", async()=>{
+
+                
+
+                const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+                Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the partition balance of the token holder after issuance")
+
+                Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the partition balance of the token holder after redemption")
+
+
+            })
+
+
+            
+           
+        })
+
+        describe("redeemFrom", ()=>{
 
         })
 
@@ -238,7 +507,5 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
  * []   redemption function ( for default / classless tokens)
  * []   redeemFrom
  * []   operatorRedeem by partiton
- * []   Transfer
- * []   TransferFrom
- * []   TransferWithData
+ 
  */

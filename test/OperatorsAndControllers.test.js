@@ -1,34 +1,18 @@
+/**
+ * @title   Operators and Controllers test script
+ * @dev     Test script to test the operators and controllers operations and activities
+ */
+
+
+
+
 const ERC1400 = artifacts.require('./ERC1400')
 
-const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
-
-const tokens=(n)=>{
-    return new web3.utils.BN(
-        web3.utils.toWei(n.toString(), 'ether')
-    )
-    
-}
-
-require("chai")
-    .use(require("chai-as-promised"))
-    .should()
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 
-contract("Controllers", ([issuer, holder2, escrow, controller1, controller2, controller3])=>{
+contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, controller2, controller3])=>{
 
-    let token
-    let name = "Tangl"
-    let symbol = "TAN"
-    let decimal = 18
-    let totalSupply = 0
-    let classA = web3.utils.asciiToHex("CLASS A")
-    let classB = web3.utils.asciiToHex("CLASS B")
-    let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
-    let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
-    let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
-    let fromIsWhiteListedOrIssuer = true
-    let toIsWhiteListed = true
-    let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
 
 
 

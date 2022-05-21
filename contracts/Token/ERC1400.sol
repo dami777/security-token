@@ -35,15 +35,14 @@ contract ERC1400 {
 
      // *************************************** Booleans ********************************************************* //
 
-    bool private _lockUpTokens = false; // token lockup indicator
-    bool private _isIssuable = true;    //  indicates when a token can be issued
-    bool private _isControllable = true;   // private variable that indicates the controllability of the tokens
+    bool private _lockUpTokens;     // token lockup indicator
+    bool private _isIssuable;        //  indicates when a token can be issued
+    bool private _isControllable;    // private variable that indicates the controllability of the tokens
     
 
     // ************************ Array ******************************//
 
     bytes32[] internal _totalPartitions;
-    //bytes32[] internal _defaultPartitions;
     address[] internal _controllers;
     bytes32 _classless = "classless";
     
@@ -92,7 +91,8 @@ contract ERC1400 {
     }
 
     modifier restricted {
-        require(msg.sender == owner, "0x56");
+
+        require(msg.sender == owner || _isController[msg.sender], "0x56");
         _;
     }
 
@@ -111,9 +111,9 @@ contract ERC1400 {
     function _useCert(bytes memory _data, uint256 _amount) internal {
 
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
-        require(!_usedSignatures[_signature], "used sig");
+        require(!_usedSignatures[_signature], "US");    // used signature
         address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
-        require(_signer == owner || _isController[_signer], "invalid signer");
+        require(_signer == owner || _isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
     }
@@ -121,23 +121,7 @@ contract ERC1400 {
 
     // *************************************** Internal functions ********************************************************* //
 
-    /// @dev    internal funtion to transfer partitionless tokens from an address to another address
-    /// @notice `0x57` revert message if receiver is address 0
-    /// @notice `0x52` insufficient balance
-    /// @notice balance must be more or equal to the value to be transferred
-    /// @dev    this version of solidity handles the underflow and overflow error
-    /// @notice the emission of Transfer event
-    /// @param  _from is the address the token is sent from
-    /// @param  _to is the address the token is sent to
-    /// @param  _amount is the value of tokens to be sent
-
     
-    function _transfer(address _from, address _to, uint256 _amount) internal returns (bool success) {
-
-        
-     }
-
-
      /// @dev   internal funtion to transfer tokens by partitions from an address to another address
      /// @notice `0x57` revert message if receiver is address 0
      /// @notice `0x52` insufficient balance
@@ -145,15 +129,20 @@ contract ERC1400 {
      /// @notice the global balance of the sender and receiver is adjusted respectively
      /// @notice the emission of TransferByPartition and Transfer events
 
-    function _transferByPartiton(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) internal returns(bytes32) {
+    function _transferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData, bool _dataRequired) internal returns(bytes32) {
        
-    
+
+        require(!_lockUpTokens, "LUP");
         require( _balanceOfByPartition[_from][_partition] >= _value, "0x52"); 
         require(_to != address(0),  "0x57");
 
-        if (_data.length != 1 && _data.length != 0) {
+        if (_dataRequired == true && _data.length > 1) {
 
             _useCert(_data, _value); 
+
+        } else if (_dataRequired == true && _data.length <= 1) {
+
+            revert("DCBE");
 
         }
       
@@ -179,15 +168,7 @@ contract ERC1400 {
     // **************************       ERC1400 FEATURES  ******************************************************//
 
 
-    //  Default Partitions
 
-
-    /*function setDefaultPartitions(bytes32[] calldata newDefaultPartitions) external  {
-
-        _defaultPartitions = newDefaultPartitions;
-
-    }*/
-     
     
     /**
         *   @dev    Document management
@@ -202,7 +183,7 @@ contract ERC1400 {
     /// @param  _uri is the uri of the document's location in the IPFS
     /// @param  _documentHash is the hash of the document saved returned from the IPFS     
 
-    function setDocument (bytes32 _name, string calldata _uri, bytes32 _documentHash) external  {
+    function setDocument (bytes32 _name, string memory _uri, bytes32 _documentHash) external  {
         
         _documents[_name] = Doc(_name, _documentHash, _uri);     // save the document
         emit Document(_name, _uri, _documentHash);              // emit event when document is set on chain
@@ -290,7 +271,7 @@ contract ERC1400 {
     
     function transfer(address _to, uint256 _value) external returns (bool success) {
 
-       _transferByPartiton(_classless, msg.sender, _to, _value, "", "");
+       _transferByPartition(_classless, msg.sender, _to, _value, "", "", false);
         return true;
 
     }
@@ -301,7 +282,7 @@ contract ERC1400 {
 
 
         require(allowance[_from][msg.sender] >= _value, "0x53");                        /// @dev the allowed value approved by the token holder must not be less than the amount. Insufficient allowance
-        _transferByPartiton(_classless, _from, _to, _value, "", "");                    /// @dev transfer the tokens from the classless partition
+        _transferByPartition(_classless, _from, _to, _value, "", "", false);                    /// @dev transfer the tokens from the classless partition
         allowance[_from][msg.sender] =  0;                                             ///  @dev reset the allowance value
         return true;           
 
@@ -316,10 +297,10 @@ contract ERC1400 {
      */ 
 
 
-    function transferWithData(address _to, uint256 _value, bytes calldata _data) external {
+    function transferWithData(address _to, uint256 _value, bytes memory _data) external {
         
-        require(_data.length > 1, "data can't be empty");               
-        _transferByPartiton(_classless, msg.sender, _to, _value, _data, "");
+        //require(_data.length > 1, "DCBE");               
+        _transferByPartition(_classless, msg.sender, _to, _value, _data, "", true);
         
     }
     
@@ -331,11 +312,10 @@ contract ERC1400 {
         @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
      */ 
 
-    function transferFromWithData(address _from, address _to, uint256 _value, bytes calldata _data) external {
+    function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
          
-        require(_data.length > 1, "data can't be empty");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
-        _transferByPartiton(_classless, _from, _to, _value, _data, "");
+        _transferByPartition(_classless, _from, _to, _value, _data, "", true);
         allowance[_from][msg.sender] =  0;   
         
     }
@@ -346,8 +326,7 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        require(_data.length > 1, "data can't be empty");
-       _transferByPartiton(_partition, msg.sender, _to, _value, _data , "");
+       _transferByPartition(_partition, msg.sender, _to, _value, _data , "", true);
         return _partition;
 
    }    
@@ -359,13 +338,15 @@ contract ERC1400 {
       
        if(_isControllable == true && _isController[msg.sender]) {
 
-           _transferByPartiton(_partition, _from, _to, _value, "", "");
+           _transferByPartition(_partition, _from, _to, _value, "", "", true);
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
        } else {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
-            _transferByPartiton(_partition, _from, _to, _value, "", "");
+            _transferByPartition(_partition, _from, _to, _value, "", "", true);
        }
+
+       return _partition;
       
        
    }
@@ -409,13 +390,13 @@ contract ERC1400 {
        
    }
 
-   function controllerTransfer(address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-        _transfer(_from, _to, _value);
+   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
+        _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
-   function controllerRedeem(address _tokenHolder, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external {
-        _redeem(_tokenHolder,  _value, _data);
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
+       _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
@@ -475,12 +456,13 @@ contract ERC1400 {
     /** 
         @dev    internal function to execute issuance to investors
     
-     */
+    */
+
     function _issue(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) internal {
 
         require(_isIssuable, "0x55");                                       // can't issue tokens for now
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
-        require(_data.length > 1, "data can't be empty");                   //  data must not be empty
+        require(_data.length > 1, "DCBE");                   //  data must not be empty
         _useCert(_data, _value);                                            // verify the certificate
         uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
         _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder
@@ -498,7 +480,7 @@ contract ERC1400 {
         The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
      */ 
     
-    function issue(address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+    function issue(address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
         
         _issue(_classless, _tokenHolder, _value, _data);
         
@@ -513,7 +495,7 @@ contract ERC1400 {
 
      */ 
 
-    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes calldata _data) external restricted {
+    function issueByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data) external restricted {
 
         _issue(_partition, _tokenHolder, _value, _data);
     
@@ -534,37 +516,24 @@ contract ERC1400 {
        _useCert(_data, _value);
        _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
        _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
+       totalSupply -= _value;
        
-       _balanceOfByPartition[address(0)][_partition] = _balanceOfByPartition[address(0)][_partition] + _value;  //  keep track of the number of redeemed tokens in a partition
-       _balanceOf[address(0)] = _balanceOf[address(0)] + _value;                                                //  keep track of the number of redeemed tokens across all partitions
-       totalSupply -= _value;
-       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
-
     }
 
-    // internal redeem function
-
-    function _redeem(address _tokenHolder, uint256 _value, bytes memory _data) internal {
-
-       require(_balanceOf[_tokenHolder] >= _value, "0x52"); // insufficient balance
-       _transfer(_tokenHolder, address(0), _value);
-       totalSupply -= _value;
-       emit Redeemed(msg.sender, _tokenHolder, _value, _data);
-
-    }
-
+   
 
    function redeem(uint256 _value, bytes memory _data) external {
 
-       _redeem(msg.sender, _value, _data);
+        _redeemByPartition(_classless, msg.sender, _value, _data, "");
+        emit Redeemed(msg.sender, msg.sender, _value, _data);
 
    }
 
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
-        //require(_isValidCertificate(_data, _value));
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
-        _redeem(_tokenHolder, _value, _data);
+        _redeemByPartition(_classless, _tokenHolder, _value, _data, "");
+         emit Redeemed(msg.sender, _tokenHolder, _value, _data);
 
    }
 
@@ -573,8 +542,8 @@ contract ERC1400 {
 
    function redeemByPartition(bytes32 _partition, uint256 _value, bytes memory _data) external {
 
-        //require(_isValidCertificate(_data, _value));  //  verify signer
        _redeemByPartition(_partition, msg.sender, _value, _data, "");
+       emit RedeemedByPartition(_partition, msg.sender, msg.sender, _value, _data);
 
    }
 
@@ -590,6 +559,8 @@ contract ERC1400 {
             require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
             _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
        }
+
+       emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
 
    }
 
@@ -681,6 +652,35 @@ contract ERC1400 {
         _totalPartitions = _newTotalPartitions;
     }
 
+
+    /**
+        @dev    Functions to set the control, lockup and issuable status of the token.
+
+        If setControl is false, the token can't be controlled forcefully
+        If setLockUp is true, all transfers will be disabled until the lockup is set to false
+        If setIssuable is false, tokens can't be issued until set to true 
+     */
+
+    function setControl(bool _controllable) external restricted {
+
+        _isControllable = _controllable;
+        emit SetControl(_controllable);
+
+    }
+
+    function setLockUp(bool _lockUp) external restricted {
+
+        _lockUpTokens = _lockUp;
+        emit LockedUp(_lockUp);
+
+    }
+
+    function setIssuable(bool _issuable) external restricted {
+
+        _isIssuable = _issuable;
+        emit SetIssuable(_issuable);
+
+    }
     
 
 
@@ -711,11 +711,13 @@ contract ERC1400 {
     event AuthorizedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is authorized for a partition
     event RevokedOperatorByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _tokenHolder);     // event to be emitted whenever an operator is revoked for a partition
     event IssuedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _to, uint256 _value, bytes _data, bytes _operatorData);    //  event to be emitted whenever a new token is issued to an holder's partition
-    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _amount, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
+    event RedeemedByPartition (bytes32 indexed _partition, address indexed _operator, address indexed _from, uint256 _value, bytes _operatorData);     // event to be emitted when tokens are burnt from any partitions
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-
+    event SetControl (bool _isControllable);
+    event LockedUp (bool _lockedUp);
+    event SetIssuable (bool _isIssuable);
 
 }
 
