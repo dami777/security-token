@@ -410,7 +410,12 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
 
             it("redeems the token", ()=>{
+
                 redemption.logs[0].event.should.be.equal("Redeemed", "it emits the Redeemed event")
+                redemption.logs[0].args._from.should.be.equal(investor_Dami, "it emits the redeemer's address")
+                redemption.logs[0].args._operator.should.be.equal(investor_Dami, "it emits the operator's address")
+                Number(redemption.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emits the amount redeemed")
+                
             })
 
         })
