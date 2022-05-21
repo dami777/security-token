@@ -381,13 +381,6 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator})
 
 
-            const cert1 = await certificate(tanglAdministratorData, investorDamiData, 1, 7, tanglDomainData, tanglAdministratorPrivkey)
-            const cert2 = await certificate(tanglAdministratorData, investorDamiData, 1, 8, tanglDomainData, tanglAdministratorPrivkey)
-             
-            await tanglSecurityToken.issue(investor_Dami, 1, cert1, {from: tanglAdministrator})
-            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert2, {from: tanglAdministrator})
-
-
         })
 
         describe("redemption of the default partition", ()=>{
@@ -399,10 +392,14 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             beforeEach(async()=>{
 
+               
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 7, tanglDomainData, tanglAdministratorPrivkey)
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 6, tanglDomainData, tanglAdministratorPrivkey)
+
+                await tanglSecurityToken.issue(investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+                
                 balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
-
-                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 6, tanglDomainData, tanglAdministratorPrivkey)
 
 
                 redemption = await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami})
@@ -417,6 +414,33 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 Number(redemption.logs[0].args._value).should.be.equal(Number(tokens(1)), "it emits the amount redeemed")
                 
             })
+
+            it("updates the balance of the token holder after redemption", async()=>{
+
+                
+
+                const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+                Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the classless partition balance of the token holder after issuance")
+
+                Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the classless partition balance of the token holder after redemption")
+
+
+            })
+
+
+
+        })
+
+
+        describe("redemption of a specific partition", ()=>{
+            
+            /*const cert2 = await certificate(tanglAdministratorData, investorDamiData, 1, 8, tanglDomainData, tanglAdministratorPrivkey)
+             
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 1, cert2, {from: tanglAdministrator})*/
 
         })
 
