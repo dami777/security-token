@@ -444,6 +444,13 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             })
 
+            it("fails to redeem due to insufficient amount to redeem", async()=>{
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)                
+
+            })
+
 
 
 
@@ -510,6 +517,17 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
 
             })
+
+
+            it("fails to redeem due to insufficient amount to redeem", async()=>{
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                
+                await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)                
+
+
+            })
+
 
 
             
