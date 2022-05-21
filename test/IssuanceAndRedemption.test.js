@@ -1,3 +1,4 @@
+const { describe } = require("yargs")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -454,7 +455,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
 
 
-                redemption = await tanglSecurityToken.redeemByPartition(classA.hex, investor_Dami, tokens(1), redemptionCert, {from: investor_Dami})
+                redemption = await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami})
 
             })
 
@@ -488,6 +489,10 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             
            
+        })
+
+        describe("redeemFrom", ()=>{
+
         })
 
     })
