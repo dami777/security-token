@@ -1,5 +1,3 @@
-
-const { before } = require("lodash")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -82,9 +80,15 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     beforeEach(async()=>{
 
+        /**
+         * set the issuable status to true after contract deployment
+         */
         
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
         reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
+
+        await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator})
+        await reitSecurityToken.setIssuable(true, {from: reitAdministrator})
 
         reitDomainData = {
         
@@ -331,6 +335,22 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
 
             })
+        })
+
+    })
+
+    describe("disabled issuance", ()=>{
+
+        let disabled 
+
+        beforeEach(async()=>{
+            disabled = await tanglSecurityToken.setIssuable(false)
+        })
+
+
+        it("reverts if issuance is attempted when issuance is disabled", async()=>{
+            const cert = await certificate(tanglAdministratorData, investorDamiData, 1, 5, tanglDomainData, tanglAdministratorPrivkey)
+            await tanglSecurityToken.issue(investor_Dami, 1, cert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.NOT_ISSUABLE)
         })
 
     })
