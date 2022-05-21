@@ -1,4 +1,4 @@
-const { describe } = require("yargs")
+
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
