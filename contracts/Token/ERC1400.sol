@@ -314,7 +314,6 @@ contract ERC1400 {
 
     function transferFromWithData(address _from, address _to, uint256 _value, bytes memory _data) external {
          
-        //require(_data.length > 1, "DCBE");
         require(allowance[_from][msg.sender] >= _value, "0x53");           // the allowed value approved by the token holder must not be less than the amount
         _transferByPartition(_classless, _from, _to, _value, _data, "", true);
         allowance[_from][msg.sender] =  0;   
@@ -327,7 +326,6 @@ contract ERC1400 {
 
     function transferByPartition(bytes32 _partition, address _to, uint256 _value, bytes memory _data) external returns (bytes32) {
 
-        //require(_data.length > 1, "DCBE");
        _transferByPartition(_partition, msg.sender, _to, _value, _data , "", true);
         return _partition;
 
