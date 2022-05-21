@@ -388,6 +388,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
 
             let redemption
 
@@ -401,7 +402,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 
                 balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
-
+                totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
 
                 redemption = await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami})
 
@@ -433,6 +434,19 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
 
 
+            it("updates the total supply", async()=>{
+
+                const totalSupplyAfterRedemption = await tanglSecurityToken.totalSupply()
+
+                Number(totalSupplyBeforeRedemption).should.be.equal(Number(tokens(1)), "the total supply before redemption")
+                Number(totalSupplyAfterRedemption).should.be.equal(0, "the total supply after redemption")
+
+
+            })
+
+
+
+
 
         })
 
@@ -441,6 +455,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
 
             let redemption
 
@@ -453,7 +468,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 
                 balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-
+                totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
 
                 redemption = await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami})
 
@@ -482,6 +497,16 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
                 Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
                 Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the partition balance of the token holder after redemption")
+
+
+            })
+
+            it("updates the total supply", async()=>{
+
+                const totalSupplyAfterRedemption = await tanglSecurityToken.totalSupply()
+
+                Number(totalSupplyBeforeRedemption).should.be.equal(Number(tokens(1)), "the total supply before redemption")
+                Number(totalSupplyAfterRedemption).should.be.equal(0, "the total supply after redemption")
 
 
             })
