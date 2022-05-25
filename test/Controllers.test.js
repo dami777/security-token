@@ -243,15 +243,22 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
                 let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
                 
-                forcedTransfer = await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex)
+                forcedTransfer = await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
 
             })
 
-            it("emits the transfer events", ()=>{
+            it("emits the transfer events and event data", ()=>{
+
                 forcedTransfer.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
                 forcedTransfer.logs[1].event.should.be.equal("TransferByPartition", "it emits the Transfer event")
                 forcedTransfer.logs[2].event.should.be.equal("ControllerTransfer", "it emits the Transfer event")
+              
+                forcedTransfer.logs[2].args._controller.should.be.equal(tanglAdministrator2, "it emits the controller that initiated the forced transfer")
+                forcedTransfer.logs[2].args._from.should.be.equal(investor_Jeff, "it emits the token holder whose token was forcefully transferred")
+                forcedTransfer.logs[2].args._to.should.be.equal(investor_Dami, "it emits the recipient of the forceful transfer")
+                Number(forcedTransfer.logs[2].args._value).should.be.equal(Number(tokens(2)), "it emits the amount that was forcefully transferred")
                 
+
             })
 
         })
