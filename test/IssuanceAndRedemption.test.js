@@ -1,4 +1,3 @@
-
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -366,6 +365,24 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
     
         })
+
+
+        describe("Issuance status", ()=>{
+
+            it("returns issuable as true", async()=>{
+                const issuable = await tanglSecurityToken.isIssuable()
+                issuable.should.be.equal(true, "it returns true as the issuance status")
+            })
+
+
+            it("returns issuable as false", async()=>{
+
+                await tanglSecurityToken.setIssuable(false)
+                const issuable = await tanglSecurityToken.isIssuable()
+                issuable.should.be.equal(false, "it returns false as the issuance status")
+            })
+
+        })
     })
 
     
@@ -388,6 +405,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
 
             let redemption
 
@@ -401,7 +419,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 
                 balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
-
+                totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
 
                 redemption = await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami})
 
@@ -433,6 +451,26 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
 
 
+            it("updates the total supply", async()=>{
+
+                const totalSupplyAfterRedemption = await tanglSecurityToken.totalSupply()
+
+                Number(totalSupplyBeforeRedemption).should.be.equal(Number(tokens(1)), "the total supply before redemption")
+                Number(totalSupplyAfterRedemption).should.be.equal(0, "the total supply after redemption")
+
+
+            })
+
+            it("fails to redeem due to insufficient amount to redeem", async()=>{
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.redeem(tokens(1), redemptionCert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)                
+
+            })
+
+
+
+
 
         })
 
@@ -441,6 +479,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
 
             let redemption
 
@@ -453,7 +492,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                 
                 balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
                 partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-
+                totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
 
                 redemption = await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami})
 
@@ -486,6 +525,27 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             })
 
+            it("updates the total supply", async()=>{
+
+                const totalSupplyAfterRedemption = await tanglSecurityToken.totalSupply()
+
+                Number(totalSupplyBeforeRedemption).should.be.equal(Number(tokens(1)), "the total supply before redemption")
+                Number(totalSupplyAfterRedemption).should.be.equal(0, "the total supply after redemption")
+
+
+            })
+
+
+            it("fails to redeem due to insufficient amount to redeem", async()=>{
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                
+                await tanglSecurityToken.redeemByPartition(classA.hex, tokens(1), redemptionCert, {from: investor_Dami}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)                
+
+
+            })
+
+
 
             
            
@@ -493,19 +553,80 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
         describe("redeemFrom", ()=>{
 
+
+            let balanceBeforeRedemption
+            let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
+            let redemptionCert
+
+            beforeEach(async()=>{
+
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 7, tanglDomainData, tanglAdministratorPrivkey)
+                redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 6, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.issue(investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+
+            })
+
+            describe("successful redemption", async()=>{
+
+                let redeemFrom
+
+                beforeEach(async()=>{
+
+                    balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                    partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+                    totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
+                        
+                    await tanglSecurityToken.approve(tanglAdministrator, tokens(1), {from: investor_Dami})
+                    redeemFrom = await tanglSecurityToken.redeemFrom(investor_Dami, tokens(1), redemptionCert, {from: tanglAdministrator})
+
+                })
+
+
+                it("emits event and event data", async()=>{
+
+                    redeemFrom.logs[0].event.should.be.equal("Redeemed", "it emits the redeemed event")
+                    redeemFrom.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emits the operator's address")
+                    redeemFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emits the tokenHolder's address")
+
+
+                })
+
+                it("updates the tokenHolder's balance and total supply", async()=>{
+
+                    const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                    const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+                    Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                    Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the partitionless balance of the token holder after issuance")
+
+                    Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                    Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the partitionless balance of the token holder after redemption")
+                
+                })
+
+            })
+
+            describe("failed redeem from", ()=>{
+
+                it("fails to redeem for insufficient approval", async()=>{
+                    
+                    await tanglSecurityToken.redeemFrom(investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+                })
+
+                it("should revert due to insufficient balance", async()=>{
+
+                    await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+                    await tanglSecurityToken.redeemFrom(investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+                })
+
+                
+            })
+
         })
 
     })
 })
 
-
-
-/**
- * Reconduct unit test for the following using the certificate:
- * 
- * []   redemption by partition
- * []   redemption function ( for default / classless tokens)
- * []   redeemFrom
- * []   operatorRedeem by partiton
- 
- */

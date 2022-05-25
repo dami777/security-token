@@ -511,7 +511,7 @@ contract ERC1400 {
 
     function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
 
-       require(_tokenHolder != address(0), "0x56");
+       require(_tokenHolder != address(0), "0x57");
        require(_balanceOfByPartition[_tokenHolder][_partition] >= _value, "0x52");              // insufficient balance
        _useCert(_data, _value);
        _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
