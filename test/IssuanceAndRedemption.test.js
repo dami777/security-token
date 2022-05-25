@@ -132,7 +132,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     })
 
-    /*describe("issuance", ()=>{
+    describe("issuance", ()=>{
 
         describe("issuance to partitionless token", ()=>{
 
@@ -266,7 +266,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                  * set a regulator / controller onchain
                  */
     
-                /*await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
+                await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
     
             })
      
@@ -365,7 +365,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
     
         })
-    })*/
+    })
 
     
     describe("redemption", ()=>{
@@ -383,7 +383,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
         })
 
-        /*describe("redemption of the default partition", ()=>{
+        describe("redemption of the default partition", ()=>{
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
@@ -531,7 +531,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             
            
-        })*/
+        })
 
         describe("redeemFrom", ()=>{
 
@@ -612,14 +612,3 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
     })
 })
 
-
-
-/**
- * Reconduct unit test for the following using the certificate:
- * 
- * []   redemption by partition
- * []   redemption function ( for default / classless tokens)
- * []   redeemFrom
- * []   operatorRedeem by partiton
- 
- */
