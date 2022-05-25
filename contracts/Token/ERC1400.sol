@@ -711,7 +711,9 @@ contract ERC1400 {
      }
 
      function granularity() external view returns (uint256) {
-         return _tokenGranularity
+
+         return _tokenGranularity;
+         
      }
     
 
