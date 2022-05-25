@@ -227,8 +227,8 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             
             it("updates the balance of the recipient", async()=>{
 
-                const balance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
-                balance.toString().should.be.equal(tokens(5).toString(), "it updates the balance of the recipient")
+                const balance = await tanglSecurityToken.balanceOf(investor_Jeff)
+                balance.toString().should.be.equal(tokens(10).toString(), "it updates the balance of the recipient")
            
             })
 
@@ -237,7 +237,22 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         describe("forced token transfer from the default partition", ()=>{
 
-            
+            let forcedTransfer
+
+            beforeEach(async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                
+                forcedTransfer = await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex)
+
+            })
+
+            it("emits the transfer events", ()=>{
+                forcedTransfer.logs[0].event.should.be.equal("Transfer", "it emits the Transfer event")
+                forcedTransfer.logs[1].event.should.be.equal("TransferByPartition", "it emits the Transfer event")
+                forcedTransfer.logs[2].event.should.be.equal("ControllerTransfer", "it emits the Transfer event")
+                
+            })
 
         })
 
