@@ -365,6 +365,7 @@ contract ERC1400 {
 
    function setControllability(bool _status) external restricted {
        _isControllable = _status;
+       emit SetControllability(_status);
    }
 
    function setController(address _controller) external restricted {
@@ -654,19 +655,14 @@ contract ERC1400 {
 
 
     /**
-        @dev    Functions to set the control, lockup and issuable status of the token.
+        @dev    Functions to set the lockup and issuable status of the token.
 
-        If setControl is false, the token can't be controlled forcefully
+        
         If setLockUp is true, all transfers will be disabled until the lockup is set to false
         If setIssuable is false, tokens can't be issued until set to true 
      */
 
-    function setControl(bool _controllable) external restricted {
 
-        _isControllable = _controllable;
-        emit SetControl(_controllable);
-
-    }
 
     function setLockUp(bool _lockUp) external restricted {
 
@@ -713,7 +709,7 @@ contract ERC1400 {
      function granularity() external view returns (uint256) {
 
          return _tokenGranularity;
-         
+
      }
     
 
@@ -749,7 +745,7 @@ contract ERC1400 {
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-    event SetControl (bool _isControllable);
+    event SetControllability(bool _isControllable);
     event LockedUp (bool _lockedUp);
     event SetIssuable (bool _isIssuable);
 
