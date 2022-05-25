@@ -709,6 +709,10 @@ contract ERC1400 {
          return _totalSupply;
 
      }
+
+     function granularity() external view returns (uint256) {
+         return _tokenGranularity
+     }
     
 
 
