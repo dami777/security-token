@@ -717,7 +717,7 @@ contract ERC1400 {
 
      // *************************************** Events ********************************************************* //
 
-    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
+    
     event Issued (address indexed _operator, address indexed _to, uint256 _value, bytes _data);            // event to be emitted whenever new tokens are minted
     event Transfer (address indexed _from, address indexed _to, uint256 _value);                                            // event to be emitted whenever token is been transferred
     event Approval (address indexed _owner, address indexed _spender, uint256 _value);                        // event to be emitted whenever an external address is approved such as escrows
