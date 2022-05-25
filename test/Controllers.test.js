@@ -88,7 +88,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    describe("controllability status", ()=>{
+    /*describe("controllability status", ()=>{
 
         it("can't control tokens", async()=>{
 
@@ -103,40 +103,58 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             setControl.logs[0].event.should.be.equal("SetControllability", "it emits the SetControllability event")
             setControl.logs[0].args._isControllable.should.be.equal(true, "it emits the status of the controllability")
         })
-    })
+    })*/
 
-    /*describe("setting and removal of controllers", ()=>{
+    describe("setting and removal of controllers", ()=>{
+
+
+        /**
+         * set controllers onchain
+         */
 
         beforeEach(async()=>{
-            await token.setController(tanglAdministrator2)    //  set controllers on chain
-            await token.setController(tanglAdministrator3)
-            await token.setController(tanglAdministrator4)
+
+            await tanglSecurityToken.setController(tanglAdministrator2)    
+            await tanglSecurityToken.setController(tanglAdministrator3)
+            await tanglSecurityToken.setController(tanglAdministrator4)
+
         })
 
         describe("Contoller's approval", ()=>{
 
             it("approves a controller", async()=>{
-                const istanglAdministrator2 = await token.isController(tanglAdministrator2)
-                const isController2 = await token.isController(tanglAdministrator3)
+
+                const isTanglAdministrator2 = await tanglSecurityToken.isController(tanglAdministrator2)
+                const isController2 = await tanglSecurityToken.isController(tanglAdministrator3)
     
-                istanglAdministrator2.should.be.equal(true, "address was approved to be a controller")
+                isTanglAdministrator2.should.be.equal(true, "address was approved to be a controller")
                 isController2.should.be.equal(true, "address was approved to be a controller")
+
             })
 
             it("returns the size of the array of controllers", async()=>{
-                const allControllers = await token.getControllers()
+
+                const allControllers = await tanglSecurityToken.getControllers()
                 allControllers.length.toString().should.be.equal("3", "returns the size of the array of controllers")
                 
             })
 
 
             it("fails to reapprove an address that is already recognized as a controller", async()=>{
-                await token.setController(tanglAdministrator4).should.be.rejected
+
+                await tanglSecurityToken.setController(tanglAdministrator4).should.be.rejectedWith(reverts.ADDRESS_IS_CONTROLLER)
+
+            })
+
+            it("fails to approve ether address as a controller", async()=>{
+
+                await tanglSecurityToken.setController(ETHER_ADDRESS).should.be.rejectedWith(reverts.INVALID_TRANSFER_AGENT)
+
             })
 
         })
 
-        describe("removal of controllers", ()=>{
+        /*describe("removal of controllers", ()=>{
 
             beforeEach(async()=>{
                 await token.removeController(tanglAdministrator2)
@@ -163,13 +181,13 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             })
 
     
-        })
+        })*/
 
         
 
     })
 
-    describe("controller can transfer without operator management", ()=>{
+    /*describe("controller can transfer without operator management", ()=>{
 
         beforeEach(async()=>{
             await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
