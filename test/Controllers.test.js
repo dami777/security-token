@@ -261,6 +261,17 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
             })
 
+            it("updates the balances of the `from` and `to` accounts of the forcefull transfer", async()=>{
+
+                const toBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                const fromBalance = await tanglSecurityToken.balanceOf(investor_Jeff)
+
+                Number(fromBalance).should.be.equal(Number(tokens(8)), "it updates the balance of the from")
+                Number(toBalance).should.be.equal(Number(tokens(2)), "it updates the balance of the recipient")
+
+
+            })
+
         })
 
 
