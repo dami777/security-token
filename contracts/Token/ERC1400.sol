@@ -384,8 +384,7 @@ contract ERC1400 {
 
    function removeController(address _controller) external restricted {
 
-        require(_controller != address(0), "0x58");     // invalid transfer agent
-        require(_isController[_controller], "0x58");      // not recognized as a controller
+        require(_controller != address(0) && _isController[_controller], "0x58");     // invalid transfer agent
         _isController[_controller] = false;
         delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
        

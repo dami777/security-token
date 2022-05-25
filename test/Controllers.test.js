@@ -154,34 +154,37 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         })
 
-        /*describe("removal of controllers", ()=>{
+        describe("removal of controllers", ()=>{
 
             beforeEach(async()=>{
-                await token.removeController(tanglAdministrator2)
+
+                await tanglSecurityToken.removeController(tanglAdministrator2)
                 
             })
 
 
             it("disabled and removed tanglAdministrator2 from the allowed controllers", async()=>{
-                const istanglAdministrator2 = await token.isController(tanglAdministrator2)
-                istanglAdministrator2.should.be.equal(false, "controller was disabled")
+                const isTanglAdministrator2 = await tanglSecurityToken.isController(tanglAdministrator2)
+                isTanglAdministrator2.should.be.equal(false, "controller was disabled")
             })
 
             it("returns the original array of controllers with the index of the disabled controller", async()=>{
-                const allControllers = await token.getControllers()
+                
+                const allControllers = await tanglSecurityToken.getControllers()
                 allControllers.length.toString().should.be.equal("3", "returns the size of the array of controllers")
+           
             })
 
             it("reverts when the address to be removed is an ether address", async()=>{
-                await token.removeController(ETHER_ADDRESS).should.be.rejected
+                await tanglSecurityToken.removeController(ETHER_ADDRESS).should.be.rejectedWith(reverts.INVALID_TRANSFER_AGENT)
             })
 
             it("reverts when the address to be removed is not recognized as a controller", async()=>{
-                await token.removeController(escrow).should.be.rejected
+                await tanglSecurityToken.removeController(escrow).should.be.rejectedWith(reverts.INVALID_TRANSFER_AGENT)
             })
 
     
-        })*/
+        })
 
         
 
