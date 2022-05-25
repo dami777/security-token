@@ -589,6 +589,24 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             })
 
+            describe("failed redeem from", ()=>{
+
+                it("fails to redeem for insufficient approval", async()=>{
+                    
+                    await tanglSecurityToken.redeemFrom(investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_ALLOWANCE)
+
+                })
+
+                it("should revert due to insufficient balance", async()=>{
+
+                    await tanglSecurityToken.approve(tanglAdministrator, tokens(2), {from: investor_Dami})
+                    await tanglSecurityToken.redeemFrom(investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+                })
+
+                
+            })
+
         })
 
     })
