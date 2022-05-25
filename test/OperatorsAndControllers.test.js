@@ -3,6 +3,9 @@
  * @dev     Test script to test the operators and controllers operations and activities
  */
 
+ require("chai")
+    .use(require("chai-as-promised"))
+    .should()
 
 
 
@@ -11,21 +14,76 @@ const ERC1400 = artifacts.require('./ERC1400')
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
 
 
-contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, controller2, controller3])=>{
+contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, investor_Jeff, holder2, escrow, tanglAdministrator2, tanglAdministrator3, tanglAdministrator4])=>{
+
+    let tanglSecurityToken
+
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+    let classless = stringToHex("classless").hex
+
+    let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
 
 
+
+     /**
+     * Define the data of the issuers and onboarded investors
+     * These data will be used to generate certificate for issuance, transfer and redemption of tokens
+     */
+
+      let tanglAdministratorData = {
+            
+        firstName: "tangl administrator",
+        lastName: "tangl administrator",
+        location: "New Yoke, London",
+        walletAddress: tanglAdministrator1
+
+    }
+
+    let investorDamiData = {
+
+        firstName: "Dami",
+        lastName: "Ogunkeye",
+        location: "New Yoke, London",
+        walletAddress: investor_Dami
+
+    }
+
+
+    let investorJeffData = {
+
+        firstName: "Jeff",
+        lastName: "Chuka",
+        location: "New Yoke, London",
+        walletAddress: investor_Jeff
+
+    }
+
+    let redemptionData = {
+
+        firstName: "address zero",
+        lastName: "address zero",
+        location: "address zero",
+        walletAddress: ETHER_ADDRESS
+
+    }
+
+    
+    //const salt = stringToHex("random").hex
+    const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
 
 
     beforeEach( async()=>{
         
-        token = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator1})
+
     })
     
 
     describe("contract address", ()=>{
 
         it("has contract address", ()=>{
-            token.address.should.not.be.equal("", "the contract has an address")
+            tanglSecurityToken.address.should.not.be.equal("", "the contract has an address")
         })
 
     })
@@ -34,32 +92,32 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
 
         it("can control tokens", async()=>{
 
-            const canControl = await token.isControllable()
-            canControl.should.be.equal(true, "token can be controlled")
+            const canControl = await tanglSecurityToken.isControllable()
+            canControl.should.be.equal(false, "token can not be controlled")
         })
 
         it("can't be controlled", async()=>{
-            await token.setControllability(false)
-            const canControl = await token.isControllable()
-            canControl.should.be.equal(false, "tokens can'e be controlled")
+            await tanglSecurityToken.setControllability(true)
+            const canControl = await tanglSecurityToken.isControllable()
+            canControl.should.be.equal(true, "tokens can be controlled")
         })
     })
 
-    describe("setting and removal of controllers", ()=>{
+    /*describe("setting and removal of controllers", ()=>{
 
         beforeEach(async()=>{
-            await token.setController(controller1)    //  set controllers on chain
-            await token.setController(controller2)
-            await token.setController(controller3)
+            await token.setController(tanglAdministrator2)    //  set controllers on chain
+            await token.setController(tanglAdministrator3)
+            await token.setController(tanglAdministrator4)
         })
 
         describe("Contoller's approval", ()=>{
 
             it("approves a controller", async()=>{
-                const isController1 = await token.isController(controller1)
-                const isController2 = await token.isController(controller2)
+                const istanglAdministrator2 = await token.isController(tanglAdministrator2)
+                const isController2 = await token.isController(tanglAdministrator3)
     
-                isController1.should.be.equal(true, "address was approved to be a controller")
+                istanglAdministrator2.should.be.equal(true, "address was approved to be a controller")
                 isController2.should.be.equal(true, "address was approved to be a controller")
             })
 
@@ -71,7 +129,7 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
 
 
             it("fails to reapprove an address that is already recognized as a controller", async()=>{
-                await token.setController(controller3).should.be.rejected
+                await token.setController(tanglAdministrator4).should.be.rejected
             })
 
         })
@@ -79,14 +137,14 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
         describe("removal of controllers", ()=>{
 
             beforeEach(async()=>{
-                await token.removeController(controller1)
+                await token.removeController(tanglAdministrator2)
                 
             })
 
 
-            it("disabled and removed controller1 from the allowed controllers", async()=>{
-                const isController1 = await token.isController(controller1)
-                isController1.should.be.equal(false, "controller was disabled")
+            it("disabled and removed tanglAdministrator2 from the allowed controllers", async()=>{
+                const istanglAdministrator2 = await token.isController(tanglAdministrator2)
+                istanglAdministrator2.should.be.equal(false, "controller was disabled")
             })
 
             it("returns the original array of controllers with the index of the disabled controller", async()=>{
@@ -113,7 +171,7 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
 
         beforeEach(async()=>{
             await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-            await token.setController(controller1)    //  set controller on chain
+            await token.setController(tanglAdministrator2)    //  set controller on chain
         })
 
         describe("token information", ()=>{
@@ -131,7 +189,7 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
 
             beforeEach(async()=>{
                 await token.setController(signer)
-                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller1})
+                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2})
             })
 
             it("emits events", async()=>{
@@ -157,17 +215,17 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
         beforeEach(async()=>{
             await token.setControllability(false)
             await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-            await token.setController(controller1)    //  set controller on chain
+            await token.setController(tanglAdministrator2)    //  set controller on chain
             await token.setController(signer)
         })
 
         it("fails to force token transfer because because the control is turned off", async()=>{
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller1}).should.be.rejected
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2}).should.be.rejected
         })
 
         it("transfers after approving controller as an operator by the holder since control is turned", async()=>{
-            await token.authorizeOperator(controller2, {from: holder2})
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: controller2})
+            await token.authorizeOperator(tanglAdministrator3, {from: holder2})
+            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator3})
             const balanceFrom = await token.balanceOfByPartition(classA, holder2)
             const balanceTo = await token.balanceOfByPartition(classA, escrow)
 
@@ -188,8 +246,8 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
             beforeEach(async()=>{
                 await token.setController(signer)
                 await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-                await token.setController(controller1)    //  set controller on chain
-                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller1})
+                await token.setController(tanglAdministrator2)    //  set controller on chain
+                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator2})
                 
             })
 
@@ -213,18 +271,18 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
 
                 
                 await token.setControllability(false)
-                await token.setController(controller1) 
+                await token.setController(tanglAdministrator2) 
                 await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(signer)
             })
 
             it("fails to redeem because control is turned off", async()=>{
-                await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller1}).should.be.rejected
+                await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator2}).should.be.rejected
             })
 
             it("redeems after approving controller as an operator by the token holder", async()=>{
-                await token.authorizeOperator(controller2, {from: holder2})
-                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:controller2})
+                await token.authorizeOperator(tanglAdministrator3, {from: holder2})
+                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator3})
                 const balance = await token.balanceOfByPartition(classA, holder2)
 
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
@@ -233,6 +291,6 @@ contract("Controllers and Operators", ([issuer, holder2, escrow, controller1, co
             })
         })
 
-    })
+    })*/
 
 })
