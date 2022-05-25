@@ -124,7 +124,8 @@ const reverts = {
     EMPTY_DATA:"DCBE",       //  DCBE : Data Can't Be Empty
     INVALID_SIGNER: "IS",
     USED_SIGNATURE: "US",
-    ADDRESS_IS_CONTROLLER:"ACC"
+    ADDRESS_IS_CONTROLLER:"ACC",
+    NOT_CONTROLLABLE: "NC"
 
 }
 

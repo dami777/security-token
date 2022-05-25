@@ -391,6 +391,7 @@ contract ERC1400 {
    }
 
    function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
+        require(_isControllable, "NC");
         _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }

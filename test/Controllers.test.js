@@ -275,25 +275,42 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
         })
 
 
-        describe("forced token transfer  by partition", ()=>{
+        describe("forced transfer by partition by regulator/controller", ()=>{
 
-        })
-
-        /*describe("forced transfer by partition by regulator/controller", ()=>{
+            /**
+             * if the token is controllable, controllers don't need to be approved as operators by the token holders
+             * they can forcefully transfer tokens by from partitions using the operatorTransferByPartition
+             */
             
-            let transfer
+            let forcedTransfer
 
             beforeEach(async()=>{
-                await token.setController(signer)
-                transfer = await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2})
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+                forcedTransfer = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
+            
             })
 
             it("emits events", async()=>{
-                transfer.logs[0].event.should.be.equal("TransferByPartition", "it emit the transfer by partition event")
-                transfer.logs[2].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
+
+                forcedTransfer.logs[1].event.should.be.equal("TransferByPartition", "it emit the transfer by partition event")
+                forcedTransfer.logs[2].event.should.be.equal("ControllerTransfer", "it emit the controller transfer event")
+                forcedTransfer.logs[2].args._controller.should.be.equal(tanglAdministrator2, "it emits the controller that initiated the forced transfer")
+                forcedTransfer.logs[2].args._from.should.be.equal(investor_Jeff, "it emits the token holder whose token was forcefully transferred")
+                forcedTransfer.logs[2].args._to.should.be.equal(investor_Dami, "it emits the recipient of the forceful transfer")
+                Number(forcedTransfer.logs[2].args._value).should.be.equal(Number(tokens(2)), "it emits the amount that was forcefully transferred")
+            
+                web3.utils.utfTo8(forcedTransfer.logs[1]._fromPartition).should.be.equal("CLASS A", "it emits the partition where the token was transferred from")
+                forcedTransfer.logs[1].args._operator.should.be.equal(tanglAdministrator2, "it emits the controller's address")
+                forcedTransfer.logs[1].args._from.should.be.equal(investor_Jeff, "it emits the token holder whose tokens were transferred")
+                forcedTransfer.logs[1].args._to.should.be.equal(investor_Dami, "it emits the recipient's address")
+                Number(forcedTransfer.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount that was forcefully transferred")
+                
             })
 
             it("updates the balances of the accounts", async()=>{
+
                 const balanceFrom = await token.balanceOfByPartition(classA, investor_Jeff)
                 const balanceTo = await token.balanceOfByPartition(classA, escrow)
 
@@ -301,7 +318,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
             })
 
-        })*/
+        })
 
 
     })
