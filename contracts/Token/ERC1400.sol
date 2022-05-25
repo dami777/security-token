@@ -365,7 +365,7 @@ contract ERC1400 {
 
    function setControllability(bool _status) external restricted {
        _isControllable = _status;
-       emit SetControllability(_status);
+       
    }
 
    function setController(address _controller) external restricted {
@@ -390,12 +390,12 @@ contract ERC1400 {
        
    }
 
-   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
+   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
         _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
-   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
        _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
@@ -666,14 +666,14 @@ contract ERC1400 {
     function setLockUp(bool _lockUp) external restricted {
 
         _lockUpTokens = _lockUp;
-        emit LockedUp(_lockUp);
+        
 
     }
 
     function setIssuable(bool _issuable) external restricted {
 
         _isIssuable = _issuable;
-        emit SetIssuable(_issuable);
+        
 
     }
 
@@ -744,9 +744,9 @@ contract ERC1400 {
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-    event SetControllability(bool _isControllable);
-    event LockedUp (bool _lockedUp);
-    event SetIssuable (bool _isIssuable);
+    //event SetControllability(bool _isControllable);
+    //event LockedUp (bool _lockedUp);
+    //event SetIssuable (bool _isIssuable);
 
 }
 

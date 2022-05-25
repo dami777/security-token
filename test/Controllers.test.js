@@ -11,10 +11,11 @@
 
 const ERC1400 = artifacts.require('./ERC1400')
 
-const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts } = require("./helper")
+
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
 
 
-contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, investor_Jeff, holder2, escrow, tanglAdministrator2, tanglAdministrator3, tanglAdministrator4])=>{
+contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, investor_Jeff, escrow, tanglAdministrator2, tanglAdministrator3, tanglAdministrator4])=>{
 
     let tanglSecurityToken
 
@@ -68,6 +69,8 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     }
 
+    let tanglDomainData
+
     
     //const salt = stringToHex("random").hex
     const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
@@ -76,6 +79,18 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
     beforeEach( async()=>{
         
         tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator1})
+        await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator1})
+
+
+        tanglDomainData = {
+
+            name: tanglTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: tanglSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
 
     })
     
@@ -114,13 +129,13 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         beforeEach(async()=>{
 
-            await tanglSecurityToken.setController(tanglAdministrator2)    
-            await tanglSecurityToken.setController(tanglAdministrator3)
-            await tanglSecurityToken.setController(tanglAdministrator4)
+            await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})    
+            await tanglSecurityToken.setController(tanglAdministrator3, {from: tanglAdministrator1})
+            await tanglSecurityToken.setController(tanglAdministrator4, {from: tanglAdministrator1})
 
         })
 
-        describe("Contoller's approval", ()=>{
+        /*describe("Contoller's approval", ()=>{
 
             it("approves a controller", async()=>{
 
@@ -184,35 +199,60 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             })
 
     
-        })
+        })*/
 
         
 
     })
 
-    /*describe("controller can transfer without operator management", ()=>{
+    describe("forced token transfer", ()=>{
+
+
+
 
         beforeEach(async()=>{
-            await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-            await token.setController(tanglAdministrator2)    //  set controller on chain
+
+            let issuanceCert1 = await certificate(tanglAdministratorData, investorJeffData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            let issuanceCert2 = await certificate(tanglAdministratorData, investorJeffData, 5, 2, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Jeff, 5, issuanceCert1, {from: tanglAdministrator1})  // issue tokens to an holder's partiton
+            await tanglSecurityToken.issue(investor_Jeff, 5, issuanceCert2, {from: tanglAdministrator1})
+            
+            await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})    
+        
+                    
         })
 
         describe("token information", ()=>{
             
             it("updates the balance of the recipient", async()=>{
-                const balance = await token.balanceOfByPartition(classA, holder2)
+
+                const balance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
                 balance.toString().should.be.equal(tokens(5).toString(), "it updates the balance of the recipient")
+           
             })
 
         })
 
-        describe("forced transfer by partition by regulator/controller", ()=>{
+
+        describe("forced token transfer from the default partition", ()=>{
+
+            
+
+        })
+
+
+        describe("forced token transfer  by partition", ()=>{
+
+        })
+
+        /*describe("forced transfer by partition by regulator/controller", ()=>{
             
             let transfer
 
             beforeEach(async()=>{
                 await token.setController(signer)
-                transfer = await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2})
+                transfer = await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2})
             })
 
             it("emits events", async()=>{
@@ -221,35 +261,35 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             })
 
             it("updates the balances of the accounts", async()=>{
-                const balanceFrom = await token.balanceOfByPartition(classA, holder2)
+                const balanceFrom = await token.balanceOfByPartition(classA, investor_Jeff)
                 const balanceTo = await token.balanceOfByPartition(classA, escrow)
 
                 balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
                 balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
             })
 
-        })
+        })*/
 
 
     })
 
-    describe("forced transfer cannot happen when the control is turned off", ()=>{
+    /*describe("forced transfer cannot happen when the control is turned off", ()=>{
 
         beforeEach(async()=>{
             await token.setControllability(false)
-            await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+            await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
             await token.setController(tanglAdministrator2)    //  set controller on chain
             await token.setController(signer)
         })
 
         it("fails to force token transfer because because the control is turned off", async()=>{
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2}).should.be.rejected
+            await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2}).should.be.rejected
         })
 
         it("transfers after approving controller as an operator by the holder since control is turned", async()=>{
-            await token.authorizeOperator(tanglAdministrator3, {from: holder2})
-            await token.operatorTransferByPartition(classA, holder2, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator3})
-            const balanceFrom = await token.balanceOfByPartition(classA, holder2)
+            await token.authorizeOperator(tanglAdministrator3, {from: investor_Jeff})
+            await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator3})
+            const balanceFrom = await token.balanceOfByPartition(classA, investor_Jeff)
             const balanceTo = await token.balanceOfByPartition(classA, escrow)
 
             balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
@@ -268,9 +308,9 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
             beforeEach(async()=>{
                 await token.setController(signer)
-                await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+                await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(tanglAdministrator2)    //  set controller on chain
-                redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator2})
+                redeem = await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2})
                 
             })
 
@@ -280,7 +320,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             })
 
             it("updates the balance of the token holder", async()=>{
-                const balance = await token.balanceOfByPartition(classA, holder2)
+                const balance = await token.balanceOfByPartition(classA, investor_Jeff)
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
             })
 
@@ -295,18 +335,18 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 
                 await token.setControllability(false)
                 await token.setController(tanglAdministrator2) 
-                await token.issueByPartition(classA, holder2, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
+                await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(signer)
             })
 
             it("fails to redeem because control is turned off", async()=>{
-                await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator2}).should.be.rejected
+                await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2}).should.be.rejected
             })
 
             it("redeems after approving controller as an operator by the token holder", async()=>{
-                await token.authorizeOperator(tanglAdministrator3, {from: holder2})
-                const redeem = await token.operatorRedeemByPartition(classA, holder2, tokens(2), data, {from:tanglAdministrator3})
-                const balance = await token.balanceOfByPartition(classA, holder2)
+                await token.authorizeOperator(tanglAdministrator3, {from: investor_Jeff})
+                const redeem = await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator3})
+                const balance = await token.balanceOfByPartition(classA, investor_Jeff)
 
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
                 redeem.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeem by partition event")
