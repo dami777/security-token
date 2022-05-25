@@ -15,15 +15,15 @@ contract ERC1400 {
 
      // *************************************** Strings ********************************************************* //
 
-    string public name;   // token name
-    string public symbol; // token symbol
+    string private _tokenName;   // token name
+    string private _tokenSymbol; // token symbol
 
 
 
     // *************************************** Integers ********************************************************* //
 
-    uint256 public granularity;                     // token granularity
-    uint256 public totalSupply;                     // token total supply
+    uint256 private _tokenGranularity;                     // token granularity
+    uint256 private _totalSupply;                     // token total supply
    
 
 
@@ -82,9 +82,9 @@ contract ERC1400 {
 
     constructor (string memory _name, string memory _symbol, uint256 _granularity) {
 
-        name = _name;
-        symbol = _symbol;
-        granularity = 10 ** _granularity; // for token decimals 
+        _tokenName = _name;
+        _tokenSymbol = _symbol;
+        _tokenGranularity = 10 ** _granularity; // for token decimals 
         owner = msg.sender;
         //_defaultPartitions = defaultPartitions;
 
@@ -112,7 +112,7 @@ contract ERC1400 {
 
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
         require(!_usedSignatures[_signature], "US");    // used signature
-        address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), name);
+        address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), _tokenName);
         require(_signer == owner || _isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
@@ -464,10 +464,10 @@ contract ERC1400 {
         require(_tokenHolder != address(0), "0x57");                        // invalid receiver
         require(_data.length > 1, "DCBE");                   //  data must not be empty
         _useCert(_data, _value);                                            // verify the certificate
-        uint256 amount =  _value * granularity;                             // the destinaton address should not be an empty address
+        uint256 amount =  _value * _tokenGranularity;                             // the destinaton address should not be an empty address
         _balanceOfByPartition[_tokenHolder][_partition] += amount;          // update the classless token reserve balance of the holder
         _balanceOf[_tokenHolder] += amount;                                 // update the general balance reserve of the holder                
-        totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
+        _totalSupply += amount;                                              // add the new minted token to the total supply ---> use safemath library to avoid under and overflow
         emit Issued(msg.sender, _tokenHolder, amount, _data);               // emit the issued event
         emit IssuedByPartition(_partition, msg.sender, _tokenHolder, amount, _data, "");
 
@@ -516,7 +516,7 @@ contract ERC1400 {
        _useCert(_data, _value);
        _balanceOfByPartition[_tokenHolder][_partition] = _balanceOfByPartition[_tokenHolder][_partition] - _value;
        _balanceOf[_tokenHolder] = _balanceOf[_tokenHolder] - _value; // the value should reflect in the global token balance of the sender
-       totalSupply -= _value;
+       _totalSupply -= _value;
        
     }
 
@@ -681,6 +681,34 @@ contract ERC1400 {
         emit SetIssuable(_issuable);
 
     }
+
+    /**
+        @dev functions to return the token details 
+
+        1.  name
+        2.  symbol
+        3.  total supply
+
+     */
+
+     function name() external view returns (string memory) {
+
+         return _tokenName;
+
+     }
+
+     function symbol() external view returns (string memory) {
+
+         return _tokenSymbol;
+
+     }
+
+
+     function totalSupply() external view returns (uint256) {
+
+         return _totalSupply;
+
+     }
     
 
 
