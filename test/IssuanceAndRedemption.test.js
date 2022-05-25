@@ -365,6 +365,24 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
     
         })
+
+
+        describe("Issuance status", ()=>{
+
+            it("returns issuable as true", ()=>{
+                const issuable = await tanglSecurityToken.isIssuable()
+                issuable.should.be.equal(true, "it returns true as the issuance status")
+            })
+
+
+            it("returns issuable as false", ()=>{
+
+                await tanglSecurityToken.setIssuable(false)
+                const issuable = await tanglSecurityToken.isIssuable()
+                issuable.should.be.equal(false, "it returns false as the issuance status")
+            })
+
+        })
     })
 
     
