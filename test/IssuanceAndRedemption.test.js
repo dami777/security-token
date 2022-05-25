@@ -1,4 +1,3 @@
-
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, reitAdministratorPrivKey, tanglAdministratorPrivkey } = require("./helper")
 
 const ERC1400 = artifacts.require("./ERC1400")
@@ -133,7 +132,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
     })
 
-    describe("issuance", ()=>{
+    /*describe("issuance", ()=>{
 
         describe("issuance to partitionless token", ()=>{
 
@@ -267,7 +266,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
                  * set a regulator / controller onchain
                  */
     
-                await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
+                /*await tanglSecurityToken.setController(tanglRegulator, {from: tanglAdministrator})
     
             })
      
@@ -366,7 +365,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
             })
     
         })
-    })
+    })*/
 
     
     describe("redemption", ()=>{
@@ -384,7 +383,7 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
         })
 
-        describe("redemption of the default partition", ()=>{
+        /*describe("redemption of the default partition", ()=>{
 
             let balanceBeforeRedemption
             let partitionBalanceBeforeRedemption
@@ -532,9 +531,63 @@ contract ("Partitionless Token", ([tanglAdministrator, reitAdministrator, invest
 
             
            
-        })
+        })*/
 
         describe("redeemFrom", ()=>{
+
+
+            let balanceBeforeRedemption
+            let partitionBalanceBeforeRedemption
+            let totalSupplyBeforeRedemption
+            let redemptionCert
+
+            beforeEach(async()=>{
+
+                const issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 1, 7, tanglDomainData, tanglAdministratorPrivkey)
+                redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(1)), 6, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.issue(investor_Dami, 1, issuanceCert, {from: tanglAdministrator})
+
+            })
+
+            describe("successful redemption", async()=>{
+
+                let redeemFrom
+
+                beforeEach(async()=>{
+
+                    balanceBeforeRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                    partitionBalanceBeforeRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+                    totalSupplyBeforeRedemption = await tanglSecurityToken.totalSupply()
+                        
+                    await tanglSecurityToken.approve(tanglAdministrator, tokens(1), {from: investor_Dami})
+                    redeemFrom = await tanglSecurityToken.redeemFrom(investor_Dami, tokens(1), redemptionCert, {from: tanglAdministrator})
+
+                })
+
+
+                it("emits event and event data", async()=>{
+
+                    redeemFrom.logs[0].event.should.be.equal("Redeemed", "it emits the redeemed event")
+                    redeemFrom.logs[0].args._operator.should.be.equal(tanglAdministrator, "it emits the operator's address")
+                    redeemFrom.logs[0].args._from.should.be.equal(investor_Dami, "it emits the tokenHolder's address")
+
+
+                })
+
+                it("updates the tokenHolder's balance and total supply", async()=>{
+
+                    const balanceAfterRedemption =  await tanglSecurityToken.balanceOf(investor_Dami)
+                    const partitionBalanceAfterRedemption = await tanglSecurityToken.balanceOfByPartition(classless, investor_Dami)
+
+                    Number(balanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the balance of the token holder after issuance")
+                    Number(partitionBalanceBeforeRedemption).should.be.equal(Number(tokens(1)), "it updates the partitionless balance of the token holder after issuance")
+
+                    Number(balanceAfterRedemption).should.be.equal(0, "it updates the balance of the token holder after redemption")
+                    Number(partitionBalanceAfterRedemption).should.be.equal(0, "it updates the partitionless balance of the token holder after redemption")
+                
+                })
+
+            })
 
         })
 
