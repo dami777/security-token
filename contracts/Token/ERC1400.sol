@@ -87,7 +87,7 @@ contract ERC1400 {
         _tokenGranularity = 10 ** _granularity; // for token decimals 
         //owner = msg.sender;
         //_defaultPartitions = defaultPartitions;
-        setController(msg.sender);
+        _setController(msg.sender);
     
 
     }
@@ -118,6 +118,17 @@ contract ERC1400 {
         require(_isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
+    }
+
+    /**
+        @dev an internal function to set controllers
+
+     */
+
+    function _setController(address _controller) internal {
+        _isController[_controller] = true;
+       _controllers.push(_controller);
+       _indexOfController[_controller] = _controllers.length - 1;
     }
 
 
@@ -370,13 +381,11 @@ contract ERC1400 {
        
    }
 
-   function setController(address _controller) public restricted {
+   function setController(address _controller) external restricted {
 
        require(_controller != address(0), "0x58");      // invalid transfer agent
        require(!_isController[_controller], "ACC");       // address is currently a controller
-       _isController[_controller] = true;
-       _controllers.push(_controller);
-       _indexOfController[_controller] = _controllers.length - 1;
+      _setController(_controller);
 
    }
 
