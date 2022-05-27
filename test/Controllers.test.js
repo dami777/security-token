@@ -272,6 +272,33 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
             })
 
+            it("reverts if a non regulator attempts to execute forceful transfer", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: escrow}).should.be.rejectedWith(reverts.RESTRICTED)
+
+
+            })
+
+
+            it("reverts if a forceful transfer is executed when the contract is uncontrollable", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.setControllability(false)
+                await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator1}).should.be.rejectedWith(reverts.NOT_CONTROLLABLE)
+
+
+            })
+
+
+            it("reverts if the token owner has insufficient balance", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(30)), 4, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.controllerTransfer(investor_Jeff, investor_Dami, tokens(30), transferCert, stringToHex("").hex, {from: tanglAdministrator1}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+
+            })
+
         })
 
 
