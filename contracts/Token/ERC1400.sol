@@ -351,7 +351,7 @@ contract ERC1400 {
       
        if(_isControllable == true && _isController[msg.sender]) {
 
-           _transferByPartition(_partition, _from, _to, _value, "", "", true);
+           _transferByPartition(_partition, _from, _to, _value, _data, "", true);
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
        } else {

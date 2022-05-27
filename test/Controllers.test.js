@@ -301,7 +301,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 forcedTransfer.logs[2].args._to.should.be.equal(investor_Dami, "it emits the recipient of the forceful transfer")
                 Number(forcedTransfer.logs[2].args._value).should.be.equal(Number(tokens(2)), "it emits the amount that was forcefully transferred")
             
-                web3.utils.utfTo8(forcedTransfer.logs[1]._fromPartition).should.be.equal("CLASS A", "it emits the partition where the token was transferred from")
+                web3.utils.hexToUtf8(forcedTransfer.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emits the partition where the token was transferred from")
                 forcedTransfer.logs[1].args._operator.should.be.equal(tanglAdministrator2, "it emits the controller's address")
                 forcedTransfer.logs[1].args._from.should.be.equal(investor_Jeff, "it emits the token holder whose tokens were transferred")
                 forcedTransfer.logs[1].args._to.should.be.equal(investor_Dami, "it emits the recipient's address")
@@ -311,8 +311,8 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
             it("updates the balances of the accounts", async()=>{
 
-                const balanceFrom = await token.balanceOfByPartition(classA, investor_Jeff)
-                const balanceTo = await token.balanceOfByPartition(classA, escrow)
+                const balanceFrom = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+                const balanceTo = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
 
                 balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
                 balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
