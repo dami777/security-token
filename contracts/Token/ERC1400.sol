@@ -71,7 +71,7 @@ contract ERC1400 {
     mapping (address => mapping(bytes32 => uint256)) private _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping (address => bytes32[]) private _partitionsOf;                           // map that stores the partitions of a token holder
     mapping (address => mapping(address => bool)) private _isOperator;              // map to approve or revoke operators for a token holder
-    mapping (bytes32 => uint256) private _indexOfPartitions;
+    
 
     // holder's address -> operator  address -> partition -> true/false
     mapping (address => mapping(address => mapping (bytes32 => bool))) private _isOperatorForPartition;                  // map to approve or revoke operators by partition
@@ -85,14 +85,16 @@ contract ERC1400 {
         _tokenName = _name;
         _tokenSymbol = _symbol;
         _tokenGranularity = 10 ** _granularity; // for token decimals 
-        owner = msg.sender;
+        //owner = msg.sender;
         //_defaultPartitions = defaultPartitions;
+        setController(msg.sender);
+    
 
     }
 
     modifier restricted {
 
-        require(msg.sender == owner || _isController[msg.sender], "0x56");
+        require(_isController[msg.sender], "0x56");
         _;
     }
 
@@ -113,7 +115,7 @@ contract ERC1400 {
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
         require(!_usedSignatures[_signature], "US");    // used signature
         address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), _tokenName);
-        require(_signer == owner || _isController[_signer], "IS");      // invalid signer
+        require(_isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
     }
@@ -368,7 +370,7 @@ contract ERC1400 {
        
    }
 
-   function setController(address _controller) external restricted {
+   function setController(address _controller) public restricted {
 
        require(_controller != address(0), "0x58");      // invalid transfer agent
        require(!_isController[_controller], "ACC");       // address is currently a controller
@@ -476,7 +478,7 @@ contract ERC1400 {
 
 
     /**
-        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the controllers of the contract
 
         The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
      */ 
@@ -745,16 +747,8 @@ contract ERC1400 {
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-    //event SetControllability(bool _isControllable);
-    //event LockedUp (bool _lockedUp);
-    //event SetIssuable (bool _isIssuable);
+    
 
 }
 
 
-/**
-    @refactoring 
-
-    1.  refactor redeem by partition
-    2.  use the signature in the tranfer internal functions
- */

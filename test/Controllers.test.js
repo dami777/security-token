@@ -219,7 +219,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             await tanglSecurityToken.issue(investor_Jeff, 5, issuanceCert2, {from: tanglAdministrator1})
             
             await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})    
-        
+            await tanglSecurityToken.setControllability(true)
                     
         })
 
