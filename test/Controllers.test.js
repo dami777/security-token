@@ -345,6 +345,35 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
             })
 
+
+            it("reverts if a non regulator attempts to execute forceful transfer without being approved as an operator", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: escrow}).should.be.rejectedWith(reverts.RESTRICTED)
+
+
+            })
+
+
+            it("reverts if a forceful transfer is executed when the contract is uncontrollable and the caller is not an operator", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 3, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.setControllability(false)
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator1}).should.be.rejectedWith(reverts.RESTRICTED)
+
+
+            })
+
+
+            it("reverts if the token owner has insufficient balance", async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(30)), 4, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Jeff, investor_Dami, tokens(30), transferCert, stringToHex("").hex, {from: tanglAdministrator1}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+
+            })
+
+
         })
 
 
