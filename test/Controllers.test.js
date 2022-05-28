@@ -380,7 +380,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    describe("forced transfer cannot happen when the control is turned off", ()=>{
+    /*describe("forced transfer cannot happen when the control is turned off", ()=>{
 
         let transferCert
 
@@ -415,35 +415,38 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             
         })  
 
-    })
+    })*/
 
-    /*describe("controller redemption", ()=>{
+    describe("controller redemption", ()=>{
 
         describe("redemption by control", ()=>{
 
-            let redeem
+            let controllerRedeem
 
             beforeEach(async()=>{
-                await token.setController(signer)
-                await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-                await token.setController(tanglAdministrator2)    //  set controller on chain
-                redeem = await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2})
+
+                await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})
+
+                let issuanceCert = await certificate(tanglAdministratorData, investorJeffData, 5, 7, tanglDomainData, tanglAdministratorPrivkey)
+
+                await tanglSecurityToken.issueByPartition(classA.hex, investor_Jeff, 5, issuanceCert)  // issue tokens to an holder's partiton
+                controllerRedeem = await tanglSecurityToken.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2})
                 
             })
 
 
             it("emits Controller Redemption event", async()=>{
-                redeem.logs[1].event.should.be.equal("ControllerRedemption", "it emits ControllerRedemption")
+                controllerRedeem.logs[1].event.should.be.equal("ControllerRedemption", "it emits ControllerRedemption")
             })
 
             it("updates the balance of the token holder", async()=>{
-                const balance = await token.balanceOfByPartition(classA, investor_Jeff)
+                const balance = await tanglSecurityToken.balanceOfByPartition(classA, investor_Jeff)
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
             })
 
         })   
 
-        describe("redemption by approving operator when control is turned off", ()=>{
+        /*describe("redemption by approving operator when control is turned off", ()=>{
             
            
 
@@ -469,8 +472,8 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 redeem.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeem by partition event")
 
             })
-        })
+        })*/
 
-    })*/
+    })
 
 })
