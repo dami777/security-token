@@ -356,7 +356,7 @@ contract ERC1400 {
 
        } else {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
-            _transferByPartition(_partition, _from, _to, _value, "", "", true);
+            _transferByPartition(_partition, _from, _to, _value, _data, "", true);
        }
 
        return _partition;

@@ -212,6 +212,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         beforeEach(async()=>{
 
+
             let issuanceCert1 = await certificate(tanglAdministratorData, investorJeffData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
             let issuanceCert2 = await certificate(tanglAdministratorData, investorJeffData, 5, 2, tanglDomainData, tanglAdministratorPrivkey)
 
@@ -379,24 +380,34 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    /*describe("forced transfer cannot happen when the control is turned off", ()=>{
+    describe("forced transfer cannot happen when the control is turned off", ()=>{
+
+        let transferCert
 
         beforeEach(async()=>{
-            await token.setControllability(false)
-            await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-            await token.setController(tanglAdministrator2)    //  set controller on chain
-            await token.setController(signer)
+
+            await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})    //  set controller onchain
+
+
+            let issuanceCert = await certificate(tanglAdministratorData, investorJeffData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.setControllability(false)
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Jeff, 5, issuanceCert, {from: tanglAdministrator2})  // issue tokens to an holder's partiton
+            
+            
         })
 
-        it("fails to force token transfer because because the control is turned off", async()=>{
-            await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator2}).should.be.rejected
+        it("fails to force token transfer because the control is turned off", async()=>{
+            await tanglSecurityToken.operatorTransferByPartition(classA, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejected
         })
 
-        it("transfers after approving controller as an operator by the holder since control is turned", async()=>{
-            await token.authorizeOperator(tanglAdministrator3, {from: investor_Jeff})
-            await token.operatorTransferByPartition(classA, investor_Jeff, escrow, tokens(2), web3.utils.toHex(""), data, {from: tanglAdministrator3})
-            const balanceFrom = await token.balanceOfByPartition(classA, investor_Jeff)
-            const balanceTo = await token.balanceOfByPartition(classA, escrow)
+        it("transfers after approving controller as an operator by the holder when control is turned", async()=>{
+            
+            await tanglSecurityToken.authorizeOperator(tanglAdministrator3, {from: investor_Jeff})
+            await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator3})
+            const balanceFrom = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+            const balanceTo = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
 
             balanceFrom.toString().should.be.equal(tokens(3).toString(), "it updates the balance of the from account")
             balanceTo.toString().should.be.equal(tokens(2).toString(), "it updates the balance of the to account")
@@ -406,7 +417,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    describe("controller redemption", ()=>{
+    /*describe("controller redemption", ()=>{
 
         describe("redemption by control", ()=>{
 
