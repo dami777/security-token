@@ -408,7 +408,8 @@ contract ERC1400 {
    }
 
    function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
-       _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
+        require(_isControllable, "NC");
+        _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
