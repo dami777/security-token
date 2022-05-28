@@ -436,8 +436,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         describe("redemption by default partition", ()=>{
 
-           let totalSupplyBeforeForcedRedemption
-           let ownerBalanceBeforeRedemption
+        
            let controllerRedeem
 
 
@@ -475,8 +474,8 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 const totalSupplyAfterForcedRedemption = await tanglSecurityToken.totalSupply()
                 const ownerBalanceAfterRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
 
-                BigInt(totalSupplyBeforeForcedRedemption - totalSupplyAfterForcedRedemption).should.be.equal(BigInt(tokens(5)), "the total supply was reduced")
-                BigInt(ownerBalanceBeforeRedemption - ownerBalanceAfterRedemption).should.be.equal(BigInt(tokens(5)), "the balance of the token holder was reduced")
+                BigInt(totalSupplyAfterForcedRedemption).should.be.equal(BigInt(tokens(5)), "the total supply was reduced")
+                BigInt(ownerBalanceAfterRedemption).should.be.equal(BigInt(tokens(5)), "the balance of the token holder was reduced")
 
 
            })
@@ -506,29 +505,49 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         })
 
-        /*describe("redemption by partition", ()=>{
+        describe("redemption by partition", ()=>{
 
-           let totalSupplyBeforeForcedRedemption
-           let ownerBalanceBeforeRedemption
+           
            let controllerRedeem
 
             beforeEach(async()=>{
 
-                controllerRedeem = await tanglSecurityToken.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2})
+                /**
+                * check balance and total suppley before forced redemption
+                * controller calls the redeem function
+                */
+
+                totalSupplyBeforeForcedRedemption = await tanglSecurityToken.totalSupply()
+                ownerBalanceBeforeRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 6, tanglDomainData, tanglAdministratorPrivkey)
+
+
+                controllerRedeem = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(2), redemptionCert, {from:tanglAdministrator2})
                 
             })
 
 
             it("emits Controller Redemption event", async()=>{
-                controllerRedeem.logs[1].event.should.be.equal("ControllerRedemption", "it emits ControllerRedemption")
+
+                controllerRedeem.logs[0].event.should.be.equal("ControllerRedemption", "it emits ControllerRedemption")
+                controllerRedeem.logs[0].args._controller.should.be.equal(tanglAdministrator2, "it emits the controller that called the function")
+                controllerRedeem.logs[0].args._tokenHolder.should.be.equal(investor_Jeff, "it emits the token holder's address")
+                BigInt(controllerRedeem.logs[0].args._value).should.be.equal(BigInt(tokens(2)), "it emits the number of tokens redeemed")
+            
             })
 
-            it("updates the balance of the token holder", async()=>{
-                const balance = await tanglSecurityToken.balanceOfByPartition(classA, investor_Jeff)
-                balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
-            })
+            it("reduces the total supply and the balance of the token holder", async()=>{
 
-        })*/
+                const totalSupplyAfterForcedRedemption = await tanglSecurityToken.totalSupply()
+                const ownerBalanceAfterRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
+
+                BigInt(totalSupplyAfterForcedRedemption).should.be.equal(BigInt(tokens(8)), "the total supply was reduced")
+                BigInt(ownerBalanceAfterRedemption).should.be.equal(BigInt(tokens(8)), "the balance of the token holder was reduced")
+
+           })
+
+        })
 
         /*describe("redemption by approving operator when control is turned off", ()=>{
             

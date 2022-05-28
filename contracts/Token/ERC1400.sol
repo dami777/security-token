@@ -566,11 +566,11 @@ contract ERC1400 {
 
        //require(_isValidCertificate(_operatorData, _value));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
-            _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
-            emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
+            _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
+            emit ControllerRedemption(msg.sender, _tokenHolder, _value, _operatorData, _operatorData);
        } else {
             require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
-            _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
+            _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
        }
 
        emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
