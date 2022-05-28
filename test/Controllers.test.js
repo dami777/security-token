@@ -11,7 +11,6 @@
 
 const ERC1400 = artifacts.require('./ERC1400')
 
-
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
 
 
@@ -419,7 +418,61 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     describe("controller redemption", ()=>{
 
-        describe("redemption by control", ()=>{
+        let totalSupply
+
+        beforeEach(async()=>{
+
+            let issuanceCert1 = await certificate(tanglAdministratorData, investorJeffData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            let issuanceCert2 = await certificate(tanglAdministratorData, investorJeffData, 5, 2, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Jeff, 5, issuanceCert1, {from: tanglAdministrator1})  // issue tokens to an holder's partiton
+            await tanglSecurityToken.issue(investor_Jeff, 5, issuanceCert2, {from: tanglAdministrator1})
+            
+            await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})    
+            await tanglSecurityToken.setControllability(true)
+                    
+       
+        })
+
+
+        describe("redemption by default partition", ()=>{
+
+           let totalSupplyBeforeForcedRedemption
+           let ownerBalanceBeforeRedemption
+
+
+
+           beforeEach(async()=>{
+               /**
+                * check balance and total suppley before forced redemption
+                * controller calls the redeem function
+                */
+                totalSupplyBeforeForcedRedemption = await tanglSecurityToken.totalSupply()
+                ownerBalanceBeforeRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
+
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(5)), 6, tanglDomainData, tanglAdministratorPrivkey)
+
+
+                await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(5), redemptionCert, stringToHex("").hex, {from: tanglAdministrator2})
+
+           })
+
+
+           it("reduces the total supply and the balance of the token holder", async()=>{
+
+                const totalSupplyAfterForcedRedemption = await tanglSecurityToken.totalSupply()
+                const ownerBalanceAfterRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
+
+                BigInt(totalSupplyBeforeForcedRedemption - totalSupplyAfterForcedRedemption).should.be.equal(BigInt(tokens(5)), "the total supply was reduced")
+                BigInt(ownerBalanceBeforeRedemption - ownerBalanceAfterRedemption).should.be.equal(BigInt(tokens(5)), "the balance of the token holder was reduced")
+
+
+           })
+
+        })
+
+        /*describe("redemption by control", ()=>{
 
             let controllerRedeem
 
@@ -444,7 +497,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
             })
 
-        })   
+        })*/
 
         /*describe("redemption by approving operator when control is turned off", ()=>{
             
