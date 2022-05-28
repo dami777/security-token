@@ -418,7 +418,6 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     describe("controller redemption", ()=>{
 
-        let totalSupply
 
         beforeEach(async()=>{
 
@@ -439,6 +438,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
            let totalSupplyBeforeForcedRedemption
            let ownerBalanceBeforeRedemption
+           let controllerRedeem
 
 
 
@@ -454,9 +454,20 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(5)), 6, tanglDomainData, tanglAdministratorPrivkey)
 
 
-                await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(5), redemptionCert, stringToHex("").hex, {from: tanglAdministrator2})
+                controllerRedeem =  await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(5), redemptionCert, stringToHex("").hex, {from: tanglAdministrator2})
 
            })
+
+
+           it("emits event and event data", ()=>{
+
+               controllerRedeem.logs[0].event.should.be.equal("ControllerRedemption", "it emits the controller redemption event")
+               controllerRedeem.logs[0].args._controller.should.be.equal(tanglAdministrator2, "it emits the controller that called the function")
+               controllerRedeem.logs[0].args._tokenHolder.should.be.equal(investor_Jeff, "it emits the token holder's address")
+               Number(controllerRedeem.logs[0].args._value).should.be.equal(Number(tokens(5)), "it emits the number of tokens redeemed")
+               
+
+            })
 
 
            it("reduces the total supply and the balance of the token holder", async()=>{
@@ -495,17 +506,14 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         })
 
-        /*describe("redemption by control", ()=>{
+        /*describe("redemption by partition", ()=>{
 
-            let controllerRedeem
+           let totalSupplyBeforeForcedRedemption
+           let ownerBalanceBeforeRedemption
+           let controllerRedeem
 
             beforeEach(async()=>{
 
-                await tanglSecurityToken.setController(tanglAdministrator2, {from: tanglAdministrator1})
-
-                let issuanceCert = await certificate(tanglAdministratorData, investorJeffData, 5, 7, tanglDomainData, tanglAdministratorPrivkey)
-
-                await tanglSecurityToken.issueByPartition(classA.hex, investor_Jeff, 5, issuanceCert)  // issue tokens to an holder's partiton
                 controllerRedeem = await tanglSecurityToken.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2})
                 
             })
