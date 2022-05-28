@@ -71,7 +71,7 @@ contract ERC1400 {
     mapping (address => mapping(bytes32 => uint256)) private _balanceOfByPartition; // map to store the partitioned token balance of a token holder 
     mapping (address => bytes32[]) private _partitionsOf;                           // map that stores the partitions of a token holder
     mapping (address => mapping(address => bool)) private _isOperator;              // map to approve or revoke operators for a token holder
-    mapping (bytes32 => uint256) private _indexOfPartitions;
+    
 
     // holder's address -> operator  address -> partition -> true/false
     mapping (address => mapping(address => mapping (bytes32 => bool))) private _isOperatorForPartition;                  // map to approve or revoke operators by partition
@@ -85,14 +85,16 @@ contract ERC1400 {
         _tokenName = _name;
         _tokenSymbol = _symbol;
         _tokenGranularity = 10 ** _granularity; // for token decimals 
-        owner = msg.sender;
+        //owner = msg.sender;
         //_defaultPartitions = defaultPartitions;
+        _setController(msg.sender);
+    
 
     }
 
     modifier restricted {
 
-        require(msg.sender == owner || _isController[msg.sender], "0x56");
+        require(_isController[msg.sender], "0x56");
         _;
     }
 
@@ -113,9 +115,20 @@ contract ERC1400 {
         (bytes memory _signature, bytes32 _salt, uint256 _nonce, Certificate.Holder memory _from, Certificate.Holder memory _to) = Certificate.decodeData(_data);
         require(!_usedSignatures[_signature], "US");    // used signature
         address _signer = Certificate.returnSigner(_signature, _salt, _nonce, _from, _to, _amount, address(this), _tokenName);
-        require(_signer == owner || _isController[_signer], "IS");      // invalid signer
+        require(_isController[_signer], "IS");      // invalid signer
         _usedSignatures[_signature] = true;
 
+    }
+
+    /**
+        @dev an internal function to set controllers
+
+     */
+
+    function _setController(address _controller) internal {
+        _isController[_controller] = true;
+       _controllers.push(_controller);
+       _indexOfController[_controller] = _controllers.length - 1;
     }
 
 
@@ -338,12 +351,12 @@ contract ERC1400 {
       
        if(_isControllable == true && _isController[msg.sender]) {
 
-           _transferByPartition(_partition, _from, _to, _value, "", "", true);
+           _transferByPartition(_partition, _from, _to, _value, _data, "", true);
            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
        } else {
             require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
-            _transferByPartition(_partition, _from, _to, _value, "", "", true);
+            _transferByPartition(_partition, _from, _to, _value, _data, "", true);
        }
 
        return _partition;
@@ -365,15 +378,14 @@ contract ERC1400 {
 
    function setControllability(bool _status) external restricted {
        _isControllable = _status;
+       
    }
 
    function setController(address _controller) external restricted {
 
        require(_controller != address(0), "0x58");      // invalid transfer agent
        require(!_isController[_controller], "ACC");       // address is currently a controller
-       _isController[_controller] = true;
-       _controllers.push(_controller);
-       _indexOfController[_controller] = _controllers.length - 1;
+      _setController(_controller);
 
    }
 
@@ -383,20 +395,21 @@ contract ERC1400 {
 
    function removeController(address _controller) external restricted {
 
-        require(_controller != address(0), "0x58");     // invalid transfer agent
-        require(_isController[_controller], "0x58");      // not recognized as a controller
+        require(_controller != address(0) && _isController[_controller], "0x58");     // invalid transfer agent
         _isController[_controller] = false;
         delete _controllers[_indexOfController[_controller]];     // remove the controller from the array of controllers using their saved index value
        
    }
 
-   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
+   function controllerTransfer(address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
+        require(_isControllable, "NC");
         _transferByPartition(_classless, _from, _to, _value, _data, _operatorData, true);
         emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);
    }
 
-   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external {
-       _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
+   function controllerRedeem(address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) external restricted {
+        require(_isControllable, "NC");
+        _redeemByPartition(_classless, _tokenHolder, _value, _data, _operatorData);
         emit ControllerRedemption(msg.sender, _tokenHolder, _value, _data, _operatorData);
    }
 
@@ -475,7 +488,7 @@ contract ERC1400 {
 
 
     /**
-        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the owner of the contract
+        @dev    function to mint and issue new tokens. This function is restricted to other addresses except the controllers of the contract
 
         The tokens are issued to the classless partition. This will serve as default reserve for securities with no class
      */ 
@@ -553,11 +566,11 @@ contract ERC1400 {
 
        //require(_isValidCertificate(_operatorData, _value));           //  verify signer
        if(_isControllable == true && _isController[msg.sender]) {
-            _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
-            emit ControllerRedemption(msg.sender, _tokenHolder, _value, "", _operatorData);
+            _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
+            emit ControllerRedemption(msg.sender, _tokenHolder, _value, _operatorData, _operatorData);
        } else {
-            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
-            _redeemByPartition(_partition, _tokenHolder, _value, "", _operatorData);
+            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x56");     // invalid operator
+            _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
        }
 
        emit RedeemedByPartition(_partition, msg.sender, _tokenHolder, _value, _operatorData);
@@ -654,31 +667,26 @@ contract ERC1400 {
 
 
     /**
-        @dev    Functions to set the control, lockup and issuable status of the token.
+        @dev    Functions to set the lockup and issuable status of the token.
 
-        If setControl is false, the token can't be controlled forcefully
+        
         If setLockUp is true, all transfers will be disabled until the lockup is set to false
         If setIssuable is false, tokens can't be issued until set to true 
      */
 
-    function setControl(bool _controllable) external restricted {
 
-        _isControllable = _controllable;
-        emit SetControl(_controllable);
-
-    }
 
     function setLockUp(bool _lockUp) external restricted {
 
         _lockUpTokens = _lockUp;
-        emit LockedUp(_lockUp);
+        
 
     }
 
     function setIssuable(bool _issuable) external restricted {
 
         _isIssuable = _issuable;
-        emit SetIssuable(_issuable);
+        
 
     }
 
@@ -713,7 +721,7 @@ contract ERC1400 {
      function granularity() external view returns (uint256) {
 
          return _tokenGranularity;
-         
+
      }
     
 
@@ -722,7 +730,7 @@ contract ERC1400 {
 
      // *************************************** Events ********************************************************* //
 
-    event WhiteList (address _investor, uint256 _timeAdded);                                                 // event to be emitted whenever an address is whitelisted
+    
     event Issued (address indexed _operator, address indexed _to, uint256 _value, bytes _data);            // event to be emitted whenever new tokens are minted
     event Transfer (address indexed _from, address indexed _to, uint256 _value);                                            // event to be emitted whenever token is been transferred
     event Approval (address indexed _owner, address indexed _spender, uint256 _value);                        // event to be emitted whenever an external address is approved such as escrows
@@ -749,16 +757,8 @@ contract ERC1400 {
     event Redeemed (address indexed _operator, address indexed _from, uint256 _value, bytes _data);          //  event to be emitted when a token is being redeemed
     event ControllerTransfer (address _controller, address indexed _from, address indexed _to, uint256 _value, bytes _data, bytes _operatorData); // event to be emitted whenever a controller forces a token transfer
     event ControllerRedemption (address _controller, address indexed _tokenHolder, uint256 _value, bytes _data, bytes _operatorData);        // event to be emitted whenever a controller forces token redemption from a token holder's wallet
-    event SetControl (bool _isControllable);
-    event LockedUp (bool _lockedUp);
-    event SetIssuable (bool _isIssuable);
+    
 
 }
 
 
-/**
-    @refactoring 
-
-    1.  refactor redeem by partition
-    2.  use the signature in the tranfer internal functions
- */

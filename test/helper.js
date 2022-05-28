@@ -120,9 +120,12 @@ const reverts = {
     INVALID_RECEIVER: "0x57",
     INSUFFICIENT_BALANCE: "0x52",
     INSUFFICIENT_ALLOWANCE: "0x53",
+    INVALID_TRANSFER_AGENT: "0x58",
     EMPTY_DATA:"DCBE",       //  DCBE : Data Can't Be Empty
     INVALID_SIGNER: "IS",
-    USED_SIGNATURE: "US"
+    USED_SIGNATURE: "US",
+    ADDRESS_IS_CONTROLLER:"ACC",
+    NOT_CONTROLLABLE: "NC"
 
 }
 
@@ -207,8 +210,8 @@ const certificate= async (from, to, amount, nonce, domainData, signerPrivateKey)
 }
 
 
-const tanglAdministratorPrivkey = "622ae25bbf6aabeac44f694483a4a358e318971740b32c6648a605c3985b53af"
-const reitAdministratorPrivKey = "1d8bccd20e82026bcbb0f745fbaf83e8a04bb1e9983a3210baab77cf4ddaef02"
+const tanglAdministratorPrivkey = "f434eb2bd31c5b989c8c1aeafb50262f7356e1bd2312b72d31c2aed90a6172a7"
+const reitAdministratorPrivKey = "2deca9d8a865fdb6035c82e611a8e95bfefdeccabaf6cd43f12b3d77d6d27f0d"
 
 
 module.exports = { 
