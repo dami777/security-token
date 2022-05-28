@@ -565,34 +565,41 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
         })
 
-        /*describe("redemption by approving operator when control is turned off", ()=>{
+        describe("redemption by approving operator when control is turned off", ()=>{
             
            
 
             beforeEach(async()=>{
 
                 
-                await token.setControllability(false)
-                await token.setController(tanglAdministrator2) 
-                await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
-                await token.setController(signer)
+                await tanglSecurityToken.setControllability(false)
+                
 
             })
 
             it("fails to redeem because control is turned off", async()=>{
-                await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator2}).should.be.rejected
+                const redemptionCert = await certificate(investorJeffData, redemptionData, BigInt(tokens(5)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(5), redemptionCert, {from:tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
             })
 
             it("redeems after approving controller as an operator by the token holder", async()=>{
-                await token.authorizeOperator(tanglAdministrator3, {from: investor_Jeff})
-                const redeem = await token.operatorRedeemByPartition(classA, investor_Jeff, tokens(2), data, {from:tanglAdministrator3})
-                const balance = await token.balanceOfByPartition(classA, investor_Jeff)
 
-                balance.toString().should.be.equal(tokens(3).toString(), "it updates the balance")
+                const redemptionCert = await certificate(investorJeffData, redemptionData, BigInt(tokens(2)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.authorizeOperator(tanglAdministrator2, {from: investor_Jeff})
+                const redeem = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(2), redemptionCert, {from:tanglAdministrator2})
+                const balance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+                const totalSupply = await tanglSecurityToken.totalSupply()
+
+                Number(balance).should.be.equal(Number(tokens(3)), "it updates the balance of the token holder")
+                Number(totalSupply).should.be.equal(Number(tokens(8)), "it updates the total supply")
                 redeem.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeem by partition event")
+                Number(redeem.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount redeemed")
+                web3.utils.hexToUtf8(redeem.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition the token was redeemed from")
+                redeem.logs[0].args._from.should.be.equal(investor_Jeff, "it emits the token holder")
+                redeem.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emits the operator")
 
             })
-        })*/
+        })
 
     })
 
