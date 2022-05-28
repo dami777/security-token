@@ -470,6 +470,29 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
            })
 
+           it("reverts if forced redemption is attempted by a non regulator", async()=>{
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(5)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(5), redemptionCert, stringToHex("").hex, {from: escrow}).should.be.rejectedWith(reverts.RESTRICTED)
+
+           })
+
+           it("reverts if forced redemption is attempted when control is turned off", async()=>{
+                
+                await tanglSecurityToken.setControllability(false)
+
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(5)), 8, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(5), redemptionCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.NOT_CONTROLLABLE)
+
+           })
+
+           it("reverts if the token holder has insufficient amount", async()=>{
+            
+                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(5)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.controllerRedeem(investor_Jeff, tokens(10), redemptionCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+           })
+
         })
 
         /*describe("redemption by control", ()=>{
