@@ -569,7 +569,7 @@ contract ERC1400 {
             _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
             emit ControllerRedemption(msg.sender, _tokenHolder, _value, _operatorData, _operatorData);
        } else {
-            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x58");     // invalid operator
+            require(_isOperator[_tokenHolder][msg.sender] || _isOperatorForPartition[_tokenHolder][msg.sender][_partition], "0x56");     // invalid operator
             _redeemByPartition(_partition, _tokenHolder, _value, _operatorData, "");
        }
 

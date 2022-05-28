@@ -520,7 +520,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 totalSupplyBeforeForcedRedemption = await tanglSecurityToken.totalSupply()
                 ownerBalanceBeforeRedemption = await tanglSecurityToken.balanceOf(investor_Jeff)
 
-                const redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 6, tanglDomainData, tanglAdministratorPrivkey)
+                const redemptionCert = await certificate(investorJeffData, redemptionData, BigInt(tokens(2)), 6, tanglDomainData, tanglAdministratorPrivkey)
 
 
                 controllerRedeem = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(2), redemptionCert, {from:tanglAdministrator2})
@@ -547,6 +547,22 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
            })
 
+           it("reverts if forced redemption is attempted by a non regulator", async()=>{
+
+                const redemptionCert = await certificate(investorJeffData, redemptionData, BigInt(tokens(5)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(2), redemptionCert, {from:escrow}).should.be.rejectedWith(reverts.RESTRICTED)
+
+           })
+
+
+
+            it("reverts if the token holder has insufficient amount", async()=>{
+            
+                const redemptionCert = await certificate(investorJeffData, redemptionData, BigInt(tokens(5)), 9, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(8), redemptionCert, {from:tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+            })
+
         })
 
         /*describe("redemption by approving operator when control is turned off", ()=>{
@@ -560,6 +576,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
                 await token.setController(tanglAdministrator2) 
                 await token.issueByPartition(classA, investor_Jeff, 5, web3.utils.toHex(""))  // issue tokens to an holder's partiton
                 await token.setController(signer)
+
             })
 
             it("fails to redeem because control is turned off", async()=>{
