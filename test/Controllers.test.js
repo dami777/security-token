@@ -102,7 +102,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    /*describe("controllability status", ()=>{
+    describe("controllability status", ()=>{
 
         it("can't control tokens", async()=>{
 
@@ -117,7 +117,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             setControl.logs[0].event.should.be.equal("SetControllability", "it emits the SetControllability event")
             setControl.logs[0].args._isControllable.should.be.equal(true, "it emits the status of the controllability")
         })
-    })*/
+    })
 
     describe("setting and removal of controllers", ()=>{
 
@@ -379,7 +379,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
     })
 
-    /*describe("forced transfer cannot happen when the control is turned off", ()=>{
+    describe("forced transfer cannot happen when the control is turned off", ()=>{
 
         let transferCert
 
@@ -414,7 +414,7 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
             
         })  
 
-    })*/
+    })
 
     describe("controller redemption", ()=>{
 
