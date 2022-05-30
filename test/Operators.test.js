@@ -299,6 +299,35 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         describe("revoke operators across all partititons", ()=>{
 
+            /**
+             * revoke an authorized operator
+             */
+
+            beforeEach(async()=>{
+
+                await tanglSecurityToken.authorizeOperator(tanglAdministrator2, {from: investor_Dami})
+
+            })
+
+            it("authorizes the operator", async()=>{
+
+                const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)              
+                isOperator.should.be.equal(true, "investor authorizes an operator across all partitions of his token")
+            
+            })
+
+            it("revokes the operator across all parition", async()=>{
+
+                const revokeOperator = await tanglSecurityToken.revokeOperator(tanglAdministrator2, {from: investor_Dami})
+                const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)              
+                isOperator.should.be.equal(false, "investor revokes an operator across all partitions of his token")
+            
+                revokeOperator.logs[0].event.should.be.equal("RevokedOperator", "it emits the revoked operator event")
+                revokeOperator.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emits the revoked operator's address")
+                revokeOperator.logs[0].args._tokenHolder.should.be.equal(investor_Dami, "it emits the address of the token holder")
+
+            })
+
         })
 
 
