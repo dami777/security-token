@@ -267,8 +267,24 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
 
             it("returns false for the operator's status across all partitions", async()=>{
+
                 const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)
                 isOperator.should.be.equal(false, "not an operator for the token holder's partitions")
+            
+            })
+
+            it("authorizes an operator for a token holder across all parititons", async()=>{
+
+                const authorizeOperator = await tanglSecurityToken.authorizeOperator(tanglAdministrator2, {from: investor_Dami})
+                const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)
+                
+                isOperator.should.be.equal(true, "investor authorizes an operator across all partitions of his token")
+                authorizeOperator.logs[0].event.should.be.equal("AuthorizedOperator", "it emits the authorized operator event")
+                authorizeOperator.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emits the authorized operator")
+                authorizeOperator.logs[0].args._tokenHolder.should.be.equal(investor_Dami, "it emits the token holder")
+
+
+
             })
 
 
