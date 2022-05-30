@@ -351,6 +351,37 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         describe("revoke operators for a specific partition", ()=>{
 
+            /**
+             * Authorize operator
+             * Revoke operator
+             */
+
+            beforeEach(async()=>{
+
+                await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
+
+            })
+
+            it("approves operation for a partition", async()=>{
+
+                const isOperatorForPartition = await tanglSecurityToken.isOperatorForPartition(classA.hex, tanglAdministrator2, investor_Dami)
+                isOperatorForPartition.should.be.equal(true, "operator was approved by token holder to the partition")
+
+            })
+
+            it("revokes operator", async()=>{
+
+                const revokeOperatorByPartition = await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from:investor_Dami})
+                const isOperatorForPartition = await tanglSecurityToken.isOperatorForPartition(classA.hex, tanglAdministrator2, investor_Dami)
+
+                isOperatorForPartition.should.be.equal(false, "operator was revoked by token holder to the partition")
+                revokeOperatorByPartition.logs[0].event.should.be.equal("RevokedOperatorByPartition", "it emits the revoked operator by partition event")
+                web3.utils.hexToUtf8(revokeOperatorByPartition.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition where the operator was revoked")
+                revokeOperatorByPartition.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emits the revoked operator's address")
+                revokeOperatorByPartition.logs[0].args._tokenHolder.should.be.equal(investor_Dami, "it emits the token holder's address")
+
+            })
+
         })
 
 
