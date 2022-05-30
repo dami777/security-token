@@ -290,13 +290,6 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         })
 
-
-        describe("authorize operator across a specific partition", ()=>{
-
-        })
-
-
-
         describe("revoke operators across all partititons", ()=>{
 
             /**
@@ -316,7 +309,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
             
             })
 
-            it("revokes the operator across all parition", async()=>{
+            it("revokes the operator across all partitions", async()=>{
 
                 const revokeOperator = await tanglSecurityToken.revokeOperator(tanglAdministrator2, {from: investor_Dami})
                 const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)              
@@ -330,6 +323,24 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         })
 
+
+        describe("authorize operator across a specific partition", ()=>{
+
+            it("returns false as the default status for operators before authorization", async()=>{
+                
+                const isOperatorForPartition = await tanglSecurityToken.isOperatorForPartition(classA.hex, tanglAdministrator2, investor_Dami)
+                isOperatorForPartition.should.be.equal(false, "by default, no address is an operator for any token holder until they are authorized")
+
+            })
+
+            it("authorizes an operator for a specific partition", async()=>{
+
+                const authorizeOperatorForClassA = await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
+                const isOperatorForPartition = await tanglSecurityToken.isOperatorForPartition(classA.hex, tanglAdministrator2, investor_Dami)
+            
+            })
+
+        })
 
         describe("revoke operators for a specific partition", ()=>{
 
