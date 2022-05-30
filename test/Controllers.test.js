@@ -26,12 +26,12 @@ contract("Controllers and Operators", ([tanglAdministrator1, investor_Dami, inve
 
 
 
-     /**
+    /**
      * Define the data of the issuers and onboarded investors
      * These data will be used to generate certificate for issuance, transfer and redemption of tokens
-     */
+    */
 
-      let tanglAdministratorData = {
+    let tanglAdministratorData = {
             
         firstName: "tangl administrator",
         lastName: "tangl administrator",

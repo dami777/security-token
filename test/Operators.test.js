@@ -1,48 +1,106 @@
 
 const ERC1400 = artifacts.require("./ERC1400")
-const { ETHER_ADDRESS } = require("./helper")
+
 
 require("chai")
     .use(require("chai-as-promised"))
     .should()
 
-const tokens=(n)=>{
-    return new web3.utils.BN(
-        web3.utils.toWei(n.toString(), 'ether')
-    )
+const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
+
+
+contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff])=>{
+
     
-}
+    let tanglSecurityToken
 
-contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, investor5, operator1, operator2,])=>{
+    let classA = stringToHex("CLASS A")
+    let classB = stringToHex("CLASS B")
+    let classless = stringToHex("classless").hex
 
-    let erc1400
-    let name = "Tangl"
-    let symbol = "TAN"
-    let decimal = 18
-    let totalSupply = 0
-    let classA = web3.utils.asciiToHex("CLASS A")
-    let classB = web3.utils.asciiToHex("CLASS B")
-    let signature = "0x9292906193066a70b863da0861b6ea2e366074a455a4c5f6b1a79e7347734e4c72e3b654f028795e7eb8b7762a0be9b249484ac3586f809ba1bc072afe1713191b"
-    let ethHash = "0xa420c3c01ff29855b5c7421b2a235747e80195ebea4a0eecde39229964686d97"
-    let signer  = "0xa3CfeF02b1D2ecB6aa51B133177Ee29764f25e31"
-    let fromIsWhiteListedOrIssuer = true
-    let toIsWhiteListed = true
-    let data =  web3.eth.abi.encodeParameters(["bytes", "bytes32", "bool", "bool"], [signature, ethHash, fromIsWhiteListedOrIssuer, toIsWhiteListed])
-        
+    let tanglTokenDetails = setToken("TANGL", "TAN", 18, 0, [classA.hex,classB.hex])
+
+
+    /**
+     * Define the data of the issuers and onboarded investors
+     * These data will be used to generate certificate for issuance, transfer and redemption of tokens
+    */
+
+      let tanglAdministratorData = {
+            
+        firstName: "tangl administrator",
+        lastName: "tangl administrator",
+        location: "New Yoke, London",
+        walletAddress: tanglAdministrator
+
+    }
+
+    let investorDamiData = {
+
+        firstName: "Dami",
+        lastName: "Ogunkeye",
+        location: "New Yoke, London",
+        walletAddress: investor_Dami
+
+    }
+
+
+    let investorJeffData = {
+
+        firstName: "Jeff",
+        lastName: "Chuka",
+        location: "New Yoke, London",
+        walletAddress: investor_Jeff
+
+    }
+
+    let redemptionData = {
+
+        firstName: "address zero",
+        lastName: "address zero",
+        location: "address zero",
+        walletAddress: ETHER_ADDRESS
+
+    }
+
+    let tanglDomainData
+
+    
+    //const salt = stringToHex("random").hex
+    const salt = "0xa99ee9d3aab69713b85beaef7f222d0304b9c35e89072ae3c6e0cbabcccacc0a"
+
+
     beforeEach( async()=>{
-        erc1400 = await ERC1400.new(name, symbol, decimal, totalSupply, [classA, classB])
-        await erc1400.setTotalPartitions([classA, classB])
+        
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
+        await tanglSecurityToken.setIssuable(true, {from: tanglAdministrator})
+        
+
+
+        tanglDomainData = {
+
+            name: tanglTokenDetails.name,
+            version: "1",
+            chainId: 1337,
+            verifyingContract: tanglSecurityToken.address,
+            salt: salt //"0x0daa2a09fd91f1dcd75517ddae4699d3ade05dd587e55dc861fe82551d2c0b66"
+    
+        }
+
     })
+    
 
     describe("contract deployment", ()=>{
 
         it("has a contract address", ()=>{
-            erc1400.address.should.not.be.equal("", "it has a contract address")
+
+                tanglSecurityToken.address.should.not.be.equal("", "it has a contract address")
+        
         })
 
     })
 
-    describe("partitions of a token holder", ()=>{
+    /*describe("partitions of a token holder", ()=>{
 
         it("returns an array of the initialized partitions", async()=>{
 
@@ -200,9 +258,9 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         })
 
-    })
+    })*/
 
-   describe("operator's access", ()=>{
+   /*describe("operator's access", ()=>{
 
         let issueClassA
 
@@ -642,7 +700,7 @@ contract("ERC1400", ([issuer, investor1, investor2, investor3, investor4, invest
 
         })
 
-    })
+    })*/
 
     
 
