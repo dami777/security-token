@@ -9,7 +9,7 @@ require("chai")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
 
 
-contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff])=>{
+contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdministrator2, tanglAdministrator3])=>{
 
     
     let tanglSecurityToken
@@ -260,161 +260,40 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff])=>{
 
     })*/
 
-   /*describe("operator's access", ()=>{
-
-        let issueClassA
-
-        beforeEach(async()=>{
-
-            issueClassA = await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
-            
-        })
-
-        
-
-        it("confirms that an unauthorized operator can't access an holder's asset", async()=>{
-            const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, investor1)
-            operatorStatus.should.be.equal(false, "unauthorized operator can't access the holder's asset")
-        })
-
-        
-        describe("failed operator's activities", ()=>{
-
-            beforeEach(async()=>{
-                await erc1400.authorizeOperatorByPartition(classA, operator1, {from: investor1})  // investor1 authorizes an operation to access his class A tokens
-            })
-
-            it("failed to send tokens by an unauthorized operator from an address", async()=>{
-
-                await erc1400.operatorTransferByPartition(classA, investor1, investor2, tokens(1), web3.utils.toHex(""), data).should.be.rejected
-
-            })
+    describe("authorize and revoke operators", ()=>{
 
 
-            it("failed to send tokens by an unauthorized signer", async()=>{
-
-                await erc1400.operatorTransferByPartition(classA, investor1, investor2, tokens(1), web3.utils.toHex(""), data, {from:operator1}).should.be.rejected
-
-            })
+        describe("authorize operators across all partitions", ()=>{
 
 
-            
-
-        })
-
-        describe("authorize operator for a specific partition", ()=>{
-
-            let authorizeForPartition
-            
-
-            beforeEach( async()=>{
-                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: investor1})  // investor1 authorizes an operation to access his class A tokens
-            })
-
-            it("validates that aeraton opr has been authorized by a token holder to have access to his assets in a specific partition", async()=>{
-
-                const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, investor1)
-                operatorStatus.should.be.equal(true, "operator has been authorized to access an holder's asset")
-
-            })
-
-            it("validates that the access is restricted to the authorized partition", async()=>{
-                const operatorStatus = await erc1400.isOperatorForPartition(classB, operator1, investor1)
-                operatorStatus.should.be.equal(false, "operator's can only access to holder's class A assets only as he was authorized, hence no access to the holder's class B assets")
-            })
-
-            it("emits an event after authorization", async()=>{
-                authorizeForPartition.logs[0].event.should.be.equal("AuthorizedOperatorByPartition", "it emits the event expected to be emitted")
+            it("returns false for the operator's status across all partitions", async()=>{
+                const isOperator = await tanglSecurityToken.isOperator(tanglAdministrator2, investor_Dami)
+                isOperator.should.be.equal(false, "not an operator for the token holder's partitions")
             })
 
 
         })
 
-        describe("authorizes an operator for all partitions", ()=>{
 
-            let authorizeForAllPartitions
-
-            beforeEach(async()=>{
-                authorizeForAllPartitions = await erc1400.authorizeOperator(operator2, {from: investor1})
-            })
-
-            it("validates that an operator has been authorized", async()=>{
-
-                const operatorStatus1 = await erc1400.isOperator(operator2, investor1)
-                const operatorStatus2 = await erc1400.isOperator(operator2, investor2)
-
-                operatorStatus1.should.be.equal(true, "operator has been authorized by this holder for all his partitioned assets")
-                operatorStatus2.should.be.equal(false, "operator has not been authorized by this holder for all his partitioned assets")
-
-            })
-
-            it("emits the event for authorization of all partitions", async()=>{
-                authorizeForAllPartitions.logs[0].event.should.be.equal("AuthorizedOperator", "emits the required event when an operator is authorized by an holder to access all his assets")
-            })
+        describe("authorize operator across a specific partition", ()=>{
 
         })
 
-        describe("revoke operators", ()=>{
 
-            let authorizeForPartition
-            let authorizeForAllPartitions
 
-            beforeEach(async()=>{
-                authorizeForAllPartitions = await erc1400.authorizeOperator(operator2, {from: investor1})
-            })
-            
-
-            beforeEach( async()=>{
-                authorizeForPartition = await erc1400.authorizeOperatorByPartition(classA, operator1, {from: investor1})  // investor1 authorizes an operation to access his class A tokens
-            })
-
-            describe("revoke operator to a specific partition", ()=>{
-
-                it("authorizes an operator to a specific partition", async()=>{
-                    const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, investor1)
-                    operatorStatus.should.be.equal(true, "operator has been authorized to access class A tokens of an holder's asset")
-                })
-    
-                it("revokes an operator's access to specific partition", async()=>{
-                    const revokeOperatorToPartition = await erc1400.revokeOperatorByPartition(classA, operator1, {from: investor1})
-    
-                    const operatorStatus = await erc1400.isOperatorForPartition(classA, operator1, investor1)
-                    operatorStatus.should.be.equal(false, "operator has been revoked to access class A tokens of an holder's asset")
-    
-                    revokeOperatorToPartition.logs[0].event.should.be.equal("RevokedOperatorByPartition", "it emits the revoked operator by partition event after an address has been revoked")
-    
-                })
-
-            })
-
-            describe("revoke operator to all partitions", ()=>{
-
-                it("authorizes an operator to all partitions", async()=>{
-                    const operatorStatus = await erc1400.isOperator(operator2, investor1)
-                    operatorStatus.should.be.equal(true, "operator has been authorized to access all partitions in an holder's asset")
-                })
-
-                it("revokes an operator to all partitions", async()=>{
-                    const revokeOperatorToAllPartitions = await erc1400.revokeOperator(operator2, {from: investor1}) // revoke operator
-
-                    const operatorStatus = await erc1400.isOperator(operator2, investor1)
-                    operatorStatus.should.be.equal(false, "operator has been revoked from accessing all partitions in an holder's asset")
-
-                    revokeOperatorToAllPartitions.logs[0].event.should.be.equal("RevokedOperator", "emits the event required to be emitted whenever an operator is revoked for all partitions")
-
-                })
-
-               
-
-            })
-
-            
+        describe("revoke operators across all partititons", ()=>{
 
         })
+
+
+        describe("revoke operators for a specific partition", ()=>{
+
+        })
+
 
     })
 
-    describe("operator's operations on assets", ()=>{
+    /*describe("operator's operations on assets", ()=>{
 
         beforeEach(async()=>{
             
