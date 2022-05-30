@@ -338,6 +338,13 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
                 const authorizeOperatorForClassA = await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
                 const isOperatorForPartition = await tanglSecurityToken.isOperatorForPartition(classA.hex, tanglAdministrator2, investor_Dami)
             
+                isOperatorForPartition.should.be.equal(true, "operator approved for partition by token holder")
+                authorizeOperatorForClassA.logs[0].event.should.be.equal("AuthorizedOperatorByPartition", "it emits the authorized operator by partition event")
+                web3.utils.hexToUtf8(authorizeOperatorForClassA.logs[0].args._partition).should.be.equal("CLASS A", "it emits the partition where access was granted to the operator")
+                authorizeOperatorForClassA.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emits the operator's address")
+                authorizeOperatorForClassA.logs[0].args._tokenHolder.should.be.equal(investor_Dami, "it emits the token holder's address")
+
+
             })
 
         })
