@@ -699,17 +699,17 @@ contract ERC1400 {
 
      */
 
-     function name() external view returns (string memory) {
+    function name() external view returns (string memory) {
 
-         return _tokenName;
+        return _tokenName;
 
-     }
+    }
 
-     function symbol() external view returns (string memory) {
+    function symbol() external view returns (string memory) {
 
-         return _tokenSymbol;
+        return _tokenSymbol;
 
-     }
+    }
 
 
      function totalSupply() external view returns (uint256) {
@@ -718,11 +718,11 @@ contract ERC1400 {
 
      }
 
-     function granularity() external view returns (uint256) {
+    function granularity() external view returns (uint256) {
 
-         return _tokenGranularity;
+        return _tokenGranularity;
 
-     }
+    }
     
 
 
