@@ -501,7 +501,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
                 })
     
     
-                it("limits the operator to the authorized paritition", async()=>{
+                it("limits the operator to the authorized partition", async()=>{
     
                     await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
     
@@ -529,9 +529,6 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
                     let transferCert1 = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
                     let transferCert2 = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
-                    
-                    await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
-
     
                     operatorTransferByClassA = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert1, stringToHex("").hex, {from: tanglAdministrator3})
                     operatorTransferByClassB = await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert2, stringToHex("").hex, {from: tanglAdministrator3})
@@ -608,6 +605,53 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
 
             describe("unsuccessful operator transfer", ()=>{
+
+                let transferCert
+    
+                beforeEach(async()=>{
+    
+
+                    transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+    
+                })
+
+                it("fails to transfer by an unauthorized operator", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
+    
+    
+                it("fails to transfer by a revoked operator", async()=>{
+    
+                    await tanglSecurityToken.revokeOperator(tanglAdministrator3, {from:investor_Dami})
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
+    
+    
+                it("fails to transfer due to insufficient balance", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(6), transferCert, stringToHex("").hex, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+                    await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(6), transferCert, stringToHex("").hex, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+                    
+                })
+    
+    
+                it("fails to transfer ether address", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, ETHER_ADDRESS, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+    
+                })
+    
+    
+                it("limits the operator to the authorized partition", async()=>{
+    
+                    const transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+                    await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Jeff, investor_Dami, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
 
             })
 
