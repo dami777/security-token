@@ -392,9 +392,11 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         beforeEach(async()=>{
 
-            let issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            let issuanceCert1 = await certificate(tanglAdministratorData, investorDamiData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            let issuanceCert2 = await certificate(tanglAdministratorData, investorDamiData, 5, 2, tanglDomainData, tanglAdministratorPrivkey)
 
-            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert, {from: tanglAdministrator})  // issue tokens to an holder's partiton
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert1, {from: tanglAdministrator})  // issue tokens to an holder's partiton
+            await tanglSecurityToken.issueByPartition(classB.hex, investor_Dami, 5, issuanceCert2, {from: tanglAdministrator})  // issue tokens to an holder's partiton
 
             await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
@@ -407,7 +409,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
             beforeEach(async()=>{
 
-                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                let transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
                 operatorTransferByPartition = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
             
             })
@@ -442,7 +444,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
                 const fromPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
                 const toPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
 
-                Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(3)), "it updates the total balance of the `from` account")
+                Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(8)), "it updates the total balance of the `from` account")
                 Number(fromPartitionBalance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
             
                 Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(2)), "it updates the total balance of the `to` account")
@@ -454,6 +456,49 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
 
         describe("unsuccessful operator transfers", ()=>{
+
+            let transferCert
+
+            beforeEach(async()=>{
+
+                transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+            })
+
+            it("fails to transfer by an unauthorized operator", async()=>{
+
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+
+            })
+
+
+            it("fails to transfer by a revoked operator", async()=>{
+
+                await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from:investor_Dami})
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+
+            })
+
+
+            it("fails to transfer due to insufficient balance", async()=>{
+
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(6), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+            })
+
+
+            it("fails to transfer ether address", async()=>{
+
+                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, ETHER_ADDRESS, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+
+            })
+
+
+            it("limits the operator to the authorized paritition", async()=>{
+
+                await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+
+            })
 
         })
 
