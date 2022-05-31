@@ -398,109 +398,216 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
             await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert1, {from: tanglAdministrator})  // issue tokens to an holder's partiton
             await tanglSecurityToken.issueByPartition(classB.hex, investor_Dami, 5, issuanceCert2, {from: tanglAdministrator})  // issue tokens to an holder's partiton
 
-            await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
         })
 
-        describe("successful operator transfer", ()=>{
 
-            let operatorTransferByPartition
+        describe("operator transfer due to authorizing for specific partitions", ()=>{
 
+            describe("successful operator transfer", ()=>{
 
-            beforeEach(async()=>{
+                let operatorTransferByPartition
+    
+    
+                beforeEach(async()=>{
 
-                let transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
-                operatorTransferByPartition = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
-            
-            })
+                    let transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
-            it("emits the transfer by partition event", ()=>{
-
-                operatorTransferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
-                operatorTransferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+    
+                    operatorTransferByPartition = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
                 
-                //  Transfer event test
-                operatorTransferByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
-                operatorTransferByPartition.logs[0].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
-                Number(operatorTransferByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
-
-
-                //  TransferByPartition event test
-                operatorTransferByPartition.logs[1].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
-                operatorTransferByPartition.logs[1].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
-                Number(operatorTransferByPartition.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
-                operatorTransferByPartition.logs[1].args._operator.should.be.equal(tanglAdministrator2, "it emits the operator's address")
-                web3.utils.hexToUtf8(operatorTransferByPartition.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emits the partition sent")
-
-
+                })
+    
+                it("emits the transfer by partition event", ()=>{
+    
+                    operatorTransferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+                    operatorTransferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                    
+                    //  Transfer event test
+                    operatorTransferByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByPartition.logs[0].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+    
+    
+                    //  TransferByPartition event test
+                    operatorTransferByPartition.logs[1].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByPartition.logs[1].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByPartition.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+                    operatorTransferByPartition.logs[1].args._operator.should.be.equal(tanglAdministrator2, "it emits the operator's address")
+                    web3.utils.hexToUtf8(operatorTransferByPartition.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emits the partition sent")
+    
+    
+                })
+    
+                it("updates the balances of the `from` and `to` accounts", async()=>{
+    
+                    const fromBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const toBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Jeff)
+    
+    
+                    const fromPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const toPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+    
+                    Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(8)), "it updates the total balance of the `from` account")
+                    Number(fromPartitionBalance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
+                
+                    Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(2)), "it updates the total balance of the `to` account")
+                    Number(toPartitionBalance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
+                })
+    
+    
             })
+    
+    
+            describe("unsuccessful operator transfers", ()=>{
+    
+                let transferCert
+    
+                beforeEach(async()=>{
+    
+                    await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
-            it("updates the balances of the `from` and `to` accounts", async()=>{
-
-                const fromBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Dami)
-                const toBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Jeff)
-
-
-                const fromPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-                const toPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
-
-                Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(8)), "it updates the total balance of the `from` account")
-                Number(fromPartitionBalance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
-            
-                Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(2)), "it updates the total balance of the `to` account")
-                Number(toPartitionBalance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
+                    transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+    
+                })
+    
+                it("fails to transfer by an unauthorized operator", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
+    
+    
+                it("fails to transfer by a revoked operator", async()=>{
+    
+                    await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from:investor_Dami})
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
+    
+    
+                it("fails to transfer due to insufficient balance", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(6), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+    
+                })
+    
+    
+                it("fails to transfer ether address", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, ETHER_ADDRESS, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
+    
+                })
+    
+    
+                it("limits the operator to the authorized paritition", async()=>{
+    
+                    await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+    
+                })
+    
             })
-
 
         })
 
 
-        describe("unsuccessful operator transfers", ()=>{
-
-            let transferCert
+        describe("operator transfer due to authorizing across all paritions", ()=>{
 
             beforeEach(async()=>{
 
-                transferCert = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                await tanglSecurityToken.authorizeOperator(tanglAdministrator3, {from: investor_Dami})
+            
+            })
+
+            describe("successful operator transfer", ()=>{
+
+                let operatorTransferByClassA
+                let operatorTransferByClassB
+
+                beforeEach(async()=>{
+
+                    let transferCert1 = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                    let transferCert2 = await certificate(investorDamiData, investorJeffData, BigInt(tokens(2)), 2, tanglDomainData, tanglAdministratorPrivkey)
+                    
+                    await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
+
+    
+                    operatorTransferByClassA = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert1, stringToHex("").hex, {from: tanglAdministrator3})
+                    operatorTransferByClassB = await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert2, stringToHex("").hex, {from: tanglAdministrator3})
+                    
+                })
+                
+                it("emits the transfer by partition event", ()=>{
+    
+                    operatorTransferByClassA.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+                    operatorTransferByClassA.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                    
+                    //  Transfer event test
+                    operatorTransferByClassA.logs[0].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByClassA.logs[0].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByClassA.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+    
+    
+                    //  TransferByPartition event test
+                    operatorTransferByClassA.logs[1].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByClassA.logs[1].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByClassA.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+                    operatorTransferByClassA.logs[1].args._operator.should.be.equal(tanglAdministrator3, "it emits the operator's address")
+                    web3.utils.hexToUtf8(operatorTransferByClassA.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emits the partition sent")
+    
+    
+                })
+
+
+                it("emits the transfer by partition event", ()=>{
+    
+                    operatorTransferByClassB.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+                    operatorTransferByClassB.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                    
+                    //  Transfer event test
+                    operatorTransferByClassB.logs[0].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByClassB.logs[0].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByClassB.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+    
+    
+                    //  TransferByPartition event test
+                    operatorTransferByClassB.logs[1].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                    operatorTransferByClassB.logs[1].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                    Number(operatorTransferByClassB.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+                    operatorTransferByClassB.logs[1].args._operator.should.be.equal(tanglAdministrator3, "it emits the operator's address")
+                    web3.utils.hexToUtf8(operatorTransferByClassB.logs[1].args._fromPartition).should.be.equal("CLASS B", "it emits the partition sent")
+    
+    
+                })
+    
+                /*it("updates the balances of the `from` and `to` accounts", async()=>{
+    
+                    const fromBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const toBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Jeff)
+    
+    
+                    const fromPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const toPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+    
+                    Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(8)), "it updates the total balance of the `from` account")
+                    Number(fromPartitionBalance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
+                
+                    Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(2)), "it updates the total balance of the `to` account")
+                    Number(toPartitionBalance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
+                })*/
+    
 
             })
 
-            it("fails to transfer by an unauthorized operator", async()=>{
 
-                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
-
-            })
-
-
-            it("fails to transfer by a revoked operator", async()=>{
-
-                await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from:investor_Dami})
-                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
-
-            })
-
-
-            it("fails to transfer due to insufficient balance", async()=>{
-
-                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(6), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
-
-            })
-
-
-            it("fails to transfer ether address", async()=>{
-
-                await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, ETHER_ADDRESS, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INVALID_RECEIVER)
-
-            })
-
-
-            it("limits the operator to the authorized paritition", async()=>{
-
-                await tanglSecurityToken.operatorTransferByPartition(classB.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+            describe("unsuccessful operator transfer", ()=>{
 
             })
 
         })
+
+        
 
     })
 
