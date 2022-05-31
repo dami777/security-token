@@ -387,6 +387,62 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
     })
 
+
+    describe("operator transfer", ()=>{
+
+        beforeEach(async()=>{
+
+            let issuanceCert = await certificate(tanglAdministratorData, investorDamiData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert, {from: tanglAdministrator})  // issue tokens to an holder's partiton
+
+            await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
+
+        })
+
+        describe("successful operator transfer", ()=>{
+
+            let operatorTransferByPartition
+
+
+            beforeEach(async()=>{
+
+                let transferCert = await certificate(investorJeffData, investorDamiData, BigInt(tokens(2)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                operatorTransferByPartition = await tanglSecurityToken.operatorTransferByPartition(classA.hex, investor_Dami, investor_Jeff, tokens(2), transferCert, stringToHex("").hex, {from: tanglAdministrator2})
+            
+            })
+
+            it("emits the transfer by partition event", ()=>{
+
+                operatorTransferByPartition.logs[0].event.should.be.equal("Transfer", "it emits the transfer event")
+                operatorTransferByPartition.logs[1].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
+                
+                //  Transfer event test
+                operatorTransferByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                operatorTransferByPartition.logs[0].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                Number(operatorTransferByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+
+
+                //  TransferByPartition event test
+                operatorTransferByPartition.logs[1].args._from.should.be.equal(investor_Dami, "it emits the `from` account")
+                operatorTransferByPartition.logs[1].args._to.should.be.equal(investor_Jeff, "it emits the `to` account")
+                Number(operatorTransferByPartition.logs[1].args._value).should.be.equal(Number(tokens(2)), "it emits the amount sent")
+                operatorTransferByPartition.logs[1].args._operator.should.be.equal(tanglAdministrator2, "it emits the operator's address")
+                web3.utils.hexToUtf8(operatorTransferByPartition.logs[1].args._fromPartition).should.be.equal("CLASS A", "it emits the partition sent")
+
+
+            })
+
+
+        })
+
+
+        describe("unsuccessful operator transfers", ()=>{
+
+        })
+
+    })
+
     /*describe("operator's operations on assets", ()=>{
 
         beforeEach(async()=>{
