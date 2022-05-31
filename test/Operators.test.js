@@ -581,21 +581,27 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
     
                 })
     
-                /*it("updates the balances of the `from` and `to` accounts", async()=>{
+                it("updates the balances of the `from` and `to` accounts", async()=>{
     
                     const fromBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Dami)
                     const toBalanceAcrossAllPartitions = await tanglSecurityToken.balanceOf(investor_Jeff)
     
     
-                    const fromPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-                    const toPartitionBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
-    
-                    Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(8)), "it updates the total balance of the `from` account")
-                    Number(fromPartitionBalance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
-                
-                    Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(2)), "it updates the total balance of the `to` account")
-                    Number(toPartitionBalance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
-                })*/
+                    const fromPartitionA_Balance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const fromPartitionB_Balance = await tanglSecurityToken.balanceOfByPartition(classB.hex, investor_Dami)
+                    
+                    const toPartitionA_Balance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Jeff)
+                    const toPartitionB_Balance = await tanglSecurityToken.balanceOfByPartition(classB.hex, investor_Jeff)
+                    
+                    Number(fromBalanceAcrossAllPartitions).should.be.equal(Number(tokens(6)), "it updates the total balance of the `from` account")
+                    Number(fromPartitionA_Balance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
+                    Number(fromPartitionB_Balance).should.be.equal(Number(tokens(3)), "it updates the partition balance of the `from` account")
+                    
+                    Number(toBalanceAcrossAllPartitions).should.be.equal(Number(tokens(4)), "it updates the total balance of the `to` account")
+                    Number(toPartitionA_Balance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
+                    Number(toPartitionB_Balance).should.be.equal(Number(tokens(2)), "it updates the partition balance of the `to` account")
+                    
+                })
     
 
             })
