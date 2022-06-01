@@ -260,7 +260,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
     })*/
 
-    describe("authorize and revoke operators", ()=>{
+    /*describe("authorize and revoke operators", ()=>{
 
 
         describe("authorize operators across all partitions", ()=>{
@@ -290,13 +290,13 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         })
 
-        describe("revoke operators across all partititons", ()=>{
+        describe("revoke operators across all partititons", ()=>{*/
 
             /**
              * revoke an authorized operator
              */
 
-            beforeEach(async()=>{
+            /*beforeEach(async()=>{
 
                 await tanglSecurityToken.authorizeOperator(tanglAdministrator2, {from: investor_Dami})
 
@@ -356,7 +356,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
              * Revoke operator
              */
 
-            beforeEach(async()=>{
+            /*beforeEach(async()=>{
 
                 await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
@@ -385,10 +385,10 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
         })
 
 
-    })
+    })*/
 
 
-    describe("operator transfer", ()=>{
+   /* describe("operator transfer", ()=>{
 
         beforeEach(async()=>{
 
@@ -512,7 +512,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
         })
 
 
-        describe("operator transfer due to authorizing across all paritions", ()=>{
+        describe("operator transfer due to authorizing across all partitions", ()=>{
 
             beforeEach(async()=>{
 
@@ -659,6 +659,77 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         
 
+    })*/
+
+
+    describe("operator redeem", ()=>{
+
+
+        //  [] isssue by partition to A and B
+        //  test total supply and balances
+        //  approve operator by partition
+        //  operator redeem by partition
+        //  test success and failed cases
+        //  approve across all partitions
+        //  operator can redeem across all partitions
+        //  test failed cases
+
+        let redemptionCert
+
+        beforeEach(async()=>{
+
+            let issuanceCert1 = await certificate(tanglAdministratorData, investorDamiData, 5, 1, tanglDomainData, tanglAdministratorPrivkey)
+            let issuanceCert2 = await certificate(tanglAdministratorData, investorDamiData, 5, 2, tanglDomainData, tanglAdministratorPrivkey)
+
+            await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert1, {from: tanglAdministrator})  // issue tokens to an holder's partiton
+            await tanglSecurityToken.issueByPartition(classB.hex, investor_Dami, 5, issuanceCert2, {from: tanglAdministrator})  // issue tokens to an holder's partiton
+            
+            redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 7, tanglDomainData, tanglAdministratorPrivkey)
+
+        })
+
+
+        describe("operator redeems due to authorizing for specific partitions", ()=>{
+
+            beforeEach(async()=>{
+                await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
+            })
+
+
+            describe("successful redemption", ()=>{
+
+                it("updates the total supply after issuance", async()=>{
+                    const totalSupply = await tanglSecurityToken.totalSupply()
+                    Number(totalSupply).should.be.equal(Number(tokens(10)), "it updates the total supplyn after issuance")
+                })
+
+                it("redeems the token by the authorized operator", async()=>{
+                    const operatorRedeemByPartition = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2})
+                
+                    // test the RedeemedByPartition event
+
+                    operatorRedeemByPartition.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition event")
+                    operatorRedeemByPartition.logs[0].args._operator.should.be.equal(tanglAdministrator2, "it emit the operator of the token redemption")
+                    operatorRedeemByPartition.logs[0].args._from.should.be.equal(investor_Dami, "it emit the token holder")
+                    web3.utils.hexToUtf8(operatorRedeemByPartition.logs[0].args._partition).should.be.equal("CLASS A", "it emit the redeemed partition")
+                    Number(operatorRedeemByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emit the amount redeemed")
+                    
+                })
+
+            })
+
+
+            describe("failed redemption", ()=>{
+
+            })
+
+        })
+
+
+        describe("operator redeems due to authorizing across all partitions", ()=>{
+
+        })
+        
     })
 
     /*describe("operator's operations on assets", ()=>{
