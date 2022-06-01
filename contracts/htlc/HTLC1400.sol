@@ -122,13 +122,13 @@ contract HTLC1400 {
     /// @notice `ERC1400_TOKEN.transferByPartition` refunds the issuer
     /// @notice `_swapState[_swapID] = OrderLibrary.SwapState.EXPIRED` sets the order's state to EXPIRED
 
-    function refund(bytes32 _swapID, address _securityToken) external {
+    function refund(bytes32 _swapID, address _securityToken, bytes calldata _data) external {
 
         OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         require(_order._issuer == msg.sender, "invalid caller");
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
         require(block.timestamp > _order._expiration, "not expired"); 
-        IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, msg.sender, _order._tokenValue, hex"00");
+        IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).transferByPartition(_order._partition, msg.sender, _order._tokenValue, _data);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.EXPIRED;
         emit RefundOrder(msg.sender, _securityToken, _order._swapID, _order._tokenValue, _order._expiration, _order._partition);
 

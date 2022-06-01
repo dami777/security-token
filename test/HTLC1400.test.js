@@ -267,14 +267,20 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
         })
 
-        /*describe("successful withdrawal", ()=>{
+        describe("successful withdrawal", ()=>{
 
             let successfulTanglWithdrawal
             let successfulReitWithdrawal
 
             beforeEach(async()=>{
-                successfulTanglWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, tanglSecurityToken.address, {from: investor_Dami})
-                successfulReitWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, {from: investo    })
+
+                let withdrawalCert1 = await certificate(htlcData, investorDamiData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                let withdrawalCert2 = await certificate(htlcData, investorJeffData, BigInt(tokens(5)), 2, reitDomainData, reitAdministratorPrivKey)
+                
+                successfulTanglWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami})
+                successfulReitWithdrawal = await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Jeff})
+
+            })
 
             it("emits the Closed Order event", ()=>{
                 successfulTanglWithdrawal.logs[0].event.should.be.equal("ClosedOrder", "it emits the closed order event")
@@ -285,7 +291,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
                 //  investors balance after withdrawal
                 const investorTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
-                const investorReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, investo        //  htlc contract balance after withdrawal by investors
+                const investorReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, investor_Jeff)       //  htlc contract balance after withdrawal by investors
 
                 const htlcTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
                 const htlcReitBalance = await reitSecurityToken.balanceOfByPartition(classB.hex, htlc1400.address)
@@ -303,7 +309,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
                 const order = await htlc1400.checkOrder(orderID, tanglSecurityToken.address)
                 order._investor.should.be.equal(investor_Dami, "it fetched the recipient of the order")
-                order._issuer.should.be.equal(issuer, "it fetched the issuer of the order")
+                order._issuer.should.be.equal(tanglAdministrator, "it fetched the issuer of the order")
                 order._amount.toString().should.be.equal(tokens(5).toString(),"it fetched the amount in the order")
                 order._expiration.toString().should.be.equal(expiration.toString(),"it fetched the expiration of the order")
                 order._orderState.toString().should.be.equal(swapState.CLOSED, "it fetched the updated order state which is closed")
@@ -311,17 +317,18 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 
             })
 
-        })*/
+        })
 
          /**
          * To test for failed withdrawal, comment out the require statement that reverts opening orders for expired time
          */
 
-        /*describe("failed withdrawal", ()=>{
+        describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
+            
 
-            const expiration2 = expired(2)       // set expiration to 2 days before
+            /*const expiration2 = expired(2)       // set expiration to 2 days before
             
             
             beforeEach(async()=>{
@@ -335,17 +342,21 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
                 await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeffe.rejected
-            })
+            })*/
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
-                await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, {from: investor_Dami}).should.be.rejected
+
+                let withdrawalCert1 = await certificate(htlcData, investorDamiData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
+                await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_ORDER)
             })
 
             it("fails to withdraw if an investor tries to use his order ID to withdraw from another security token order of same ID", async()=>{
-                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, reitSecurityToken.address, {from: investor_Dami}).should.be.rejected
+                
+                let withdrawalCert2 = await certificate(htlcData, investorJeffData, BigInt(tokens(5)), 2, reitDomainData, reitAdministratorPrivKey)
+                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
             })
             
-        })*/
+        })
 
         /**
          * To test for refund, comment out the require statement that reverts opening orders for expired time
