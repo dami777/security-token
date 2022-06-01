@@ -95,173 +95,14 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         it("has a contract address", ()=>{
 
-                tanglSecurityToken.address.should.not.be.equal("", "it has a contract address")
+            tanglSecurityToken.address.should.not.be.equal("", "it has a contract address")
         
         })
 
     })
 
-    /*describe("partitions of a token holder", ()=>{
-
-        it("returns an array of the initialized partitions", async()=>{
-
-            const partitions = await erc1400.totalPartitions()
-            partitions.should.not.be.equal([], "the partition is not empty")
-        
-        })
-
-        it("returns a zero balance in share class A for issuer", async()=>{
-            const balance = await erc1400.balanceOfByPartition(classA, issuer)
-            balance.toString().should.be.equal("0", "issuer has 0 balance in class A")
-        }) 
-
-    })
-
-    describe("partition balance of an holder", ()=>{
-
-        beforeEach(async()=>{
-
-            // issuer classA and classB to investor1
-            await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
-            await erc1400.issueByPartition(classB, investor1, 5, web3.utils.toHex(""))
-            
-            // issue classB to investor2
-            await erc1400.issueByPartition(classB, investor2, 5, web3.utils.toHex(""))
-
-        })
-
-        it("outputs the partitions being held by an investor", async()=>{
-            const partitionsOfinvestor1 = await erc1400.partitionsOf(investor1)
-            partitionsOfinvestor1.length.toString().should.be.equal("2", "it returns the partitions in the investor's wallet")
-
-            const partitionsOfinvestor2 = await erc1400.partitionsOf(investor2)
-
-            //  It returns length of 2 instead of 1; which are  bytes0 and the partition he is holding
-            partitionsOfinvestor2.length.toString().should.be.equal("2", "it returns the partitions in the investor's wallet")
-            
-        })
-
-    })
-
-    describe ("issuance of token by partition", ()=>{
-
-        let issueClassA
-
-        beforeEach(async()=>{
-
-            issueClassA = await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
-            
-        })
-
-        describe("issuance of class A tokens", ()=>{
-
-            it("updates the global balance of the token holder", async()=>{
-                const investor1TotalBalance = await erc1400.balanceOf(investor1)
-                investor1TotalBalance.toString().should.be.equal(tokens(5).toString(), "total balance increased")
-            })
-
-            it("updates the balance of the token holder in class A", async()=>{
-                const classAbalance = await erc1400.balanceOfByPartition(classA, investor1)
-                classAbalance.toString().should.be.equal(tokens(5).toString(), "it updates the class A token balance of the holder")
-            })
-
-            it("doesn't affect balance in other partitions", async()=>{
-                const classBbalance = await erc1400.balanceOfByPartition(classB, investor1)
-                classBbalance.toString().should.be.equal(tokens(0).toString(), "issuance to class A doesn't affect class B balance")
-            })
-
-        })
-
-        describe("issuance of class B tokens", ()=>{
-
-            beforeEach(async()=>{
-
-                issueClassB = await erc1400.issueByPartition(classB, investor1, 10, web3.utils.toHex(""))
-
-            })
-
-           it("updates the global balance of the token holder", async()=>{
-                const investor1TotalBalance = await erc1400.balanceOf(investor1)
-                investor1TotalBalance.toString().should.be.equal(tokens(15).toString(), "the global balance of the token holder increases after being issued class B tokens")
-           })
-
-           it("updates class B balance of the holder", async()=>{
-                const classBbalance = await erc1400.balanceOfByPartition(classB, investor1)
-                classBbalance.toString().should.be.equal(tokens(10).toString(), "it updates the class B balance of the holder")
-           })
-
-           it("doesn't affect the balance in other partitions", async()=>{
-                const classAbalance = await erc1400.balanceOfByPartition(classA, investor1)
-                classAbalance.toString().should.be.equal(tokens(5).toString(), "class B issuance doen't affect class A balance") 
-           })
-
-        })
-
-        
-
-    })
-
-    describe("tokens transfer from partitons", ()=>{
-
-
-        let issueClassA
-        
-        beforeEach(async()=>{
-            issueClassA = await erc1400.issueByPartition(classA, investor1, 5, web3.utils.toHex(""))
-            await erc1400.setController(signer)
-        })
-
-        describe("successful transfer", ()=>{
-
-            let classAtokenTransfer
-
-            beforeEach(async()=>{
-                classAtokenTransfer = await erc1400.transferByPartition(classA, investor2, tokens(2), data, {from: investor1})
-            })
-
-           it("transfers tokens in class A from address 2 to investor2", async()=>{
-               
-                const investor1ClassABalance = await erc1400.balanceOfByPartition(classA, investor1)
-                investor1ClassABalance.toString().should.be.equal(tokens(3).toString(), "class A balance of sender reduced accordingly")
-
-                const investor2ClassABalance = await erc1400.balanceOfByPartition(classA, investor2)
-                investor2ClassABalance.toString().should.be.equal(tokens(2).toString(), "class A balance of token receiver increases as expected")
-
-
-            })
-
-            it("reflects in the global balance of the sender and receiver", async()=>{
-                const investor1GlobalBalance = await erc1400.balanceOf(investor1)
-                investor1GlobalBalance.toString().should.be.equal(tokens(3).toString(), "the global balance of the sender updates after transfer")
-
-                const investor2GlobalBalance = await erc1400.balanceOf(investor2)
-                investor2GlobalBalance.toString().should.be.equal(tokens(2).toString(), "the global balance of the receiver updates after transfer")
-            })
-
-            it("emits events", async()=>{
-                classAtokenTransfer.logs[0].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
-                classAtokenTransfer.logs[1].event.should.be.equal("Transfer", "it emits the transfer event")
-                
-            })
-
-        })
-
-        describe("failed transfer", ()=>{
-
-            it("failed to transfer tokens to ether address", async()=>{
-                await erc1400.transferByPartition(classA, ETHER_ADDRESS, tokens(2), data, {from: investor1}).should.be.rejected
-            })
-
-            it("failed due to insufficient tokens", async()=>[
-                await erc1400.transferByPartition(classB, investor2, tokens(2), data, {from: investor1}).should.be.rejected
-            ])
-
-
-        })
-
-    })*/
-
-    /*describe("authorize and revoke operators", ()=>{
+    
+    describe("authorize and revoke operators", ()=>{
 
 
         describe("authorize operators across all partitions", ()=>{
@@ -291,13 +132,13 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         })
 
-        describe("revoke operators across all partititons", ()=>{*/
+        describe("revoke operators across all partititons", ()=>{
 
             /**
              * revoke an authorized operator
              */
 
-            /*beforeEach(async()=>{
+            beforeEach(async()=>{
 
                 await tanglSecurityToken.authorizeOperator(tanglAdministrator2, {from: investor_Dami})
 
@@ -357,7 +198,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
              * Revoke operator
              */
 
-            /*beforeEach(async()=>{
+            beforeEach(async()=>{
 
                 await tanglSecurityToken.authorizeOperatorByPartition(classA.hex, tanglAdministrator2, {from: investor_Dami})
 
@@ -386,10 +227,10 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
         })
 
 
-    })*/
+    })
 
 
-   /* describe("operator transfer", ()=>{
+    describe("operator transfer", ()=>{
 
         beforeEach(async()=>{
 
@@ -660,18 +501,18 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
         
 
-    })*/
+    })
 
 
     describe("operator redeem", ()=>{
 
 
-        //  [] isssue by partition to A and B
+        //  isssue by partition to A and B
         //  test total supply and balances
         //  approve operator by partition
         //  operator redeem by partition
         //  test success and failed cases
-        //  approve across all partitions
+        //  approve operator across all partitions
         //  operator can redeem across all partitions
         //  test failed cases
 
