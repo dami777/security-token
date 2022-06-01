@@ -734,6 +734,38 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
             describe("failed redemption", ()=>{
 
+                it("fails to redeem by an unauthorized address", async()=>{
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+
+                })
+
+
+                it("fails to redeem by an due to insufficient amount", async()=>{
+
+                    redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(12)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(12), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+
+
+                })
+
+
+                it("fails to redeem with a used signature", async()=>{
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2})
+                    
+                    //  attempt to reuse the signature for a replay attack
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.USED_SIGNATURE)
+
+                })
+
+                it("limits the operator to approved partitions only", async()=>{
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classB.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+
+                })
+
             })
 
         })
