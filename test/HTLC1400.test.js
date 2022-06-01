@@ -251,18 +251,18 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             it("fails to open order with an existing order ID", async()=>{
 
-                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor_Dami, tanglSecurityToken.address, tokens(5), expiration, tanglAdministratorTransferCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA.hex, investor_Dami, tanglSecurityToken.address, tokens(5), expiration, tanglAdministratorTransferCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
             
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
 
                 const orderID2 = web3.utils.asciiToHex("x23dvsdgd5t")
-                await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA, investor_JeffrityToken.address, tokens(5), expiration, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(orderID2, secretHex2, secretHash1, classA.hex, investor_Jeff, tanglSecurityToken.address, tokens(5), expiration, tanglAdministratorTransferCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_SECRET)
             })
 
             it("fails to open orders for expired dates", async()=>{
-                await htlc1400.openOrder(stringToHex("4t5d").hex, secretHex1, secretHash1, classA, investor_Dami, tanglSecurityToken.address, expired(1), 10000, data, {from: issuer}).should.be.rejected
+                await htlc1400.openOrder(stringToHex("4t5d").hex, secretHex1, secretHash1, classA.hex, investor_Dami, tanglSecurityToken.address, tokens(5), expired(1), tanglAdministratorTransferCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXPIRATION_TIME_LESS_THAN_NOW)
             })
 
         })
