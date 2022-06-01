@@ -42,8 +42,8 @@ contract ERC1400 {
 
     // ************************ Array ******************************//
 
-    bytes32[] internal _totalPartitions;
-    address[] internal _controllers;
+    bytes32[] private _totalPartitions;
+    address[] private _controllers;
     bytes32 _classless = "classless";
     
 
@@ -209,7 +209,7 @@ contract ERC1400 {
     /// @return uri is saved uri to be returned
     /// @return docHash is the hash of the document to be returned
     
-    function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 docHash) {
+    function getDocument (bytes32 _name) external view returns (string memory, bytes32) {
 
         Doc memory _document = _documents[_name];
 
@@ -311,8 +311,7 @@ contract ERC1400 {
 
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
-        
-        //require(_data.length > 1, "DCBE");               
+                   
         _transferByPartition(_classless, msg.sender, _to, _value, _data, "", true);
         
     }
@@ -597,9 +596,6 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        /*if( _isValidCertificate(_data, _value) != true) {
-            return (hex"59", "invalid signer");
-        }*/
 
         return (hex"51", "transfer success");
 
@@ -623,9 +619,6 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
-        /*if( _isValidCertificate(_data, _value) != true) {
-            return (hex"59", "invalid signer");
-        }*/
 
         return (hex"51", "transfer success");
 
