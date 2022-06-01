@@ -209,7 +209,7 @@ contract ERC1400 {
     /// @return uri is saved uri to be returned
     /// @return docHash is the hash of the document to be returned
     
-    function getDocument (bytes32 _name) external view returns (string memory uri, bytes32 docHash) {
+    function getDocument (bytes32 _name) external view returns (string memory, bytes32) {
 
         Doc memory _document = _documents[_name];
 

@@ -5,8 +5,7 @@ const ERC1400 = artifacts.require("./ERC1400")
 require("chai")
     .use(require("chai-as-promised"))
     .should()
-
-const { should } = require("chai")
+    
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
 
 
