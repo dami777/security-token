@@ -76,7 +76,7 @@ contract HTLC1400 {
     /// @dev    with the uniqueness of the IDS, the secrets dont have to be unique accross the blockchain. The unique ID will keep track of each unique swap orders
     /// @notice IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
 
-    function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _investor, address _securityToken, uint256 _tokenValue, uint256 _expiration, bytes memory _data) external {
+    function openOrder(bytes32 _swapID, bytes32 _secretKey, bytes32 _secretHash, bytes32 _partition, address _investor, address _securityToken, uint256 _tokenValue, uint256 _expiration, bytes calldata _data) external {
 
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "existing id");
