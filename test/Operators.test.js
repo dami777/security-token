@@ -740,6 +740,13 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
                 })
 
+                it("fails to redeem by a revoked operator", async()=>{
+
+                    await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from :investor_Dami})
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+
+                })
+
 
                 it("fails to redeem by an due to insufficient amount", async()=>{
 
@@ -772,6 +779,21 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
 
         describe("operator redeems due to authorizing across all partitions", ()=>{
+
+            beforeEach(async()=>{
+
+                await tanglSecurityToken.authorizeOperator(tanglAdministrator3, {from: investor_Dami})
+            
+            })
+
+            describe("successful redemption", ()=>{
+
+            })
+
+
+            describe("unsuccessful redemption", ()=>{
+                
+            })
 
         })
         
