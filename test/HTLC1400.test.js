@@ -5,7 +5,7 @@ require("chai")
 
 const { ETHER_ADDRESS, tokens, swapState, BYTES_0, setToken, 
     stringToHex, expire, expired, hashSecret, tanglAdministratorPrivkey, 
-    reitAdministratorPrivKey, certificate} = require("./helper.js")
+    reitAdministratorPrivKey, certificate, reverts} = require("./helper.js")
 
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
@@ -229,7 +229,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             })
 
             it("emits the correct open order event data", ()=>{
-                
+
                 createTanglOrder.logs[0].args._investor.should.be.equal(investor_Dami, "it emits the correct recipient address of the security token")
                 createTanglOrder.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the value deposited")
                 createTanglOrder.logs[0].args._secretHash.should.be.equal(secretHash1, "it emits the hash of the open order")
@@ -239,10 +239,20 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             })
         })
 
-        /*describe("failed open order", ()=>{
+        describe("failed open order", ()=>{
+
+            let tanglAdministratorTransferCert
+
+            beforeEach(async()=>{
+
+                tanglAdministratorTransferCert = await certificate(tanglAdministratorData, htlcData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+            })
 
             it("fails to open order with an existing order ID", async()=>{
-                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor_Dami, tanglSecurityToken.address, tokens(5), expiration, data, {from: issuer}).should.be.rejected
+
+                await htlc1400.openOrder(orderID, secretHex1, secretHash1, classA, investor_Dami, tanglSecurityToken.address, tokens(5), expiration, tanglAdministratorTransferCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.EXISTING_ID)
+            
             })
 
             it("fails to open an order if the secret provided by the issuer doesn't match the hash", async()=>{
@@ -257,7 +267,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
         })
 
-        describe("successful withdrawal", ()=>{
+        /*describe("successful withdrawal", ()=>{
 
             let successfulTanglWithdrawal
             let successfulReitWithdrawal
