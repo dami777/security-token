@@ -6,6 +6,7 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const { should } = require("chai")
 const { stringToHex, setToken, certificate, tokens, ETHER_ADDRESS, reverts, tanglAdministratorPrivkey } = require("./helper")
 
 
@@ -841,6 +842,43 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
 
             describe("unsuccessful redemption", ()=>{
+
+                it("fails to redeem by an unauthorized address", async()=>{
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+
+
+                })
+
+                it("fails to redeem by a revoked operator", async()=>{
+
+                    await tanglSecurityToken.revokeOperator(tanglAdministrator3, {from: investor_Dami})
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.RESTRICTED)
+                    
+                })
+
+
+                it("fails to redeem due to insufficient balance", async()=>{
+
+                    redemptionCert1 = await certificate(investorDamiData, redemptionData, BigInt(tokens(12)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(12), redemptionCert1, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+                    
+                })
+
+
+                it("fails to redeem with a used signature", async()=>{
+
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator3})
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.USED_SIGNATURE)
+                    
+                })
+
+                it("limits the operator to holders' it is approved by", async()=>{
+
+                    redemptionCert1 = await certificate(investorJeffData, redemptionData, BigInt(tokens(2)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Jeff, tokens(2), redemptionCert1, {from: tanglAdministrator3}).should.be.rejectedWith(reverts.RESTRICTED)
+
+                })
                 
             })
 
@@ -848,294 +886,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
         
     })
 
-    /*describe("operator's operations on assets", ()=>{
-
-        beforeEach(async()=>{
-            
-            await erc1400.setController(signer)
-        })
-
-        // issuance variable for investor1
-
-        let issueClassAToAdddress2
-        let issueClassBToAdddress2
-
-        // issuance variable for investor2
-
-        let issueClassAToAdddress3
-        let issueClassBToAdddress3
-
-        beforeEach(async()=>{
-            issueClassAToAdddress2 = await erc1400.issueByPartition(classA, investor1, 20, web3.utils.toHex(""))    //issue class A tokens to investor1
-            issueClassBToAdddress2 = await erc1400.issueByPartition(classB, investor1, 20, web3.utils.toHex(""))    //issue class A tokens to investor1
-
-
-            issueClassAToAdddress3 = await erc1400.issueByPartition(classA, investor2, 20, web3.utils.toHex(""))    //issue class A tokens to investor2
-            issueClassBToAdddress3 = await erc1400.issueByPartition(classB, investor2, 20, web3.utils.toHex(""))    //issue class A tokens to investor2
-
-
-            // authorize operator1 accross all partitions
-
-            await erc1400.authorizeOperator(operator1, {from: investor1})
-            await erc1400.authorizeOperator(operator1, {from: investor2})
-
-
-
-            // authorize operator2 accross specific partitions
-
-            await erc1400.authorizeOperatorByPartition(classA, operator2, {from: investor1}) // authorize operator2 to class A
-            await erc1400.authorizeOperatorByPartition(classB, operator2, {from: investor2}) // authorize operator2 to class B
-
-
-
-        })
-
-        it("issued tokens to address 2 and 3", async()=>{
-            const investor1Balance = await erc1400.balanceOf(investor1)
-            investor1Balance.toString().should.be.equal(tokens(40).toString(), "new tokens were issued to investor1")
-
-            const investor2Balance = await erc1400.balanceOf(investor2)
-            investor2Balance.toString().should.be.equal(tokens(40).toString(), "new tokens were issued to investor2")
-        })
-
-        describe("operator 1 transfer activities", ()=>{
-
-            it("transfers tokens from investor1's class A tokens to other addresses", async()=>{
-
-
-                const transfer = await erc1400.operatorTransferByPartition(classA, investor1, investor3, tokens(5), web3.utils.toHex(""), data, {from: operator1})
-
-                const investor1Balance = await erc1400.balanceOfByPartition(classA, investor1)
-                const investor3Balance = await erc1400.balanceOfByPartition(classA, investor3)
-
-                investor1Balance.toString().should.be.equal(tokens(15).toString(), "operator sent tokens from this account")
-                investor3Balance.toString().should.be.equal(tokens(5).toString(), "operator sent tokens from an account to this account")
-                
-                transfer.logs[0].event.should.be.equal("TransferByPartition", "it emits the transfer by partition event")
-                transfer.logs[1].event.should.be.equal("Transfer", "it emits the transfer event")
-
-            })
-
-
-            it("transfers tokens from investor1's class B tokens to other addresses", async()=>{
-
-
-                const transfer = await erc1400.operatorTransferByPartition(classB, investor1, investor4, tokens(10), web3.utils.toHex(""), data, {from: operator1})
-
-                const investor1Balance = await erc1400.balanceOfByPartition(classB, investor1)
-                const investor4Balance = await erc1400.balanceOfByPartition(classB, investor4)
-
-                investor1Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from this account")
-                investor4Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from an account to this account")
-
-            })
-
-            it("fails to transfer tokens from the specified partition due to holder's insufficient token in that partition", async()=>{
-                await erc1400.operatorTransferByPartition(classB, investor1, investor4, tokens(40), web3.utils.toHex(""), data, {from: operator1}).should.be.rejected
-            })
-
-        })
-
-        describe("operator 2 transfer activities", ()=>{
-
-            it("transfers tokens from the class A partition it has been given to", async()=>{
-
-                const transfer = await erc1400.operatorTransferByPartition(classA, investor1, investor4, tokens(20), web3.utils.toHex(""), data, {from: operator2})
-
-                const investor1Balance = await erc1400.balanceOfByPartition(classA, investor1)
-                const investor4Balance = await erc1400.balanceOfByPartition(classA, investor4)
-
-                investor1Balance.toString().should.be.equal(tokens(0).toString(), "operator sent tokens from this account")
-                investor4Balance.toString().should.be.equal(tokens(20).toString(), "operator sent tokens from an account to this account")
-
-
-            })
-
-
-            it("transfers tokens from class B partition it has been given access to", async()=>{
-
-                const transfer = await erc1400.operatorTransferByPartition(classB, investor2, investor3, tokens(10), web3.utils.toHex(""), data, {from: operator2})
-
-                const investor2Balance = await erc1400.balanceOfByPartition(classB, investor2)
-                const investor3Balance = await erc1400.balanceOfByPartition(classB, investor3)
-
-                investor2Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from this account")
-                investor3Balance.toString().should.be.equal(tokens(10).toString(), "operator sent tokens from an account to this account")
-
-            })
-
-            it("rejects an operator's transfer operation from partitions it has no access to", async()=>{
-                await erc1400.operatorTransferByPartition(classB, investor1, investor4, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2}).should.be.rejected
-                await erc1400.operatorTransferByPartition(classA, investor2, investor4, tokens(10), web3.utils.toHex(""), web3.utils.toHex(""), {from: operator2}).should.be.rejected
-            })
-
-        })
-
     
-
-
-
-    })
-
-    describe("redemption by partitition", ()=>{
-
-        let issueClassAToAdddress2
-        let issueClassBToAdddress2
-
-        beforeEach(async()=>{
-
-            issueClassAToAdddress2 = await erc1400.issueByPartition(classA, investor1, 20, web3.utils.toHex(""))    //issue class A tokens to investor1
-            issueClassBToAdddress2 = await erc1400.issueByPartition(classB, investor1, 20, web3.utils.toHex(""))    //issue class A tokens to investor1
-
-            // authorize operator 1 to all partitions
-
-            await erc1400.authorizeOperator(operator1, {from: investor1})
-            
-
-            // authorize operator2 to specific partitions
-
-            await erc1400.authorizeOperatorByPartition(classA, operator2, {from: investor1}) // authorize operator2 to class A only
-           
-            await erc1400.setController(signer)  // add signer to the controllers
-        })
-
-        it("issued tokens to investor1", async()=>{
-            const balance = await erc1400.balanceOf(investor1)
-            balance.toString().should.be.equal(tokens(40).toString(), "tokens were issued to address 2")
-        })
-
-        it("updated the total supply", async()=>{
-            const totalSupply = await erc1400.totalSupply()
-            totalSupply.toString().should.be.equal(tokens(40).toString(), "total supply was updated")
-
-        })
-
-
-        describe("holder burnt his tokens in a partition", ()=>{
-
-            let tokenBurn
-
-            beforeEach(async()=>{
-
-                tokenBurn = await erc1400.redeemByPartition(classA, tokens(1), data, {from: investor1})
-
-            })
-
-            it("burnt tokens successfully", async()=>{
-
-                const balanceOfByPartition = await erc1400.balanceOfByPartition(classA, investor1)
-                balanceOfByPartition.toString().should.be.equal(tokens(19).toString(), "tokens reduced in the specific partition of the token holder after burning")
-
-                const balance = await erc1400.balanceOf(investor1)
-                balance.toString().should.be.equal(tokens(39).toString(), "total balance of the holder reduced after burning tokens in a partition")
-
-            })
-
-            it("reduced the total supply across all partitions after burning tokens", async()=>{
-                const totalSupply = await erc1400.totalSupply()
-                totalSupply.toString().should.be.equal(tokens(39).toString(), "total supply accross all partitions reduces after holder burnt tokens")
-            })
-
-            it("emits the redeem by partition event after an holder burnt his tokens", async()=>{
-
-                tokenBurn.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition event")
-                //tokenBurn.logs[0].args._partition.should.be.equal(classA, "the partition data emitted checks")
-                tokenBurn.logs[0].args._operator.should.be.equal(investor1, "the operator address checks")
-                tokenBurn.logs[0].args._from.should.be.equal(investor1, "the address from which tokens were burnt checks")
-                tokenBurn.logs[0].args._amount.toString().should.be.equal(tokens(1).toString(), "the amount of tokens burnt checks")
-                
-
-            })
-
-            it("failed to burn tokens from partitions with insufficient tokens to burn", async()=>{
-                await erc1400.redeemByPartition(classB, tokens(31), data, {from: investor1}).should.be.rejected
-            })
-
-        })
-
-        describe("operator burns an holder's token", ()=>{
-
-            let operator1Burn
-            let operator2Burn
-
-            
-
-            describe("operator 1 burns token", ()=>{
-
-                beforeEach(async()=>{
-                    operator1Burn = await erc1400.operatorRedeemByPartition(classB, investor1, tokens(5), data, {from: operator1})
-                })
-
-                it("reduces the total supply", async()=>{
-                    const totalSupply = await erc1400.totalSupply()
-                    totalSupply.toString().should.be.equal(tokens(35).toString(), "total supply reduces after operator burns tokens from an holder's partition")
-                })
-
-                it("reduces the balance of the holder", async()=>{
-                    const balanceOfByPartition = await erc1400.balanceOfByPartition(classB, investor1)
-                    balanceOfByPartition.toString().should.be.equal(tokens(15).toString(), "tokens reduced in the specific partition of the token holder after burning")
-
-                    const balance = await erc1400.balanceOf(investor1)
-                    balance.toString().should.be.equal(tokens(35).toString(), "total balance of the holder reduced after burning tokens in a partition")
-                })
-
-                it("emits redeemed by partition event", async()=>{
-                    operator1Burn.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition after an operator burns tokens from an holder's partition")
-                    operator1Burn.logs[0].args._operator.should.be.equal(operator1, "emits the operator's address")
-                    operator1Burn.logs[0].args._from.should.be.equal(investor1, "it emits the holder's address")
-                    operator1Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
-                    operator1Burn.logs[0].args._operatorData.should.be.equal(data, "it emits the signature")
-                })
-
-            })
-
-            describe("operator 2 burns token", ()=>{
-
-                beforeEach(async()=>{
-                    operator2Burn = await erc1400.operatorRedeemByPartition(classA, investor1, tokens(5), data, {from: operator2})
-                })
-
-
-                it("reduces the total supply", async()=>{
-                    const totalSupply = await erc1400.totalSupply()
-                    totalSupply.toString().should.be.equal(tokens(35).toString(), "total supply reduces after operator burns tokens from an holder's partition")
-                })
-
-                it("reduces the balance of the holder", async()=>{
-                    const balanceOfByPartition = await erc1400.balanceOfByPartition(classA, investor1)
-                    balanceOfByPartition.toString().should.be.equal(tokens(15).toString(), "tokens reduced in the specific partition of the token holder after burning")
-
-                    const balance = await erc1400.balanceOf(investor1)
-                    balance.toString().should.be.equal(tokens(35).toString(), "total balance of the holder reduced after burning tokens in a partition")
-                })
-
-                it("emits redeemed by partition event", async()=>{
-                    operator2Burn.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition after an operator burns tokens from an holder's partition")
-                    operator2Burn.logs[0].args._operator.should.be.equal(operator2, "emits the operator's address")
-                    operator2Burn.logs[0].args._from.should.be.equal(investor1, "it emits the holder's address")
-                    operator2Burn.logs[0].args._amount.toString().should.be.equal(tokens(5).toString(), "it emits the amount of tokens burnt")
-                    operator2Burn.logs[0].args._operatorData.should.be.equal(data, "it emits the signature")
-                })
-
-                it("rejects an operator's operation to burn tokens from a specific partition due to his unauthorized access to that partition", async()=>{
-
-                    await erc1400.operatorRedeemByPartition(classB, investor1, tokens(5), data, {from: operator2}).should.be.rejected
-
-                })
-
-                it("rejects the operator's operation because the signer cannot be verified", async()=>{
-                    await erc1400.removeController(signer)
-                    await erc1400.operatorRedeemByPartition(classB, investor1, tokens(5), data, {from: operator2}).should.be.rejected
-
-
-                })
-
-            })
-
-        })
-
-    })*/
-
     
 
 })
