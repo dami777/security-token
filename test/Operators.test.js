@@ -674,7 +674,8 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
         //  operator can redeem across all partitions
         //  test failed cases
 
-        let redemptionCert
+        let redemptionCert1
+        let redemptionCert2
 
         beforeEach(async()=>{
 
@@ -684,7 +685,8 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
             await tanglSecurityToken.issueByPartition(classA.hex, investor_Dami, 5, issuanceCert1, {from: tanglAdministrator})  // issue tokens to an holder's partiton
             await tanglSecurityToken.issueByPartition(classB.hex, investor_Dami, 5, issuanceCert2, {from: tanglAdministrator})  // issue tokens to an holder's partiton
             
-            redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 7, tanglDomainData, tanglAdministratorPrivkey)
+            redemptionCert1 = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 7, tanglDomainData, tanglAdministratorPrivkey)
+            redemptionCert2 = await certificate(investorDamiData, redemptionData, BigInt(tokens(2)), 8, tanglDomainData, tanglAdministratorPrivkey)
 
         })
 
@@ -704,7 +706,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
                 })
 
                 it("redeems the token by the authorized operator", async()=>{
-                    const operatorRedeemByPartition = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2})
+                    const operatorRedeemByPartition = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2})
                 
                     // test the RedeemedByPartition event
 
@@ -736,22 +738,22 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
                 it("fails to redeem by an unauthorized address", async()=>{
 
-                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator}).should.be.rejectedWith(reverts.RESTRICTED)
 
                 })
 
                 it("fails to redeem by a revoked operator", async()=>{
 
                     await tanglSecurityToken.revokeOperatorByPartition(classA.hex, tanglAdministrator2, {from :investor_Dami})
-                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
 
                 })
 
 
                 it("fails to redeem by an due to insufficient amount", async()=>{
 
-                    redemptionCert = await certificate(investorDamiData, redemptionData, BigInt(tokens(12)), 7, tanglDomainData, tanglAdministratorPrivkey)
-                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(12), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
+                    redemptionCert1 = await certificate(investorDamiData, redemptionData, BigInt(tokens(12)), 7, tanglDomainData, tanglAdministratorPrivkey)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(12), redemptionCert1, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.INSUFFICIENT_BALANCE)
 
 
                 })
@@ -759,17 +761,17 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
                 it("fails to redeem with a used signature", async()=>{
 
-                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2})
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2})
                     
                     //  attempt to reuse the signature for a replay attack
 
-                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.USED_SIGNATURE)
+                    await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.USED_SIGNATURE)
 
                 })
 
                 it("limits the operator to approved partitions only", async()=>{
 
-                    await tanglSecurityToken.operatorRedeemByPartition(classB.hex, investor_Dami, tokens(2), redemptionCert, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
+                    await tanglSecurityToken.operatorRedeemByPartition(classB.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator2}).should.be.rejectedWith(reverts.RESTRICTED)
 
                 })
 
@@ -787,6 +789,53 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
             })
 
             describe("successful redemption", ()=>{
+
+                let operatorRedeemByClassA
+                let operatorRedeemByClassB
+
+                beforeEach(async()=>{
+
+                    operatorRedeemByClassA = await tanglSecurityToken.operatorRedeemByPartition(classA.hex, investor_Dami, tokens(2), redemptionCert1, {from: tanglAdministrator3})
+                    operatorRedeemByClassB = await tanglSecurityToken.operatorRedeemByPartition(classB.hex, investor_Dami, tokens(2), redemptionCert2, {from: tanglAdministrator3})
+
+                })
+
+                it("emits the event and event data", async()=>{
+
+                    //  event for class A
+
+                    operatorRedeemByClassA.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition event")
+                    operatorRedeemByClassA.logs[0].args._operator.should.be.equal(tanglAdministrator3, "it emit the operator of the token redemption")
+                    operatorRedeemByClassA.logs[0].args._from.should.be.equal(investor_Dami, "it emit the token holder")
+                    web3.utils.hexToUtf8(operatorRedeemByClassA.logs[0].args._partition).should.be.equal("CLASS A", "it emit the redeemed partition")
+                    Number(operatorRedeemByClassA.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emit the amount redeemed")
+
+                    //  event for class B
+
+                    operatorRedeemByClassB.logs[0].event.should.be.equal("RedeemedByPartition", "it emits the redeemed by partition event")
+                    operatorRedeemByClassB.logs[0].args._operator.should.be.equal(tanglAdministrator3, "it emit the operator of the token redemption")
+                    operatorRedeemByClassB.logs[0].args._from.should.be.equal(investor_Dami, "it emit the token holder")
+                    web3.utils.hexToUtf8(operatorRedeemByClassB.logs[0].args._partition).should.be.equal("CLASS B", "it emit the redeemed partition")
+                    Number(operatorRedeemByClassB.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emit the amount redeemed")
+
+                })
+
+                it("updates the total supply and holder's balances", async()=>{
+                    // test the total supply after redemption
+
+                    const totalSupply = await tanglSecurityToken.totalSupply()
+                    Number(totalSupply).should.be.equal(Number(tokens(6)), "it updates the total supply after redemption")
+
+                    //  test the holder's balances
+                    const totalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const balanceOfByPartitionA = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+                    const balanceOfByPartitionB = await tanglSecurityToken.balanceOfByPartition(classB.hex, investor_Dami)
+
+                    Number(totalBalance).should.be.equal(Number(tokens(6)), "it updates the total balance of the holder after redemption")
+                    Number(balanceOfByPartitionA).should.be.equal(Number(tokens(3)), "it updates the redeemed partition balance after redemption")
+                    Number(balanceOfByPartitionB).should.be.equal(Number(tokens(3)), "it updates the redeemed partition balance after redemption")
+                    
+                })
 
             })
 
