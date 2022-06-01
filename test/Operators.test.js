@@ -700,7 +700,7 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
 
                 it("updates the total supply after issuance", async()=>{
                     const totalSupply = await tanglSecurityToken.totalSupply()
-                    Number(totalSupply).should.be.equal(Number(tokens(10)), "it updates the total supplyn after issuance")
+                    Number(totalSupply).should.be.equal(Number(tokens(10)), "it updates the total supply after issuance")
                 })
 
                 it("redeems the token by the authorized operator", async()=>{
@@ -714,6 +714,19 @@ contract("ERC1400", ([tanglAdministrator, investor_Dami, investor_Jeff, tanglAdm
                     web3.utils.hexToUtf8(operatorRedeemByPartition.logs[0].args._partition).should.be.equal("CLASS A", "it emit the redeemed partition")
                     Number(operatorRedeemByPartition.logs[0].args._value).should.be.equal(Number(tokens(2)), "it emit the amount redeemed")
                     
+
+                    // test the total supply after redemption
+
+                    const totalSupply = await tanglSecurityToken.totalSupply()
+                    Number(totalSupply).should.be.equal(Number(tokens(8)), "it updates the total supply after redemption")
+
+                    //  test the holder's balances
+                    const totalBalance = await tanglSecurityToken.balanceOf(investor_Dami)
+                    const balanceOfByPartition = await tanglSecurityToken.balanceOfByPartition(classA.hex, investor_Dami)
+
+                    Number(totalBalance).should.be.equal(Number(tokens(8)), "it updates the total balance of the holder after redemption")
+                    Number(balanceOfByPartition).should.be.equal(Number(tokens(3)), "it updates the redeemed partition balance after redemption")
+
                 })
 
             })
