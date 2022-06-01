@@ -42,8 +42,8 @@ contract ERC1400 {
 
     // ************************ Array ******************************//
 
-    bytes32[] internal _totalPartitions;
-    address[] internal _controllers;
+    bytes32[] private _totalPartitions;
+    address[] private _controllers;
     bytes32 _classless = "classless";
     
 
