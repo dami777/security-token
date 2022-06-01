@@ -311,8 +311,7 @@ contract ERC1400 {
 
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
-        
-        //require(_data.length > 1, "DCBE");               
+                   
         _transferByPartition(_classless, msg.sender, _to, _value, _data, "", true);
         
     }
@@ -597,9 +596,6 @@ contract ERC1400 {
             return (hex"52", "insufficient balance");
         }
 
-        /*if( _isValidCertificate(_data, _value) != true) {
-            return (hex"59", "invalid signer");
-        }*/
 
         return (hex"51", "transfer success");
 
@@ -623,9 +619,6 @@ contract ERC1400 {
             return (hex"58", "invalid operator");
         } 
 
-        /*if( _isValidCertificate(_data, _value) != true) {
-            return (hex"59", "invalid signer");
-        }*/
 
         return (hex"51", "transfer success");
 
