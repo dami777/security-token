@@ -518,7 +518,9 @@ contract ERC1400 {
    // *********************    TOKEN REDEMPTION
 
 
-   // internal redeem by partition function
+   /**
+        @dev the internal function to redeem tokens 
+    */
 
 
     function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
@@ -533,7 +535,9 @@ contract ERC1400 {
     }
 
    
-
+    /**
+        @dev function to redeem from the default partition
+     */
    function redeem(uint256 _value, bytes memory _data) external {
 
         _redeemByPartition(_classless, msg.sender, _value, _data, "");
@@ -541,6 +545,9 @@ contract ERC1400 {
 
    }
 
+    /**
+        @dev function to for an external spender to redeem function
+     */
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
