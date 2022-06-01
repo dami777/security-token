@@ -347,13 +347,13 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             it("fails due to withdrawal of an id that isn't opened", async()=>{
 
                 let withdrawalCert1 = await certificate(htlcData, investorDamiData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
-                await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_ORDER)
+                await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_OPENED)
             })
 
             it("fails to withdraw if an investor tries to use his order ID to withdraw from another security token order of same ID", async()=>{
                 
                 let withdrawalCert2 = await certificate(htlcData, investorJeffData, BigInt(tokens(5)), 2, reitDomainData, reitAdministratorPrivKey)
-                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
+                await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
             })
             
         })
