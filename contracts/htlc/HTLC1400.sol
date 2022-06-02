@@ -71,7 +71,7 @@ contract HTLC1400 {
     /// @param  _secretKey is the secret word or phrase attached to an order
     /// @param  _secretHash is the hash of the secret that must be provided by the recipient for the recipient to withdraw the security token
     /// @param  _partition is the partition where the token will be withdrawn into, in the investor's wallet
-    /// @param  _data is the encoded certificate that will be decoded to ensure that the recipient is a whitelisted investor
+    /// @param  _data is the encoded certificate needed by the security token contract to authorize the htlc contract's transfer from the issuer's balance
     /// @dev    this htlc contract address should be approved as an operator using "authorizeOperator" accross all partitions or "authorizeOperatorByPartition" for the specific partitions where tokens need to be deposited for the atomic swap
     /// @dev    with the uniqueness of the IDS, the secrets dont have to be unique accross the blockchain. The unique ID will keep track of each unique swap orders
     /// @notice IERC1400(_orderSwap[_securityToken][_swapID]._ERC1400_ADDRESS).operatorTransferByPartition function moves the tokens from the issuer wallets to the htlc address
@@ -90,7 +90,7 @@ contract HTLC1400 {
     }
 
 
-
+    /// @param _data is the certificate generated for the investor to place withdrawal. The security token needs the certificate to authorize transaction
     /// @param  _secretKey is the secret the recipient provides to withdraw the token from the htlc contract    
     /// @param  _swapID is the ID of the order. The ID provided must be valid
     /// @notice the existence of the hash of the secret is checked to be sure that it exist
@@ -116,7 +116,8 @@ contract HTLC1400 {
     }
 
 
-    /// @param _swapID is the id of the order to refunded to the issuer 
+    /// @param _swapID is the id of the order to refunded to the issuer
+    /// @param _data is the refund certificate needed by the htlc contract to refund the issuer 
     /// @notice `_order._issuer` should be msg.sender
     /// @notice `_order._expiration` should be lesser than the current time.  In order words, the order has expired
     /// @notice `ERC1400_TOKEN.transferByPartition` refunds the issuer
