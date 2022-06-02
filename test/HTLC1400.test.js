@@ -3,6 +3,7 @@ require("chai")
     .should()
 
 
+const { default: Web3 } = require("web3")
 const { ETHER_ADDRESS, tokens, swapState, BYTES_0, setToken, 
     stringToHex, expire, expired, hashSecret, tanglAdministratorPrivkey, 
     reitAdministratorPrivKey, certificate, reverts} = require("./helper.js")
@@ -198,7 +199,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
         })
 
 
-        /*describe("successful open orders", ()=>{
+        describe("successful open orders", ()=>{
             
             it("should register the htlc contract address as an operator", async ()=>{
 
@@ -317,13 +318,13 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 
             })
 
-        })*/
+        })
 
          /**
          * To test for failed withdrawal, comment out the require statement that reverts opening orders for expired time
          */
 
-        /*describe("failed withdrawal", ()=>{
+        describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
             
@@ -344,7 +345,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeffe.rejected
             })*/
 
-            /*it("fails due to withdrawal of an id that isn't opened", async()=>{
+            it("fails due to withdrawal of an id that isn't opened", async()=>{
 
                 let withdrawalCert1 = await certificate(htlcData, investorDamiData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
                 await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_OPENED)
@@ -356,13 +357,13 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
             })
             
-        })*/
+        })
 
         /**
          * To test for refund, comment out the require statement that reverts opening orders for expired time
          */
 
-        describe("refund", ()=>{
+        /*describe("refund", ()=>{
 
             let orderID3 = stringToHex("x23d33sdgdp").hex
             const expiration2 = expired(2)       // set expiration to 2 days before
@@ -456,20 +457,29 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             
 
-        })
+        })*/
 
-        /*describe("order checking", ()=>{
+        describe("order checking", ()=>{
 
             it("checks valid orders", async()=>{
+
                 const validOrder = await htlc1400.checkOrder(orderID, tanglSecurityToken.address)
                 validOrder._orderState.toString().should.be.equal(swapState.OPEN)
+                validOrder._issuer.should.be.equal(tanglAdministrator, "it returns the issuer of the order")
+                validOrder._investor.should.be.equal(investor_Dami, "it returns the investor for the order")
+                validOrder._securityTokenAddress.should.be.equal(tanglSecurityToken.address, "it returns the security token address of the order")
+                Number(validOrder._amount).should.be.equal(Number(tokens(5)), "it returns the ordered token amount")
+                web3.utils.hexToUtf8(validOrder._partition).should.be.equal("CLASS A", "it returns the partition of the order")
+                web3.utils.hexToUtf8(validOrder._orderID).should.be.equal("x23dvsdgd", "it returns the id of the order")
+                web3.utils.hexToUtf8(validOrder._secretKey).should.be.equal("", "it returns the empty value for the secret because it is yet to be revealed by the issuer")
+                
             })
 
             it("fails to check invalid orders", async()=>{
-                await htlc1400.checkOrder(stringToHex("x23dfdbvsdgdp").hex, tanglSecurityToken.address).should.be.rejected
+                await htlc1400.checkOrder(stringToHex("x23dfdbvsdgdp").hex, tanglSecurityToken.address).should.be.rejectedWith(reverts.INVALID_ORDER)
             })
 
-        })*/
+        })
 
 
     })
