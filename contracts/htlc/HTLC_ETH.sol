@@ -88,8 +88,8 @@ contract HTLC_ETH {
 
     function issuerWithdrawal(bytes32 _swapID, bytes32 _secretKey, address _securityToken) external noReEntrancy {
 
-        require(_orderSwap[_securityToken][_swapID]._issuer == msg.sender, "invalid caller");
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
+        require(_orderSwap[_securityToken][_swapID]._issuer == msg.sender, "invalid caller");
         require(_orderSwap[_securityToken][_swapID]._funded == true, "not funded");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];
         require(block.timestamp < _order._expiration, "expired order");
@@ -110,8 +110,8 @@ contract HTLC_ETH {
 
     function refund(bytes32 _swapID, address _securityToken) noReEntrancy external  {
 
-        require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.OPEN, "not opened");
+        require(_orderSwap[_securityToken][_swapID]._investor == msg.sender, "invalid caller");
         require(_orderSwap[_securityToken][_swapID]._funded == true, "not funded");
         require(block.timestamp > _orderSwap[_securityToken][_swapID]._expiration, "not expired");
         OrderLibrary.OrderSwap memory _order = _orderSwap[_securityToken][_swapID];

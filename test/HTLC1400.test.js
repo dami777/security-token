@@ -198,7 +198,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
         })
 
 
-        describe("successful open orders", ()=>{
+        /*describe("successful open orders", ()=>{
             
             it("should register the htlc contract address as an operator", async ()=>{
 
@@ -317,13 +317,13 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 
             })
 
-        })
+        })*/
 
          /**
          * To test for failed withdrawal, comment out the require statement that reverts opening orders for expired time
          */
 
-        describe("failed withdrawal", ()=>{
+        /*describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
             
@@ -344,7 +344,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeffe.rejected
             })*/
 
-            it("fails due to withdrawal of an id that isn't opened", async()=>{
+            /*it("fails due to withdrawal of an id that isn't opened", async()=>{
 
                 let withdrawalCert1 = await certificate(htlcData, investorDamiData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
                 await htlc1400.recipientWithdrawal(stringToHex("35trgd").hex, secretHex1, tanglSecurityToken.address, withdrawalCert1, {from: investor_Dami}).should.be.rejectedWith(reverts.NOT_OPENED)
@@ -356,20 +356,24 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 await htlc1400.recipientWithdrawal(orderID, secretHex1, reitSecurityToken.address, withdrawalCert2, {from: investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
             })
             
-        })
+        })*/
 
         /**
          * To test for refund, comment out the require statement that reverts opening orders for expired time
          */
 
-        /*describe("refund", ()=>{
+        describe("refund", ()=>{
 
             let orderID3 = stringToHex("x23d33sdgdp").hex
             const expiration2 = expired(2)       // set expiration to 2 days before
             let refund
 
+
             beforeEach(async()=>{
-                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor_JeffrityToken.address, tokens(5), expiration2, data, {from: issuer})         // expired order
+
+                const tanglAdministratorTransferCert = await certificate(tanglAdministratorData, htlcData, BigInt(tokens(5)), 2, tanglDomainData, tanglAdministratorPrivkey)
+
+                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor_Jeff, tanglSecurityToken.address, tokens(5), expiration2, tanglAdministratorTransferCert, {from: tanglAdministrator})         // expired order
                 
             })
 
@@ -378,7 +382,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
                 it("updates the htlc's and issuer's balance after order was placed", async()=>{
 
                     const htlcTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
-                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, issuer)
+                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, tanglAdministrator)
 
                     htlcTanglBalance.toString().should.be.equal(tokens(10).toString(), "the htlc balance was incremented")
                     issuerTanglBalance.toString().should.be.equal(tokens(90).toString(), "the htlc balance was incremented")
@@ -396,12 +400,15 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             describe("after refund", ()=>{
 
                 beforeEach(async()=>{
-                    refund = await htlc1400.refund(orderID3, tanglSecurityToken.address, {from:issuer})
+
+                    let refundCert = await certificate(htlcData, tanglAdministratorData, BigInt(tokens(5)), 2, tanglDomainData, tanglAdministratorPrivkey)
+
+                    refund = await htlc1400.refund(orderID3, tanglSecurityToken.address, refundCert, {from:tanglAdministrator})
                 })
 
                 it("refunds the issuer and updates the htlc and issuer's balance", async()=>{
                     const htlcTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, htlc1400.address)
-                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, issuer)
+                    const issuerTanglBalance = await tanglSecurityToken.balanceOfByPartition(classA.hex, tanglAdministrator)
 
                     //  refund the issuer
 
@@ -423,16 +430,24 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             describe("failed refund", ()=>{
 
+                let refundCert
+
+                beforeEach(async()=>{
+
+                    refundCert = await certificate(htlcData, tanglAdministratorData, BigInt(tokens(5)), 1, tanglDomainData, tanglAdministratorPrivkey)
+
+                })
+
                 it("should fail to refund orders that is yet to be expired", async()=>{
-                    await htlc1400.refund(orderID, tanglSecurityToken.address, {from:issuer}).should.be.rejected
+                    await htlc1400.refund(orderID, tanglSecurityToken.address, refundCert, {from:tanglAdministrator}).should.be.rejectedWith(reverts.NOT_EXPIRED)
                 })
 
                 it("fails to refund if called by an invalid address", async()=>{
-                    await htlc1400.refund(orderID, tanglSecurityToken.address, {from:investor_Dami}).should.be.rejected
+                    await htlc1400.refund(orderID, tanglSecurityToken.address, refundCert, {from:investor_Dami}).should.be.rejectedWith(reverts.INVALID_CALLER)
                 })
 
                 it("fails to refund an invalid order", async()=>{
-                    await htlc1400.refund(stringToHex("dfgdfdd").hex, tanglSecurityToken.address, {from:issuer}).should.be.rejected
+                    await htlc1400.refund(stringToHex("dfgdfdd").hex, tanglSecurityToken.address, refundCert, {from:tanglAdministrator}).should.be.rejectedWith(reverts.NOT_OPENED)
                 })
     
             })
@@ -441,7 +456,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             
 
-        })*/
+        })
 
         /*describe("order checking", ()=>{
 
