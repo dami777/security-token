@@ -33,7 +33,7 @@ contract HTLC20 {
     function openOrder(bytes32 _swapID, address _investor, address _erc20, address _securityToken, uint256 _price, uint256 _amount, uint256 _expiration, bytes32 _secretHash, bytes32 _secretKey, bytes32 _partition) external {
 
         require(_swapState[_securityToken][_swapID] == OrderLibrary.SwapState.INVALID, "existing id");
-        require( _secretHash == sha256(abi.encode(_secretKey)), "the secret doesn't match the hash");
+        require( _secretHash == sha256(abi.encode(_secretKey)), "invalid secret");
         require(_expiration > block.timestamp, "expiration time is less than present time");
         _orderSwap[_securityToken][_swapID] = OrderLibrary.OrderSwap(msg.sender, _investor, _erc20, _securityToken, _price, _amount, _expiration, _secretHash, bytes32(0), _swapID, _partition, false);
         _swapState[_securityToken][_swapID] = OrderLibrary.SwapState.OPEN;

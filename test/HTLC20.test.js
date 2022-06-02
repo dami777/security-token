@@ -56,8 +56,8 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         
         erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT", {from: USDT_MARKET})
         htlc20 = await HTLC20.new(erc20.address, {from: htlc20Deployer})
-        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tanglAdministrator})
-        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal,  {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal,  {from: reitAdministrator})
 
     })    
 
