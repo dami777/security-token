@@ -3,10 +3,11 @@ require("chai")
     .should()
 
 
-const { default: Web3 } = require("web3")
+const moment = require("moment");
+
 const { ETHER_ADDRESS, tokens, swapState, BYTES_0, setToken, 
     stringToHex, expire, expired, hashSecret, tanglAdministratorPrivkey, 
-    reitAdministratorPrivKey, certificate, reverts} = require("./helper.js")
+    reitAdministratorPrivKey, certificate, reverts, wait} = require("./helper.js")
 
 const HTLC1400 = artifacts.require("./HTLC1400")
 const ERC1400 = artifacts.require("./ERC1400")
@@ -327,23 +328,30 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
         describe("failed withdrawal", ()=>{
 
             let orderID2 = stringToHex("x23d33sdgdp")
+            let withdrawalCert
             
 
-            /*const expiration2 = expired(2)       // set expiration to 2 days before
+
             
             
             beforeEach(async()=>{
-                createTanglOrder2 = await htlc1400.openOrder(orderID2.hex, secretHex1, secretHash1, classA.hex, investor_JeffrityToken.address, tokens(5), expiration2, data, {from: issuer})
+                const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+                const tanglAdministratorTransferCert = await certificate(tanglAdministratorData, htlcData, BigInt(tokens(5)), 3, tanglDomainData, tanglAdministratorPrivkey)
+                withdrawalCert = await certificate(htlcData, investorJeffData, BigInt(tokens(5)), 10, tanglDomainData, tanglAdministratorPrivkey)
+                
+                createTanglOrder2 = await htlc1400.openOrder(orderID2.hex, secretHex1, secretHash1, classA.hex, investor_Jeff, tanglSecurityToken.address, tokens(5), expire_10sec, tanglAdministratorTransferCert, {from: tanglAdministrator})
             })
 
 
             it("fails to withdraw because the withdrawal date has expired", async()=>{
-                await htlc1400.recipientWithdrawal(orderID2.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeffe.rejected
+                
+                await wait(13)  // wait 13 secs for the order to expire
+                await htlc1400.recipientWithdrawal(orderID2.hex, secretHex1, tanglSecurityToken.address, withdrawalCert, {from: investor_Jeff}).rejectedWith(reverts.EXPIRED)
             })
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
-                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeffe.rejected
-            })*/
+                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeff}).rejectedWith(reverts.INVALID_CALLER)
+            })
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
 
@@ -359,14 +367,12 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             
         })
 
-        /**
-         * To test for refund, comment out the require statement that reverts opening orders for expired time
-         */
 
-        /*describe("refund", ()=>{
+        describe("refund", ()=>{
 
             let orderID3 = stringToHex("x23d33sdgdp").hex
-            const expiration2 = expired(2)       // set expiration to 2 days before
+            const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+
             let refund
 
 
@@ -374,7 +380,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
                 const tanglAdministratorTransferCert = await certificate(tanglAdministratorData, htlcData, BigInt(tokens(5)), 2, tanglDomainData, tanglAdministratorPrivkey)
 
-                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor_Jeff, tanglSecurityToken.address, tokens(5), expiration2, tanglAdministratorTransferCert, {from: tanglAdministrator})         // expired order
+                await htlc1400.openOrder(orderID3, secretHex1, secretHash1, classA.hex, investor_Jeff, tanglSecurityToken.address, tokens(5), expire_10sec, tanglAdministratorTransferCert, {from: tanglAdministrator})         // expired order
                 
             })
 
@@ -402,6 +408,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
                 beforeEach(async()=>{
 
+                    await wait(13)  // wait 10 secs for the order to expire
                     let refundCert = await certificate(htlcData, tanglAdministratorData, BigInt(tokens(5)), 2, tanglDomainData, tanglAdministratorPrivkey)
 
                     refund = await htlc1400.refund(orderID3, tanglSecurityToken.address, refundCert, {from:tanglAdministrator})
@@ -457,7 +464,7 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
 
             
 
-        })*/
+        })
 
         describe("order checking", ()=>{
 
