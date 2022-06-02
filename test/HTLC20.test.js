@@ -320,7 +320,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                /*it("fails to withdraw from an expired order", async()=>{*/
+                it("fails to withdraw from an expired order", async()=>{
 
                     /**
                      * set the orde id
@@ -331,14 +331,18 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                      */
                     
 
-                    /*const orderID = stringToHex("dfbdfb").hex 
-                    const expire_10sec = expired(2)
-                    await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address,  price, amount, expire_10sec, secretHash, secretHex, classA.hex, {from: reitAdministrator})
+                    const orderID = stringToHex("dfbdfb").hex 
+                    const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+
+                    await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address, price, amount, expire_10sec, secretHash, secretHex, classA.hex, {from: reitAdministrator})
                     await htlc20.fundOrder(orderID, reitSecurityToken.address, {from: investor1})
+
+                    await wait(13)      //  set order to expire after 13 secs
+
                     await htlc20.issuerWithdrawal(orderID, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
 
 
-                })*/
+                })
 
                 it("fails to withdraw if the secret provided by the administrator does not match the secret registered with the order", async()=>{
 
