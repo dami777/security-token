@@ -49,8 +49,8 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
         htlcEth = await HTLC_ETH.new()
         refundReEntrancy = await RefundReEntrancy.new(htlcEth.address)
         withdrawReEntrancy = await WithDrawReEntrancy.new(htlcEth.address)
-        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tanglAdministrator})
-        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, {from: reitAdministrator})
         
         //  set the gas price
 
@@ -425,7 +425,7 @@ contract ("HTLC for ETH Deposit", ([tanglAdministrator, reitAdministrator, inves
                     })
 
                     it("fails to release payment if withdrawal is attempted by the wrong issuer", async()=>{
-                        await htlcEth.issuerWithdrawal(orderID_1, secretHex, reitSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_CALLER)
+                        await htlcEth.issuerWithdrawal(orderID_2, secretHex, reitSecurityToken.address, {from:tanglAdministrator}).should.be.rejectedWith(reverts.INVALID_CALLER)
                     })
 
                     it("fails to withdraw from an order that has not been funded by the investor", async()=>{
