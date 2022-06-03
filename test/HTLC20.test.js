@@ -2,9 +2,12 @@ require("chai")
     .use(require("chai-as-promised"))
     .should()
 
+const moment = require("moment");
 
 
-const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts} = require("./helper.js")
+
+
+const { ETHER_ADDRESS, tokens, swapState, expire, expired, stringToHex, hashSecret, setToken, reverts, wait} = require("./helper.js")
 
 //  connect to the smart contract
 
@@ -56,8 +59,8 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
         
         erc20 = await ERC20_USDT.new("US Dollars Tether", "USDT", {from: USDT_MARKET})
         htlc20 = await HTLC20.new(erc20.address, {from: htlc20Deployer})
-        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal, tanglTokenDetails.totalSupply, tanglTokenDetails.shareClass, {from: tanglAdministrator})
-        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal, reitTokenDetails.totalSupply, reitTokenDetails.shareClass, {from: reitAdministrator})
+        tanglSecurityToken = await ERC1400.new(tanglTokenDetails.name, tanglTokenDetails.symbol, tanglTokenDetails.decimal,  {from: tanglAdministrator})
+        reitSecurityToken = await ERC1400.new(reitTokenDetails.name, reitTokenDetails.symbol, reitTokenDetails.decimal,  {from: reitAdministrator})
 
     })    
 
@@ -317,7 +320,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
                 })
 
-                /*it("fails to withdraw from an expired order", async()=>{*/
+                it("fails to withdraw from an expired order", async()=>{
 
                     /**
                      * set the orde id
@@ -328,14 +331,18 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
                      */
                     
 
-                    /*const orderID = stringToHex("dfbdfb").hex 
-                    const expiredDate = expired(2)
-                    await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
+                    const orderID = stringToHex("dfbdfb").hex 
+                    const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+
+                    await htlc20.openOrder(orderID, investor1, erc20.address, reitSecurityToken.address, price, amount, expire_10sec, secretHash, secretHex, classA.hex, {from: reitAdministrator})
                     await htlc20.fundOrder(orderID, reitSecurityToken.address, {from: investor1})
+
+                    await wait(13)      //  set order to expire after 13 secs
+
                     await htlc20.issuerWithdrawal(orderID, secretHex, reitSecurityToken.address, {from: reitAdministrator}).should.be.rejectedWith(reverts.EXPIRED)
 
 
-                })*/
+                })
 
                 it("fails to withdraw if the secret provided by the administrator does not match the secret registered with the order", async()=>{
 
@@ -356,18 +363,23 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
     })
 
-    /*describe("expired order", ()=>{
+    describe("expired order", ()=>{
 
         let orderID2 = stringToHex("x23d33sdgdp").hex
-        const expiredDate = expired(2)       // set expiration to 2 days before
+
         let refund
 
         beforeEach(async()=>{
 
-            await htlc20.openOrder(orderID2, investor1, erc20.address, reitSecurityToken.address,  price, amount, expiredDate, secretHash, secretHex, classA.hex, {from: reitAdministrator})
+            const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
+            
+            await htlc20.openOrder(orderID2, investor1, erc20.address, reitSecurityToken.address,  price, amount, expire_10sec, secretHash, secretHex, classA.hex, {from: reitAdministrator})
             await erc20.transfer(investor1, tokens(2000), {from: USDT_MARKET})                           // investor purchases usdt token from escrow/exchanges/p2p/any secondary market
             await erc20.approve(htlc20.address, tokens(1000), {from: investor1})    // investor approves the htlc contract to move the tokens from his wallet to fund the order
             funded = await htlc20.fundOrder(orderID2, reitSecurityToken.address, {from: investor1})            // investor funds the order
+            
+            //  order expires in 13 secs
+            await wait(13)
         })
 
         describe("the order is opened", ()=>{
@@ -458,7 +470,7 @@ contract("HTLC20", ([htlc20Deployer, tanglAdministrator, reitAdministrator, inve
 
         })
 
-    })*/
+    })
 
 })
 

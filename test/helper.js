@@ -210,8 +210,8 @@ const certificate= async (from, to, amount, nonce, domainData, signerPrivateKey)
 }
 
 
-const tanglAdministratorPrivkey = "f434eb2bd31c5b989c8c1aeafb50262f7356e1bd2312b72d31c2aed90a6172a7"
-const reitAdministratorPrivKey = "2deca9d8a865fdb6035c82e611a8e95bfefdeccabaf6cd43f12b3d77d6d27f0d"
+const tanglAdministratorPrivkey = "5a79b29911bdd92ba8693256237f1c8741de68e161531e50d363df7855dcbd7e"
+const reitAdministratorPrivKey = "edac872c376d87a61bd0b70f5ab80a2a9814d5d14cdc9c971bc564951cff163e"
 
 
 module.exports = { 

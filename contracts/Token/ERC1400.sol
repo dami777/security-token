@@ -307,7 +307,7 @@ contract ERC1400 {
         The function uses the _transferByPartition internal function
 
         @notice _data.length > 0, ensures that data with length 0 or 1 is not accepted and interpreted as empty data
-     */ 
+    */ 
 
 
     function transferWithData(address _to, uint256 _value, bytes memory _data) external {
@@ -341,27 +341,27 @@ contract ERC1400 {
        _transferByPartition(_partition, msg.sender, _to, _value, _data , "", true);
         return _partition;
 
-   }    
+    }    
 
    // operator transfer by partition
    
-   function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
+    function operatorTransferByPartition(bytes32 _partition, address _from, address _to, uint256 _value, bytes memory _data, bytes memory _operatorData) external returns (bytes32) {
 
-      
-       if(_isControllable == true && _isController[msg.sender]) {
+        
+        if(_isControllable == true && _isController[msg.sender]) {
 
-           _transferByPartition(_partition, _from, _to, _value, _data, "", true);
-           emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
-
-       } else {
-            require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
             _transferByPartition(_partition, _from, _to, _value, _data, "", true);
-       }
+            emit ControllerTransfer(msg.sender, _from, _to, _value, _data, _operatorData);       // forceful transfers
 
-       return _partition;
-      
-       
-   }
+        } else {
+                require(_isOperatorForPartition[_from][msg.sender][_partition] || _isOperator[_from][msg.sender], "0x56"); // 0x56 invalid sender
+                _transferByPartition(_partition, _from, _to, _value, _data, "", true);
+        }
+
+        return _partition;
+        
+        
+    }
 
 
 
@@ -518,7 +518,9 @@ contract ERC1400 {
    // *********************    TOKEN REDEMPTION
 
 
-   // internal redeem by partition function
+   /**
+        @dev the internal function to redeem tokens 
+    */
 
 
     function _redeemByPartition(bytes32 _partition, address _tokenHolder, uint256 _value, bytes memory _data, bytes memory _operatorData) internal {
@@ -533,7 +535,9 @@ contract ERC1400 {
     }
 
    
-
+    /**
+        @dev function to redeem from the default partition
+     */
    function redeem(uint256 _value, bytes memory _data) external {
 
         _redeemByPartition(_classless, msg.sender, _value, _data, "");
@@ -541,6 +545,9 @@ contract ERC1400 {
 
    }
 
+    /**
+        @dev function to for an external spender to redeem function
+     */
    function redeemFrom(address _tokenHolder, uint256 _value, bytes memory _data) external {
 
         require(allowance[_tokenHolder][msg.sender] >= _value, "0x53");  // insufficient allowance
