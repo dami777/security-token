@@ -346,11 +346,12 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
             it("fails to withdraw because the withdrawal date has expired", async()=>{
                 
                 await wait(13)  // wait 13 secs for the order to expire
-                await htlc1400.recipientWithdrawal(orderID2.hex, secretHex1, tanglSecurityToken.address, withdrawalCert, {from: investor_Jeff}).rejectedWith(reverts.EXPIRED)
+                await htlc1400.recipientWithdrawal(orderID2.hex, secretHex1, tanglSecurityToken.address, withdrawalCert, {from: investor_Jeff}).should.be.rejectedWith(reverts.EXPIRED)
             })
 
             it("fails due to withdrawal by an invalid recipient of a particular order", async()=>{
-                await htlc1400.recipientWithdrawal(orderID.hex, secretHex1, tanglSecurityToken.address, {from: investor_Jeff}).rejectedWith(reverts.INVALID_CALLER)
+
+                await htlc1400.recipientWithdrawal(orderID, secretHex1, tanglSecurityToken.address, withdrawalCert, {from: investor_Jeff}).should.be.rejectedWith(reverts.INVALID_CALLER)
             })
 
             it("fails due to withdrawal of an id that isn't opened", async()=>{
@@ -371,12 +372,13 @@ contract("HTLC1400", ([tanglAdministrator, reitAdministrator, investor_Dami, inv
         describe("refund", ()=>{
 
             let orderID3 = stringToHex("x23d33sdgdp").hex
-            const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
 
             let refund
 
 
             beforeEach(async()=>{
+
+                const expire_10sec = new Date(moment().add(10, 'seconds').unix()).getTime()       // order expires in 10 secs                
 
                 const tanglAdministratorTransferCert = await certificate(tanglAdministratorData, htlcData, BigInt(tokens(5)), 2, tanglDomainData, tanglAdministratorPrivkey)
 
