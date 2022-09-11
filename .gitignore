@@ -1,3 +1,4 @@
 /node_modules
 token.txt
 /contracts/Test.sol
+.env

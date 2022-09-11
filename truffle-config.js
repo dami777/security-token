@@ -1,10 +1,10 @@
 //require("babel-polyfill");
 //require("babel-register");  // set us the connfig for es6 features
-//require("dotenv").config();
+require("dotenv").config();
 const HDWalletProvider = require('truffle-hdwallet-provider-privkey')
 
-const PRIVATE_KEY = "0ea72244b1016e8f60111f88297d7132f12159397c53f9fb5d3711ca3591fa57" // process.env.PRIVATE_KEY
-const API_URL = "https://eth-rinkeby.alchemyapi.io/v2/3BSBZyCvsYxhf_NiYhy2uoGUtc-oy9kP" //process.env.API_URL
+const PRIVATE_KEY = process.env.PRIVATE_KEY
+const API_URL = process.env.API_URL
 
 
 module.exports = {
