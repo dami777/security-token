@@ -19,7 +19,6 @@ module.exports = async function (deployer) {
 
       // link libraries before contract deployment
 
-      await deployer.link(Certificate, GenerateEthSignature)
       await deployer.link(Certificate, ERC1400)
 
 
@@ -29,11 +28,8 @@ module.exports = async function (deployer) {
 
       //  deploy the contracts
 
-      await deployer.deploy(GenerateEthSignature)
-      await deployer.deploy(ERC1400, "TANGLE", "TAN", 18)
-      await deployer.deploy(HTLC1400, ERC1400.address)
-      await deployer.deploy(ERC20, "US Dollar Tether", "USDT")
-      await deployer.deploy(HTLC20, ERC20.address)
+      await deployer.deploy(HTLC1400)
+      await deployer.deploy(HTLC20)
 
 
       
